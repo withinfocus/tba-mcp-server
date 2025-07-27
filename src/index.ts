@@ -145,6 +145,73 @@ const RankingSchema = z.object({
   })).nullish(),
 });
 
+const AllianceSchema = z.object({
+  name: z.string().nullish(),
+  backup: z.object({
+    in: z.string().nullish(),
+    out: z.string().nullish(),
+  }).nullish(),
+  declines: z.array(z.string()).nullish(),
+  picks: z.array(z.string()),
+  status: z.object({
+    current_level_record: z.object({
+      losses: z.number(),
+      ties: z.number(),
+      wins: z.number(),
+    }).nullish(),
+    level: z.string().nullish(),
+    playoff_average: z.number().nullish(),
+    record: z.object({
+      losses: z.number(),
+      ties: z.number(), 
+      wins: z.number(),
+    }).nullish(),
+    status: z.string().nullish(),
+  }).nullish(),
+});
+
+const DistrictPointsSchema = z.object({
+  points: z.record(z.string(), z.object({
+    alliance_points: z.number(),
+    award_points: z.number(),
+    elim_points: z.number(),
+    qual_points: z.number(),
+    total: z.number(),
+  })),
+  tiebreakers: z.record(z.string(), z.object({
+    highest_qual_scores: z.array(z.number()).nullish(),
+    qual_wins: z.number().nullish(),
+  })).nullish(),
+});
+
+const InsightsSchema = z.object({
+  qual: z.record(z.string(), z.any()).nullish(),
+  playoff: z.record(z.string(), z.any()).nullish(),
+});
+
+const MediaSchema = z.object({
+  type: z.string(),
+  foreign_key: z.string().nullish(),
+  details: z.record(z.string(), z.any()).nullish(),
+  preferred: z.boolean().nullish(),
+  direct_url: z.string().nullish(),
+  view_url: z.string().nullish(),
+});
+
+const RobotSchema = z.object({
+  year: z.number(),
+  robot_name: z.string(),
+  key: z.string(),
+  team_key: z.string(),
+});
+
+const DistrictSchema = z.object({
+  abbreviation: z.string(),
+  display_name: z.string(),
+  key: z.string(),
+  year: z.number(),
+});
+
 let API_KEY: string | undefined;
 
 function getApiKey(): string {
@@ -342,6 +409,148 @@ async function runServer(): Promise<void> {
             required: ['event_key'],
           },
         },
+        {
+          name: 'get_event_alliances',
+          description: 'Get elimination alliances for a specific event',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              event_key: {
+                type: 'string',
+                description: 'Event key (e.g., 2023casj)',
+              },
+            },
+            required: ['event_key'],
+          },
+        },
+        {
+          name: 'get_event_insights',
+          description: 'Get event-specific insights and statistics',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              event_key: {
+                type: 'string',
+                description: 'Event key (e.g., 2023casj)',
+              },
+            },
+            required: ['event_key'],
+          },
+        },
+        {
+          name: 'get_event_district_points',
+          description: 'Get district points for teams at an event',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              event_key: {
+                type: 'string',
+                description: 'Event key (e.g., 2023casj)',
+              },
+            },
+            required: ['event_key'],
+          },
+        },
+        {
+          name: 'get_team_years_participated',
+          description: 'Get years that a team has participated in competition',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              team_key: {
+                type: 'string',
+                description: 'Team key in format frcXXXX (e.g., frc254)',
+                pattern: '^frc\\d+$',
+              },
+            },
+            required: ['team_key'],
+          },
+        },
+        {
+          name: 'get_team_districts',
+          description: 'Get district history for a team',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              team_key: {
+                type: 'string',
+                description: 'Team key in format frcXXXX (e.g., frc254)',
+                pattern: '^frc\\d+$',
+              },
+            },
+            required: ['team_key'],
+          },
+        },
+        {
+          name: 'get_team_robots',
+          description: 'Get robot names for a team by year',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              team_key: {
+                type: 'string',
+                description: 'Team key in format frcXXXX (e.g., frc254)',
+                pattern: '^frc\\d+$',
+              },
+            },
+            required: ['team_key'],
+          },
+        },
+        {
+          name: 'get_team_media',
+          description: 'Get media for a team in a specific year',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              team_key: {
+                type: 'string',
+                description: 'Team key in format frcXXXX (e.g., frc254)',
+                pattern: '^frc\\d+$',
+              },
+              year: {
+                type: 'number',
+                description: 'Competition year',
+                minimum: 1992,
+                maximum: new Date().getFullYear() + 1,
+              },
+            },
+            required: ['team_key', 'year'],
+          },
+        },
+        {
+          name: 'get_team_event_matches',
+          description: 'Get matches for a team at a specific event',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              team_key: {
+                type: 'string',
+                description: 'Team key in format frcXXXX (e.g., frc254)',
+                pattern: '^frc\\d+$',
+              },
+              event_key: {
+                type: 'string',
+                description: 'Event key (e.g., 2023casj)',
+              },
+            },
+            required: ['team_key', 'event_key'],
+          },
+        },
+        {
+          name: 'get_teams',
+          description: 'Get list of teams with pagination',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              page_num: {
+                type: 'number',
+                description: 'Page number (0-indexed)',
+                minimum: 0,
+              },
+            },
+            required: ['page_num'],
+          },
+        },
       ] as Tool[],
     };
   });
@@ -481,6 +690,138 @@ async function runServer(): Promise<void> {
               {
                 type: 'text',
                 text: JSON.stringify(matches, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'get_event_alliances': {
+          const { event_key } = z.object({ event_key: EventKeySchema }).parse(args);
+          const data = await makeApiRequest(`/event/${event_key}/alliances`);
+          const alliances = z.array(AllianceSchema).parse(data);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(alliances, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'get_event_insights': {
+          const { event_key } = z.object({ event_key: EventKeySchema }).parse(args);
+          const data = await makeApiRequest(`/event/${event_key}/insights`);
+          const insights = InsightsSchema.parse(data);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(insights, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'get_event_district_points': {
+          const { event_key } = z.object({ event_key: EventKeySchema }).parse(args);
+          const data = await makeApiRequest(`/event/${event_key}/district_points`);
+          const districtPoints = DistrictPointsSchema.parse(data);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(districtPoints, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'get_team_years_participated': {
+          const { team_key } = z.object({ team_key: TeamKeySchema }).parse(args);
+          const data = await makeApiRequest(`/team/${team_key}/years_participated`);
+          const years = z.array(z.number()).parse(data);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(years, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'get_team_districts': {
+          const { team_key } = z.object({ team_key: TeamKeySchema }).parse(args);
+          const data = await makeApiRequest(`/team/${team_key}/districts`);
+          const districts = z.array(DistrictSchema).parse(data);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(districts, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'get_team_robots': {
+          const { team_key } = z.object({ team_key: TeamKeySchema }).parse(args);
+          const data = await makeApiRequest(`/team/${team_key}/robots`);
+          const robots = z.array(RobotSchema).parse(data);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(robots, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'get_team_media': {
+          const { team_key, year } = z.object({
+            team_key: TeamKeySchema,
+            year: YearSchema,
+          }).parse(args);
+          const data = await makeApiRequest(`/team/${team_key}/media/${year}`);
+          const media = z.array(MediaSchema).parse(data);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(media, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'get_team_event_matches': {
+          const { team_key, event_key } = z.object({
+            team_key: TeamKeySchema,
+            event_key: EventKeySchema,
+          }).parse(args);
+          const data = await makeApiRequest(`/team/${team_key}/event/${event_key}/matches`);
+          const matches = z.array(MatchSchema).parse(data);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(matches, null, 2),
+              },
+            ],
+          };
+        }
+
+        case 'get_teams': {
+          const { page_num } = z.object({ page_num: z.number().min(0) }).parse(args);
+          const data = await makeApiRequest(`/teams/${page_num}`);
+          const teams = z.array(TeamSchema).parse(data);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(teams, null, 2),
               },
             ],
           };
