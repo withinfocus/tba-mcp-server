@@ -47,7 +47,7 @@ describe('The Blue Alliance MCP Server', () => {
 
   describe('API Request handling', () => {
     it('should handle successful API responses', async () => {
-      const mockData = { key: 'frc254', team_number: 254, name: 'The Cheesy Poofs' };
+      const mockData = { key: 'frc86', team_number: 86, name: 'Team Resistance' };
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockData,
@@ -55,7 +55,7 @@ describe('The Blue Alliance MCP Server', () => {
 
       const { makeApiRequest } = await import('../src/index.js');
       
-      const result = await makeApiRequest('/team/frc254');
+      const result = await makeApiRequest('/team/frc86');
       
       expect(result).toEqual(mockData);
     });
@@ -77,10 +77,10 @@ describe('The Blue Alliance MCP Server', () => {
     it('should validate team key format', async () => {
       const { TeamKeySchema } = await import('../src/index.js');
       
-      expect(() => TeamKeySchema.parse('frc254')).not.toThrow();
+      expect(() => TeamKeySchema.parse('frc86')).not.toThrow();
       expect(() => TeamKeySchema.parse('frc1234')).not.toThrow();
-      expect(() => TeamKeySchema.parse('254')).toThrow();
-      expect(() => TeamKeySchema.parse('team254')).toThrow();
+      expect(() => TeamKeySchema.parse('86')).toThrow();
+      expect(() => TeamKeySchema.parse('team86')).toThrow();
       expect(() => TeamKeySchema.parse('frcabc')).toThrow();
     });
 
@@ -98,20 +98,20 @@ describe('The Blue Alliance MCP Server', () => {
       const { TeamSchema } = await import('../src/index.js');
       
       const validTeam = {
-        key: 'frc254',
-        team_number: 254,
-        name: 'The Cheesy Poofs',
-        city: 'San Jose',
-        state_prov: 'CA',
+        key: 'frc86',
+        team_number: 86,
+        name: 'Team Resistance',
+        city: 'Jacksonville',
+        state_prov: 'Florida',
         country: 'USA',
       };
       
       expect(() => TeamSchema.parse(validTeam)).not.toThrow();
       
       const invalidTeam = {
-        key: 'frc254',
+        key: 'frc86',
         // missing required name field
-        team_number: 254,
+        team_number: 86,
       };
       
       expect(() => TeamSchema.parse(invalidTeam)).toThrow();
@@ -121,14 +121,14 @@ describe('The Blue Alliance MCP Server', () => {
       const { EventSchema } = await import('../src/index.js');
       
       const validEvent = {
-        key: '2023casj',
-        name: 'Silicon Valley Regional',
-        event_code: 'casj',
-        event_type: 1,
-        start_date: '2023-03-02',
-        end_date: '2023-03-05',
-        year: 2023,
-        event_type_string: 'Regional',
+        key: '2025hop',
+        name: 'Hopper Division',
+        event_code: 'hop',
+        event_type: 3,
+        start_date: '2025-04-16',
+        end_date: '2025-04-19',
+        year: 2025,
+        event_type_string: 'Championship Division',
       };
       
       expect(() => EventSchema.parse(validEvent)).not.toThrow();
@@ -138,21 +138,21 @@ describe('The Blue Alliance MCP Server', () => {
       const { MatchSchema } = await import('../src/index.js');
       
       const validMatch = {
-        key: '2023casj_qm1',
+        key: '2025hop_qm112',
         comp_level: 'qm',
         set_number: 1,
-        match_number: 1,
+        match_number: 112,
         alliances: {
           red: {
-            score: 150,
-            team_keys: ['frc254', 'frc1678', 'frc2056'],
+            score: 214,
+            team_keys: ['frc86', 'frc230', 'frc2960'],
           },
           blue: {
-            score: 120,
-            team_keys: ['frc973', 'frc1323', 'frc5940'],
+            score: 165,
+            team_keys: ['frc781', 'frc3814', 'frc1153'],
           },
         },
-        event_key: '2023casj',
+        event_key: '2025hop',
       };
       
       expect(() => MatchSchema.parse(validMatch)).not.toThrow();
