@@ -1,0 +1,82 @@
+name: Build
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      _REGISTRY: withinfocus.ghcr.io
+      _PROJECT_NAME: mcp-server
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Package version
+        id: retrieve-package-version
+        run: |
+          PKG_VERSION=$(jq -r .version package.json)
+          echo "package_version=$PKG_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Install
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Archive
+        run: |
+          zip -r mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip dist
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
+          path: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
+          if-no-files-found: error
+
+      - name: Docker version
+        id: tag
+        env:
+          EVENT_TYPE: ${{ contains(github.event_name, 'pull_request') && 'pull_request' || '' }}
+        run: |
+          if [[ "$EVENT_TYPE" == "pull_request" ]]; then
+            IMAGE_TAG="pr-${{ github.event.pull_request.number }}"
+          else
+            IMAGE_TAG=$(echo "${GITHUB_REF:11}" | sed "s#/#-#g")  # slash safe branch name
+            if [[ "$IMAGE_TAG" == "main" ]]; then
+              IMAGE_TAG=dev
+            fi
+          fi
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Full name
+        id: image-name
+        env:
+          IMAGE_TAG: ${{ steps.tag.outputs.image_tag }}
+        run: echo "name=${_REGISTRY}/${_PROJECT_NAME}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Docker
+        id: build-docker
+        uses: docker/build-push-action@v6
+        with:
+          file: Dockerfile
+          platforms: linux/amd64
+          push: false
+          tags: ${{ steps.image-name.outputs.name }}
