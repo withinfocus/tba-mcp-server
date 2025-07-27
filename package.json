@@ -1,0 +1,56 @@
+{
+  "type": "module",
+  "name": "@withinfocus/tba-mcp-server",
+  "version": "0.1.0",
+  "description": "The Blue Alliance MCP Server",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/withinfocus/tba-mcp-server.git"
+  },
+  "author": "Matt Bishop <matt@withinfocus.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/withinfocus/tba-mcp-server/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.17.0",
+    "shx": "0.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.32.0",
+    "@jest/globals": "30.0.5",
+    "@modelcontextprotocol/inspector": "0.16.2",
+    "@types/jest": "30.0.0",
+    "@types/node": "22.16.5",
+    "eslint": "9.32.0",
+    "globals": "16.3.0",
+    "husky": "9.1.7",
+    "jest": "30.0.5",
+    "jest-junit": "16.0.0",
+    "lint-staged": "16.1.2",
+    "prettier": "3.6.2",
+    "ts-jest": "29.4.0",
+    "typescript": "5.8.3",
+    "typescript-eslint": "8.38.0"
+  },
+  "bin": {
+    "mcp-server-tba": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "lint-staged": {
+    "*": "prettier --cache --write --ignore-unknown",
+    "*.ts": "eslint --cache --cache-strategy content --fix"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint": "eslint . --cache --cache-strategy content && prettier --check .",
+    "lint:fix": "eslint . --cache --cache-strategy content --fix",
+    "build": "tsc && shx chmod +x dist/*.js",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
+    "test": "jest --silent",
+    "test:watch": "jest --watch",
+    "test:run": "npm run test"
+  }
+}
