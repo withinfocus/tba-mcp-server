@@ -22,7 +22,7 @@
     "@jest/globals": "30.0.5",
     "@modelcontextprotocol/inspector": "0.16.2",
     "@types/jest": "30.0.0",
-    "@types/node": "22.16.5",
+    "@types/node": "24.1.0",
     "eslint": "9.32.0",
     "globals": "16.3.0",
     "husky": "9.1.7",
