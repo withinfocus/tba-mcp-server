@@ -1,24 +1,30 @@
-FROM node:24-slim AS builder
+FROM node:22-alpine AS dependencies
 
 WORKDIR /app
 
-COPY . /app
-COPY tsconfig.json /tsconfig.json
+COPY package.json package-lock.json tsconfig.json ./
 
-RUN --mount=type=cache,target=/root/.npm npm install
-RUN --mount=type=cache,target=/root/.npm-production npm ci --ignore-scripts --omit-dev
+RUN npm ci --ignore-scripts --omit-dev
+
+FROM dependencies AS builder
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm run build
 
 FROM gcr.io/distroless/nodejs22-debian12:nonroot AS release
 
 WORKDIR /app
 USER nonroot
 
-COPY --from=builder /app/ /app/
-
-ENV NODE_ENV=production
+COPY --from=builder /app/dist ./dist
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY package.json ./
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD echo '{ "jsonrpc": "2.0", "id": "123", "method": "ping" }' | \
+    CMD export BW_SESSION="dummy" && echo '{ "jsonrpc": "2.0", "id": "123", "method": "ping" }' | \
     ./dist/index.js | grep -q '"result": {}' || exit 1
 
 CMD ["dist/index.js"]
