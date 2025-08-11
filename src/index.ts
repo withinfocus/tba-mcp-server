@@ -442,14 +442,19 @@ export const PredictionSchema = z.object({
     .record(
       z.string(),
       z.object({
-        red: z.object({
-          score: z.number(),
-        }),
-        blue: z.object({
-          score: z.number(),
-        }),
+        red: z
+          .object({
+            score: z.number(),
+          })
+          .optional(),
+        blue: z
+          .object({
+            score: z.number(),
+          })
+          .optional(),
       }),
     )
+    .or(z.any())
     .nullish(),
   ranking_predictions: z
     .record(
@@ -458,6 +463,7 @@ export const PredictionSchema = z.object({
         rank: z.number(),
       }),
     )
+    .or(z.array(z.any()))
     .nullish(),
   stat_mean_vars: z.record(z.string(), z.any()).nullish(),
 });

@@ -160,9 +160,28 @@ npm run build
 
 ### Testing
 
+#### Unit Tests (Jest)
+
 ```bash
-npm test
+npm test                 # Run unit tests
+npm run test:watch       # Run unit tests in watch mode
 ```
+
+#### Integration Tests (Playwright)
+
+```bash
+npm run test:integration         # Run all integration tests
+npm run test:integration:ui      # Run with Playwright UI
+npm run test:integration:debug   # Debug mode
+```
+
+#### All Tests
+
+```bash
+npm run test:all                 # Run both unit and integration tests
+```
+
+**Note**: Integration tests require a valid TBA API key set as `TBA_API_KEY` environment variable.
 
 ### Linting
 
@@ -177,11 +196,16 @@ npm run lint:fix
 # Install dependencies
 npm install
 
-# Run tests in watch mode
+# Run unit tests in watch mode during development
 npm run test:watch
 
-# Build and test the inspector
+# Build the project
 npm run build
+
+# Run all tests (unit + integration)
+npm run test:all
+
+# Test with the MCP inspector
 npm run inspect
 ```
 

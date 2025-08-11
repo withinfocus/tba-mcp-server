@@ -21,6 +21,7 @@
     "@eslint/js": "9.32.0",
     "@jest/globals": "30.0.5",
     "@modelcontextprotocol/inspector": "0.16.2",
+    "@playwright/test": "1.54.2",
     "@types/jest": "30.0.0",
     "@types/node": "22.16.5",
     "eslint": "9.32.0",
@@ -52,6 +53,12 @@
     "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
     "test": "jest --silent",
     "test:watch": "jest --watch",
-    "test:run": "npm run test"
+    "test:unit": "jest --silent",
+    "test:integration": "playwright test",
+    "test:integration:ui": "playwright test --ui",
+    "test:integration:debug": "playwright test --debug",
+    "test:integration:headed": "playwright test --headed",
+    "test:all": "npm run test:unit && npm run test:integration",
+    "start:test": "node dist/index.js"
   }
 }

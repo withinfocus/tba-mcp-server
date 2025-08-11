@@ -8,7 +8,7 @@ export default {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  testMatch: ['**/tests/**/*.spec.ts'],
+  testMatch: ['**/tests/*.spec.ts'],
   reporters: ['default', 'jest-junit'],
   collectCoverage: true,
   collectCoverageFrom: ['src/**/*.ts'],
