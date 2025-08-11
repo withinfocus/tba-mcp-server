@@ -63,7 +63,8 @@ export async function createAndInitializeMCPClient(): Promise<MCPClient> {
 }
 
 export const test = base.extend<{ mcpClient: MCPClient }>({
-  mcpClient: async (_testInfo, use) => {
+  // eslint-disable-next-line no-empty-pattern
+  mcpClient: async ({}, use) => {
     const client = await createAndInitializeMCPClient();
     await use(client);
     await client.stop();
