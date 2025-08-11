@@ -9,7 +9,7 @@ test.describe('Data Validation Integration Tests', () => {
 
   test.beforeEach(async () => {
     mcpClient = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: process.env.TBA_API_KEY || 'test-api-key',
+      TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
     });
     await mcpClient.start();
     await mcpClient.getServerInfo();
@@ -26,7 +26,7 @@ test.describe('Data Validation Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const teamData = JSON.parse(result.content[0].text);
+      const teamData = JSON.parse(result.content[0]?.text || '');
 
       expect(teamData).toMatchObject({
         key: expect.stringMatching(/^frc\d+$/),
@@ -44,7 +44,7 @@ test.describe('Data Validation Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const events = JSON.parse(result.content[0].text);
+      const events = JSON.parse(result.content[0]?.text || '');
       expect(events).toBeInstanceOf(Array);
 
       if (events.length > 0) {
@@ -66,7 +66,7 @@ test.describe('Data Validation Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -74,7 +74,7 @@ test.describe('Data Validation Integration Tests', () => {
         const matchesResult = await mcpClient.callTool('get_event_matches', {
           event_key: eventKey,
         });
-        const matches = JSON.parse(matchesResult.content[0].text);
+        const matches = JSON.parse(matchesResult.content[0]?.text || '');
 
         if (matches.length > 0) {
           const match = matches[0];
@@ -104,10 +104,10 @@ test.describe('Data Validation Integration Tests', () => {
     });
 
     test('should return valid status schema', async () => {
-      const result = await mcpClient.callTool('get_status');
+      const result = await mcpClient.callTool('get_status', {});
 
       expect(result.content).toBeInstanceOf(Array);
-      const status = JSON.parse(result.content[0].text);
+      const status = JSON.parse(result.content[0]?.text || '');
 
       expect(status).toMatchObject({
         current_season: expect.any(Number),
@@ -141,8 +141,8 @@ test.describe('Data Validation Integration Tests', () => {
         team_key: teamKey,
       });
 
-      const fullTeam = JSON.parse(fullTeamResult.content[0].text);
-      const simpleTeam = JSON.parse(simpleTeamResult.content[0].text);
+      const fullTeam = JSON.parse(fullTeamResult.content[0]?.text || '');
+      const simpleTeam = JSON.parse(simpleTeamResult.content[0]?.text || '');
 
       expect(fullTeam.key).toBe(simpleTeam.key);
       expect(fullTeam.team_number).toBe(simpleTeam.team_number);
@@ -161,8 +161,10 @@ test.describe('Data Validation Integration Tests', () => {
         year: 2023,
       });
 
-      const events = JSON.parse(eventsResult.content[0].text);
-      const eventsSimple = JSON.parse(eventsSimpleResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
+      const eventsSimple = JSON.parse(
+        eventsSimpleResult.content[0]?.text || '',
+      );
 
       expect(events.length).toBe(eventsSimple.length);
 
@@ -184,7 +186,7 @@ test.describe('Data Validation Integration Tests', () => {
       const teamsKeysResult = await mcpClient.callTool('get_teams_keys', {
         page_num: 0,
       });
-      const teamKeys = JSON.parse(teamsKeysResult.content[0].text);
+      const teamKeys = JSON.parse(teamsKeysResult.content[0]?.text || '');
 
       expect(teamKeys).toBeInstanceOf(Array);
       expect(teamKeys.length).toBeGreaterThan(0);
@@ -195,7 +197,7 @@ test.describe('Data Validation Integration Tests', () => {
         const teamResult = await mcpClient.callTool('get_team', {
           team_key: key,
         });
-        const team = JSON.parse(teamResult.content[0].text);
+        const team = JSON.parse(teamResult.content[0]?.text || '');
         expect(team.key).toBe(key);
       }
     });
@@ -207,7 +209,7 @@ test.describe('Data Validation Integration Tests', () => {
         page_num: 0,
       });
 
-      const teams = JSON.parse(result.content[0].text);
+      const teams = JSON.parse(result.content[0]?.text || '');
       expect(teams).toBeInstanceOf(Array);
 
       if (teams.length > 0) {
@@ -226,7 +228,7 @@ test.describe('Data Validation Integration Tests', () => {
         year: 2023,
       });
 
-      const events = JSON.parse(result.content[0].text);
+      const events = JSON.parse(result.content[0]?.text || '');
       expect(events).toBeInstanceOf(Array);
 
       if (events.length > 0) {
@@ -245,7 +247,7 @@ test.describe('Data Validation Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       const championshipEvents = events.filter(
         (e: { event_type: number; event_type_string?: string }) =>
@@ -259,7 +261,7 @@ test.describe('Data Validation Integration Tests', () => {
           event_key: eventKey,
         });
 
-        const teams = JSON.parse(teamsResult.content[0].text);
+        const teams = JSON.parse(teamsResult.content[0]?.text || '');
         expect(teams).toBeInstanceOf(Array);
 
         if (teams.length > 50) {
@@ -281,7 +283,7 @@ test.describe('Data Validation Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -290,7 +292,7 @@ test.describe('Data Validation Integration Tests', () => {
           event_key: eventKey,
         });
 
-        const matches = JSON.parse(matchesResult.content[0].text);
+        const matches = JSON.parse(matchesResult.content[0]?.text || '');
         expect(matches).toBeInstanceOf(Array);
 
         matches
@@ -330,7 +332,7 @@ test.describe('Data Validation Integration Tests', () => {
           text: expect.any(String),
         });
 
-        expect(() => JSON.parse(result.content[0].text)).not.toThrow();
+        expect(() => JSON.parse(result.content[0]?.text || '')).not.toThrow();
       }
     });
   });

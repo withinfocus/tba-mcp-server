@@ -31,7 +31,7 @@ export const test = base.extend<{ mcpClient: MCPClient }>({
   mcpClient: async (_testInfo, use) => {
     const envVars = loadEnvFile();
     const apiKey =
-      process.env.TBA_API_KEY || envVars['TBA_API_KEY'] || 'test-api-key';
+      process.env['TBA_API_KEY'] || envVars['TBA_API_KEY'] || 'test-api-key';
 
     const client = new MCPClient(SERVER_PATH, {
       TBA_API_KEY: apiKey,

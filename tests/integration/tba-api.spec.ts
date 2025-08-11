@@ -9,7 +9,7 @@ test.describe('TBA API Integration Tests', () => {
 
   test.beforeEach(async () => {
     mcpClient = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: process.env.TBA_API_KEY || 'test-api-key',
+      TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
     });
     await mcpClient.start();
     await mcpClient.getServerInfo();
@@ -26,9 +26,9 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      expect(result.content[0].type).toBe('text');
+      expect(result.content[0]?.type).toBe('text');
 
-      const teamData = JSON.parse(result.content[0].text);
+      const teamData = JSON.parse(result.content[0]?.text || '');
       expect(teamData).toMatchObject({
         key: 'frc254',
         team_number: 254,
@@ -43,9 +43,9 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      expect(result.content[0].type).toBe('text');
+      expect(result.content[0]?.type).toBe('text');
 
-      const events = JSON.parse(result.content[0].text);
+      const events = JSON.parse(result.content[0]?.text || '');
       expect(events).toBeInstanceOf(Array);
 
       if (events.length > 0) {
@@ -64,9 +64,9 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      expect(result.content[0].type).toBe('text');
+      expect(result.content[0]?.type).toBe('text');
 
-      const awards = JSON.parse(result.content[0].text);
+      const awards = JSON.parse(result.content[0]?.text || '');
       expect(awards).toBeInstanceOf(Array);
     });
 
@@ -77,9 +77,9 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      expect(result.content[0].type).toBe('text');
+      expect(result.content[0]?.type).toBe('text');
 
-      const matches = JSON.parse(result.content[0].text);
+      const matches = JSON.parse(result.content[0]?.text || '');
       expect(matches).toBeInstanceOf(Array);
     });
 
@@ -97,7 +97,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const years = JSON.parse(result.content[0].text);
+      const years = JSON.parse(result.content[0]?.text || '');
       expect(years).toBeInstanceOf(Array);
       expect(years.every((year: number) => typeof year === 'number')).toBe(
         true,
@@ -110,7 +110,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const districts = JSON.parse(result.content[0].text);
+      const districts = JSON.parse(result.content[0]?.text || '');
       expect(districts).toBeInstanceOf(Array);
     });
 
@@ -120,7 +120,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const robots = JSON.parse(result.content[0].text);
+      const robots = JSON.parse(result.content[0]?.text || '');
       expect(robots).toBeInstanceOf(Array);
     });
   });
@@ -132,7 +132,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const events = JSON.parse(result.content[0].text);
+      const events = JSON.parse(result.content[0]?.text || '');
       expect(events).toBeInstanceOf(Array);
       expect(events.length).toBeGreaterThan(0);
 
@@ -147,7 +147,7 @@ test.describe('TBA API Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -157,7 +157,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const eventData = JSON.parse(result.content[0].text);
+        const eventData = JSON.parse(result.content[0]?.text || '');
         expect(eventData).toMatchObject({
           key: eventKey,
           name: expect.any(String),
@@ -170,7 +170,7 @@ test.describe('TBA API Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -180,7 +180,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const teams = JSON.parse(result.content[0].text);
+        const teams = JSON.parse(result.content[0]?.text || '');
         expect(teams).toBeInstanceOf(Array);
       }
     });
@@ -189,7 +189,7 @@ test.describe('TBA API Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -199,7 +199,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const rankings = JSON.parse(result.content[0].text);
+        const rankings = JSON.parse(result.content[0]?.text || '');
         expect(rankings).toHaveProperty('rankings');
       }
     });
@@ -208,7 +208,7 @@ test.describe('TBA API Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -218,7 +218,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const matches = JSON.parse(result.content[0].text);
+        const matches = JSON.parse(result.content[0]?.text || '');
         expect(matches).toBeInstanceOf(Array);
       }
     });
@@ -227,7 +227,7 @@ test.describe('TBA API Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -237,7 +237,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const alliances = JSON.parse(result.content[0].text);
+        const alliances = JSON.parse(result.content[0]?.text || '');
         expect(alliances).toBeInstanceOf(Array);
       }
     });
@@ -246,7 +246,7 @@ test.describe('TBA API Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -256,7 +256,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const oprs = JSON.parse(result.content[0].text);
+        const oprs = JSON.parse(result.content[0]?.text || '');
         expect(oprs).toHaveProperty('oprs');
         expect(oprs).toHaveProperty('dprs');
         expect(oprs).toHaveProperty('ccwms');
@@ -269,7 +269,7 @@ test.describe('TBA API Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -277,7 +277,7 @@ test.describe('TBA API Integration Tests', () => {
         const matchesResult = await mcpClient.callTool('get_event_matches', {
           event_key: eventKey,
         });
-        const matches = JSON.parse(matchesResult.content[0].text);
+        const matches = JSON.parse(matchesResult.content[0]?.text || '');
 
         if (matches.length > 0) {
           const matchKey = matches[0].key;
@@ -287,7 +287,7 @@ test.describe('TBA API Integration Tests', () => {
           });
 
           expect(result.content).toBeInstanceOf(Array);
-          const matchData = JSON.parse(result.content[0].text);
+          const matchData = JSON.parse(result.content[0]?.text || '');
           expect(matchData).toMatchObject({
             key: matchKey,
             comp_level: expect.any(String),
@@ -307,7 +307,7 @@ test.describe('TBA API Integration Tests', () => {
         });
         expect(result.content).toBeInstanceOf(Array);
 
-        const zebraData = JSON.parse(result.content[0].text);
+        const zebraData = JSON.parse(result.content[0]?.text || '');
         expect(zebraData).toHaveProperty('key');
         expect(zebraData).toHaveProperty('times');
         expect(zebraData).toHaveProperty('alliances');
@@ -320,10 +320,10 @@ test.describe('TBA API Integration Tests', () => {
 
   test.describe('General API Operations', () => {
     test('should get TBA status', async () => {
-      const result = await mcpClient.callTool('get_status');
+      const result = await mcpClient.callTool('get_status', {});
 
       expect(result.content).toBeInstanceOf(Array);
-      const status = JSON.parse(result.content[0].text);
+      const status = JSON.parse(result.content[0]?.text || '');
 
       expect(status).toMatchObject({
         current_season: expect.any(Number),
@@ -347,7 +347,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const teams = JSON.parse(result.content[0].text);
+      const teams = JSON.parse(result.content[0]?.text || '');
       expect(teams).toBeInstanceOf(Array);
       expect(teams.length).toBeGreaterThan(0);
 
@@ -365,7 +365,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const teams = JSON.parse(result.content[0].text);
+      const teams = JSON.parse(result.content[0]?.text || '');
       expect(teams).toBeInstanceOf(Array);
     });
 
@@ -375,7 +375,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const districts = JSON.parse(result.content[0].text);
+      const districts = JSON.parse(result.content[0]?.text || '');
       expect(districts).toBeInstanceOf(Array);
 
       if (districts.length > 0) {
@@ -396,7 +396,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const teamData = JSON.parse(result.content[0].text);
+      const teamData = JSON.parse(result.content[0]?.text || '');
       expect(teamData).toMatchObject({
         key: 'frc254',
         team_number: 254,
@@ -410,7 +410,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const events = JSON.parse(result.content[0].text);
+      const events = JSON.parse(result.content[0]?.text || '');
       expect(events).toBeInstanceOf(Array);
       expect(events.length).toBeGreaterThan(0);
     });
@@ -421,7 +421,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const teams = JSON.parse(result.content[0].text);
+      const teams = JSON.parse(result.content[0]?.text || '');
       expect(teams).toBeInstanceOf(Array);
       expect(teams.length).toBeGreaterThan(0);
     });
@@ -434,7 +434,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const keys = JSON.parse(result.content[0].text);
+      const keys = JSON.parse(result.content[0]?.text || '');
       expect(keys).toBeInstanceOf(Array);
       expect(keys.length).toBeGreaterThan(0);
       expect(keys.every((key: string) => key.startsWith('frc'))).toBeTruthy();
@@ -446,7 +446,7 @@ test.describe('TBA API Integration Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const keys = JSON.parse(result.content[0].text);
+      const keys = JSON.parse(result.content[0]?.text || '');
       expect(keys).toBeInstanceOf(Array);
       expect(keys.length).toBeGreaterThan(0);
       expect(keys.every((key: string) => key.startsWith('2023'))).toBeTruthy();
@@ -486,7 +486,7 @@ test.describe('TBA API Integration Tests', () => {
         year: 2023,
       });
 
-      const events = JSON.parse(teamResult.content[0].text);
+      const events = JSON.parse(teamResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -497,7 +497,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(statusResult.content).toBeInstanceOf(Array);
-        const status = JSON.parse(statusResult.content[0].text);
+        const status = JSON.parse(statusResult.content[0]?.text || '');
         expect(status).toHaveProperty('alliance_status_str');
         expect(status).toHaveProperty('playoff_status_str');
         expect(status).toHaveProperty('overall_status_str');
@@ -510,7 +510,7 @@ test.describe('TBA API Integration Tests', () => {
         year: 2023,
       });
 
-      const events = JSON.parse(teamResult.content[0].text);
+      const events = JSON.parse(teamResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -524,7 +524,7 @@ test.describe('TBA API Integration Tests', () => {
         );
 
         expect(matchesResult.content).toBeInstanceOf(Array);
-        const matches = JSON.parse(matchesResult.content[0].text);
+        const matches = JSON.parse(matchesResult.content[0]?.text || '');
         expect(matches).toBeInstanceOf(Array);
       }
     });
@@ -533,7 +533,7 @@ test.describe('TBA API Integration Tests', () => {
       const eventsResult = await mcpClient.callTool('get_events', {
         year: 2023,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -548,7 +548,9 @@ test.describe('TBA API Integration Tests', () => {
         expect(predictionsResult.content).toBeInstanceOf(Array);
 
         try {
-          const predictions = JSON.parse(predictionsResult.content[0].text);
+          const predictions = JSON.parse(
+            predictionsResult.content[0]?.text || '',
+          );
           expect(predictions).toHaveProperty('match_predictions');
           expect(predictions).toHaveProperty('ranking_predictions');
         } catch {
@@ -563,7 +565,7 @@ test.describe('TBA API Integration Tests', () => {
       const districtsResult = await mcpClient.callTool('get_districts', {
         year: 2023,
       });
-      const districts = JSON.parse(districtsResult.content[0].text);
+      const districts = JSON.parse(districtsResult.content[0]?.text || '');
 
       if (districts.length > 0) {
         const districtKey = districts[0].key;
@@ -573,7 +575,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const rankings = JSON.parse(result.content[0].text);
+        const rankings = JSON.parse(result.content[0]?.text || '');
         expect(rankings).toBeInstanceOf(Array);
 
         if (rankings.length > 0) {
@@ -590,7 +592,7 @@ test.describe('TBA API Integration Tests', () => {
       const districtsResult = await mcpClient.callTool('get_districts', {
         year: 2023,
       });
-      const districts = JSON.parse(districtsResult.content[0].text);
+      const districts = JSON.parse(districtsResult.content[0]?.text || '');
 
       if (districts.length > 0) {
         const districtKey = districts[0].key;
@@ -600,7 +602,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const events = JSON.parse(result.content[0].text);
+        const events = JSON.parse(result.content[0]?.text || '');
         expect(events).toBeInstanceOf(Array);
       }
     });
@@ -609,7 +611,7 @@ test.describe('TBA API Integration Tests', () => {
       const districtsResult = await mcpClient.callTool('get_districts', {
         year: 2023,
       });
-      const districts = JSON.parse(districtsResult.content[0].text);
+      const districts = JSON.parse(districtsResult.content[0]?.text || '');
 
       if (districts.length > 0) {
         const districtKey = districts[0].key;
@@ -619,7 +621,7 @@ test.describe('TBA API Integration Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const teams = JSON.parse(result.content[0].text);
+        const teams = JSON.parse(result.content[0]?.text || '');
         expect(teams).toBeInstanceOf(Array);
       }
     });

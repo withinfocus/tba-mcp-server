@@ -9,7 +9,7 @@ test.describe('MCP Server Performance Tests', () => {
 
   test.beforeEach(async () => {
     mcpClient = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: process.env.TBA_API_KEY || 'test-api-key',
+      TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
     });
     await mcpClient.start();
     await mcpClient.getServerInfo();
@@ -22,7 +22,7 @@ test.describe('MCP Server Performance Tests', () => {
   test('should respond to tool calls within acceptable time limits', async () => {
     const startTime = Date.now();
 
-    await mcpClient.callTool('get_status');
+    await mcpClient.callTool('get_status', {});
 
     const duration = Date.now() - startTime;
     expect(duration).toBeLessThan(5000);
@@ -32,7 +32,7 @@ test.describe('MCP Server Performance Tests', () => {
     const startTime = Date.now();
 
     const promises = [
-      mcpClient.callTool('get_status'),
+      mcpClient.callTool('get_status', {}),
       mcpClient.callTool('get_teams', { page_num: 0 }),
       mcpClient.callTool('get_events', { year: 2023 }),
       mcpClient.callTool('get_team_simple', { team_key: 'frc254' }),
@@ -47,7 +47,7 @@ test.describe('MCP Server Performance Tests', () => {
 
     results.forEach((result) => {
       expect(result.content).toBeInstanceOf(Array);
-      expect(result.content[0].type).toBe('text');
+      expect(result.content[0]?.type).toBe('text');
     });
   });
 
@@ -78,9 +78,9 @@ test.describe('MCP Server Performance Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      expect(result.content[0].type).toBe('text');
+      expect(result.content[0]?.type).toBe('text');
 
-      const teamData = JSON.parse(result.content[0].text);
+      const teamData = JSON.parse(result.content[0]?.text || '');
       expect(teamData.key).toBe(teamKey);
     }
   });

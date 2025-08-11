@@ -9,7 +9,7 @@ test.describe('MCP Server Error Handling Tests', () => {
 
   test.beforeEach(async () => {
     mcpClient = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: process.env.TBA_API_KEY || 'test-api-key',
+      TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
     });
     await mcpClient.start();
     await mcpClient.getServerInfo();
@@ -129,7 +129,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const teamData = JSON.parse(result.content[0].text);
+      const teamData = JSON.parse(result.content[0]?.text || '');
       expect(teamData.key).toBe('frc254');
     });
 
@@ -157,7 +157,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const teams = JSON.parse(result.content[0].text);
+      const teams = JSON.parse(result.content[0]?.text || '');
       expect(teams).toBeInstanceOf(Array);
     });
 

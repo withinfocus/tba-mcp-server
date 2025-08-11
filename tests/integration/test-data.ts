@@ -70,10 +70,10 @@ export function isValidMatchKey(key: string): boolean {
 
 export function extractTeamNumber(teamKey: string): number {
   const match = teamKey.match(/^frc(\d+)$/);
-  return match ? parseInt(match[1], 10) : -1;
+  return match ? parseInt(match[1] || '0', 10) : -1;
 }
 
 export function extractYear(eventKey: string): number {
   const match = eventKey.match(/^(\d{4})/);
-  return match ? parseInt(match[1], 10) : -1;
+  return match ? parseInt(match[1] || '0', 10) : -1;
 }

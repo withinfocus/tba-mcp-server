@@ -10,7 +10,7 @@ test.describe('MCP Server Reliability Tests', () => {
 
   test.beforeEach(async () => {
     mcpClient = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: process.env.TBA_API_KEY || 'test-api-key',
+      TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
     });
     await mcpClient.start();
     await mcpClient.getServerInfo();
@@ -22,18 +22,18 @@ test.describe('MCP Server Reliability Tests', () => {
 
   test.describe('Server Stability', () => {
     test('should handle server restart gracefully', async () => {
-      const result1 = await mcpClient.callTool('get_status');
+      const result1 = await mcpClient.callTool('get_status', {});
       expect(result1.content).toBeInstanceOf(Array);
 
       await mcpClient.stop();
 
       mcpClient = new MCPClient(SERVER_PATH, {
-        TBA_API_KEY: process.env.TBA_API_KEY || 'test-api-key',
+        TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
       });
       await mcpClient.start();
       await mcpClient.getServerInfo();
 
-      const result2 = await mcpClient.callTool('get_status');
+      const result2 = await mcpClient.callTool('get_status', {});
       expect(result2.content).toBeInstanceOf(Array);
     });
 
@@ -42,14 +42,14 @@ test.describe('MCP Server Reliability Tests', () => {
       const results = [];
 
       for (let i = 0; i < requests; i++) {
-        const result = await mcpClient.callTool('get_status');
+        const result = await mcpClient.callTool('get_status', {});
         results.push(result);
       }
 
       expect(results).toHaveLength(requests);
       results.forEach((result) => {
         expect(result.content).toBeInstanceOf(Array);
-        expect(result.content[0].type).toBe('text');
+        expect(result.content[0]?.type).toBe('text');
       });
     });
 
@@ -66,7 +66,7 @@ test.describe('MCP Server Reliability Tests', () => {
 
       results.forEach((result, index) => {
         expect(result.content).toBeInstanceOf(Array);
-        const teamData = JSON.parse(result.content[0].text);
+        const teamData = JSON.parse(result.content[0]?.text || '');
         expect(teamData.key).toBe(teamKeys[index]);
       });
     });
@@ -102,7 +102,7 @@ test.describe('MCP Server Reliability Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      expect(result.content[0].type).toBe('text');
+      expect(result.content[0]?.type).toBe('text');
     });
   });
 
@@ -117,8 +117,8 @@ test.describe('MCP Server Reliability Tests', () => {
         team_key: teamKey,
       });
 
-      const team1 = JSON.parse(result1.content[0].text);
-      const team2 = JSON.parse(result2.content[0].text);
+      const team1 = JSON.parse(result1.content[0]?.text || '');
+      const team2 = JSON.parse(result2.content[0]?.text || '');
 
       expect(team1).toEqual(team2);
     });
@@ -131,7 +131,7 @@ test.describe('MCP Server Reliability Tests', () => {
         team_key: teamKey,
         year: year,
       });
-      const events = JSON.parse(eventsResult.content[0].text);
+      const events = JSON.parse(eventsResult.content[0]?.text || '');
 
       if (events.length > 0) {
         const eventKey = events[0].key;
@@ -139,7 +139,7 @@ test.describe('MCP Server Reliability Tests', () => {
         const teamsResult = await mcpClient.callTool('get_event_teams', {
           event_key: eventKey,
         });
-        const eventTeams = JSON.parse(teamsResult.content[0].text);
+        const eventTeams = JSON.parse(teamsResult.content[0]?.text || '');
 
         const teamInEvent = eventTeams.find(
           (t: { key: string }) => t.key === teamKey,
@@ -163,7 +163,7 @@ test.describe('MCP Server Reliability Tests', () => {
         });
 
         expect(result.content).toBeInstanceOf(Array);
-        const teamData = JSON.parse(result.content[0].text);
+        const teamData = JSON.parse(result.content[0]?.text || '');
         expect(teamData.key).toBe(teamKey);
 
         if (i % 10 === 0) {
@@ -186,7 +186,7 @@ test.describe('MCP Server Reliability Tests', () => {
       });
 
       expect(result.content).toBeInstanceOf(Array);
-      const teamData = JSON.parse(result.content[0].text);
+      const teamData = JSON.parse(result.content[0]?.text || '');
       expect(teamData.key).toBe(TEST_TEAMS.CHEESY_POOFS);
     });
   });

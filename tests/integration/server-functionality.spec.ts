@@ -9,7 +9,7 @@ test.describe('MCP Server Functionality Tests', () => {
 
   test.beforeEach(async () => {
     mcpClient = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: process.env.TBA_API_KEY || 'test-api-key',
+      TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
     });
     await mcpClient.start();
   });
@@ -61,7 +61,7 @@ test.describe('MCP Server Functionality Tests', () => {
       expect(typeof tool.name).toBe('string');
       expect(typeof tool.description).toBe('string');
       expect(tool.inputSchema).toHaveProperty('type');
-      expect(tool.inputSchema.type).toBe('object');
+      expect(tool.inputSchema['type']).toBe('object');
       expect(tool.inputSchema).toHaveProperty('properties');
     }
   });

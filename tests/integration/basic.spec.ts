@@ -9,7 +9,7 @@ test.describe('Basic MCP Server Tests', () => {
 
   test.beforeEach(async () => {
     mcpClient = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: process.env.TBA_API_KEY || 'test-api-key',
+      TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
     });
     await mcpClient.start();
   });
@@ -32,9 +32,9 @@ test.describe('Basic MCP Server Tests', () => {
   test('should get TBA status', async () => {
     const result = await mcpClient.callTool('get_status', {});
     expect(result.content).toBeInstanceOf(Array);
-    expect(result.content[0].type).toBe('text');
+    expect(result.content[0]?.type).toBe('text');
 
-    const status = JSON.parse(result.content[0].text);
+    const status = JSON.parse(result.content[0]?.text || '');
     expect(status).toHaveProperty('current_season');
     expect(status).toHaveProperty('max_season');
   });
@@ -45,17 +45,17 @@ test.describe('Basic MCP Server Tests', () => {
     });
 
     expect(result.content).toBeInstanceOf(Array);
-    expect(result.content[0].type).toBe('text');
+    expect(result.content[0]?.type).toBe('text');
 
     try {
-      const teamData = JSON.parse(result.content[0].text);
+      const teamData = JSON.parse(result.content[0]?.text || '');
       expect(teamData.key).toBe('frc254');
       expect(teamData.team_number).toBe(254);
       expect(teamData.name).toBeDefined();
     } catch (error) {
-      console.log('Response was not JSON:', result.content[0].text);
-      if (result.content[0].text.includes('TBA API request failed')) {
-        test.skip('API key may be invalid or API is unavailable');
+      console.log('Response was not JSON:', result.content[0]?.text);
+      if (result.content[0]?.text?.includes('TBA API request failed')) {
+        test.skip(true, 'API key may be invalid or API is unavailable');
       }
       throw error;
     }

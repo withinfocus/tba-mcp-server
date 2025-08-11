@@ -51,7 +51,7 @@ test.describe('MCP Protocol Compliance Tests', () => {
       expect(tool.description.length).toBeGreaterThan(0);
 
       expect(tool.inputSchema).toHaveProperty('type');
-      expect(tool.inputSchema.type).toBe('object');
+      expect(tool.inputSchema['type']).toBe('object');
       expect(tool.inputSchema).toHaveProperty('properties');
     }
   });
@@ -70,9 +70,16 @@ test.describe('MCP Protocol Compliance Tests', () => {
     expect(teamTools.length).toBeGreaterThan(10);
 
     teamTools.forEach(
-      (tool: { inputSchema: { properties: Record<string, unknown> } }) => {
-        if (tool.inputSchema.properties.team_key) {
-          const teamKeyProp = tool.inputSchema.properties.team_key as {
+      (tool: {
+        name: string;
+        description: string;
+        inputSchema: Record<string, unknown>;
+      }) => {
+        const schema = tool.inputSchema as {
+          properties: Record<string, unknown>;
+        };
+        if (schema.properties && schema.properties['team_key']) {
+          const teamKeyProp = schema.properties['team_key'] as {
             type: string;
             pattern?: string;
             description?: string;
@@ -105,6 +112,6 @@ test.describe('MCP Protocol Compliance Tests', () => {
     expect(result.content.length).toBeGreaterThan(0);
     expect(result.content[0]).toHaveProperty('type');
     expect(result.content[0]).toHaveProperty('text');
-    expect(result.content[0].type).toBe('text');
+    expect(result.content[0]?.type).toBe('text');
   });
 });
