@@ -1,17 +1,12 @@
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test, createMCPClient } from './setup.js';
 import { MCPClient } from './mcp-client.js';
-import path from 'path';
-
-const SERVER_PATH = path.join(process.cwd(), 'dist/index.js');
 
 test.describe('MCP Server Functionality Tests', () => {
   let mcpClient: MCPClient;
 
   test.beforeEach(async () => {
-    mcpClient = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
-    });
-    await mcpClient.start();
+    mcpClient = await createMCPClient();
   });
 
   test.afterEach(async () => {

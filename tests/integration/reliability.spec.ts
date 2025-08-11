@@ -1,19 +1,13 @@
-import { test, expect } from '@playwright/test';
-import { MCPClient } from './mcp-client.js';
+import { expect } from '@playwright/test';
+import { test, createAndInitializeMCPClient } from './setup.js';
 import { TEST_TEAMS, TEST_YEARS } from './test-data.js';
-import path from 'path';
-
-const SERVER_PATH = path.join(process.cwd(), 'dist/index.js');
+import { MCPClient } from './mcp-client.js';
 
 test.describe('MCP Server Reliability Tests', () => {
   let mcpClient: MCPClient;
 
   test.beforeEach(async () => {
-    mcpClient = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
-    });
-    await mcpClient.start();
-    await mcpClient.getServerInfo();
+    mcpClient = await createAndInitializeMCPClient();
   });
 
   test.afterEach(async () => {
@@ -27,11 +21,7 @@ test.describe('MCP Server Reliability Tests', () => {
 
       await mcpClient.stop();
 
-      mcpClient = new MCPClient(SERVER_PATH, {
-        TBA_API_KEY: process.env['TBA_API_KEY'] || 'test-api-key',
-      });
-      await mcpClient.start();
-      await mcpClient.getServerInfo();
+      mcpClient = await createAndInitializeMCPClient();
 
       const result2 = await mcpClient.callTool('get_status', {});
       expect(result2.content).toBeInstanceOf(Array);

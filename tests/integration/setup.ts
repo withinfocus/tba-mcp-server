@@ -27,21 +27,45 @@ function loadEnvFile(): Record<string, string> {
   return env;
 }
 
+/**
+ * Get the API key from environment variables with fallback
+ */
+export function getApiKey(): string {
+  const envVars = loadEnvFile();
+  return process.env['TBA_API_KEY'] || envVars['TBA_API_KEY'] || 'test-api-key';
+}
+
+/**
+ * Get the server path
+ */
+export function getServerPath(): string {
+  return SERVER_PATH;
+}
+
+/**
+ * Create and start a new MCP client instance
+ */
+export async function createMCPClient(): Promise<MCPClient> {
+  const client = new MCPClient(SERVER_PATH, {
+    TBA_API_KEY: getApiKey(),
+  });
+  await client.start();
+  return client;
+}
+
+/**
+ * Create, start MCP client and get server info
+ */
+export async function createAndInitializeMCPClient(): Promise<MCPClient> {
+  const client = await createMCPClient();
+  await client.getServerInfo();
+  return client;
+}
+
 export const test = base.extend<{ mcpClient: MCPClient }>({
   mcpClient: async (_testInfo, use) => {
-    const envVars = loadEnvFile();
-    const apiKey =
-      process.env['TBA_API_KEY'] || envVars['TBA_API_KEY'] || 'test-api-key';
-
-    const client = new MCPClient(SERVER_PATH, {
-      TBA_API_KEY: apiKey,
-    });
-
-    await client.start();
-    await client.getServerInfo();
-
+    const client = await createAndInitializeMCPClient();
     await use(client);
-
     await client.stop();
   },
 });
