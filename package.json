@@ -60,5 +60,9 @@
     "test:integration:headed": "playwright test --headed",
     "test:all": "npm run test:unit && npm run test:integration",
     "start:test": "node dist/index.js"
+  },
+  "engines": {
+    "node": "~22",
+    "npm": "~10"
   }
 }
