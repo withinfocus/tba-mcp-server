@@ -463,10 +463,10 @@ export const PredictionSchema = z.object({
 });
 
 export const TeamHistorySchema = z.object({
-  awards: z.array(AwardSchema),
-  events: z.array(EventSchema),
-  matches: z.array(MatchSchema),
-  robots: z.array(RobotSchema),
+  awards: z.array(AwardSchema).nullish(),
+  events: z.array(EventSchema).nullish(),
+  matches: z.array(MatchSchema).nullish(),
+  robots: z.array(RobotSchema).nullish(),
 });
 
 let API_KEY: string | undefined;
