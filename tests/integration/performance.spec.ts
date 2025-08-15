@@ -29,7 +29,7 @@ test.describe('MCP Server Performance Tests', () => {
       mcpClient.callTool('get_status', {}),
       mcpClient.callTool('get_teams', { page_num: 0 }),
       mcpClient.callTool('get_events', { year: 2023 }),
-      mcpClient.callTool('get_team_simple', { team_key: 'frc254' }),
+      mcpClient.callTool('get_team_simple', { team_key: 'frc86' }),
       mcpClient.callTool('get_team_simple', { team_key: 'frc148' }),
     ];
 
@@ -46,7 +46,7 @@ test.describe('MCP Server Performance Tests', () => {
   });
 
   test('should handle rapid sequential requests', async () => {
-    const teams = ['frc254', 'frc148', 'frc1678', 'frc973', 'frc2468'];
+    const teams = ['frc86', 'frc148', 'frc1678', 'frc973', 'frc2468'];
     const startTime = Date.now();
 
     for (const team of teams) {
@@ -62,7 +62,7 @@ test.describe('MCP Server Performance Tests', () => {
 
   test('should maintain stable memory usage during extended operation', async () => {
     const operations = 20;
-    const teams = ['frc254', 'frc148', 'frc1678', 'frc973', 'frc2468'];
+    const teams = ['frc86', 'frc148', 'frc1678', 'frc973', 'frc2468'];
 
     for (let i = 0; i < operations; i++) {
       const teamKey = teams[i % teams.length];

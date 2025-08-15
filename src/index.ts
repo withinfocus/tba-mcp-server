@@ -532,7 +532,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
             },
@@ -548,7 +548,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               year: {
@@ -569,7 +569,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               year: {
@@ -590,7 +590,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               year: {
@@ -725,7 +725,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
             },
@@ -740,7 +740,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
             },
@@ -755,7 +755,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
             },
@@ -770,7 +770,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               year: {
@@ -791,7 +791,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               event_key: {
@@ -875,7 +875,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
             },
@@ -891,7 +891,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
             },
@@ -907,7 +907,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               event_key: {
@@ -1049,7 +1049,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
             },
@@ -1124,7 +1124,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               year: {
@@ -1145,7 +1145,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               year: {
@@ -1166,7 +1166,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               event_key: {
@@ -1185,7 +1185,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               year: {
@@ -1206,7 +1206,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               year: {
@@ -1227,7 +1227,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
             },
@@ -1242,7 +1242,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               media_tag: {
@@ -1261,7 +1261,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               media_tag: {
@@ -1370,7 +1370,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
             },
@@ -1385,7 +1385,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               year: {
@@ -1406,7 +1406,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               event_key: {
@@ -1425,7 +1425,7 @@ async function runServer(): Promise<void> {
             properties: {
               team_key: {
                 type: 'string',
-                description: 'Team key in format frcXXXX (e.g., frc254)',
+                description: 'Team key in format frcXXXX (e.g., frc86)',
                 pattern: '^frc\\d+$',
               },
               event_key: {

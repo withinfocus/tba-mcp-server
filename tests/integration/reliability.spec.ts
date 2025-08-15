@@ -70,7 +70,7 @@ test.describe('MCP Server Reliability Tests', () => {
       for (let i = 0; i < requests; i++) {
         promises.push(
           mcpClient.callTool('get_team_simple', {
-            team_key: `frc${254 + i}`,
+            team_key: `frc${86 + i}`,
           }),
         );
       }
@@ -98,7 +98,7 @@ test.describe('MCP Server Reliability Tests', () => {
 
   test.describe('Data Integrity', () => {
     test('should return identical data on repeated requests', async () => {
-      const teamKey = TEST_TEAMS.CHEESY_POOFS;
+      const teamKey = TEST_TEAMS.TEAM_RESISTANCE;
 
       const result1 = await mcpClient.callTool('get_team', {
         team_key: teamKey,
@@ -114,7 +114,7 @@ test.describe('MCP Server Reliability Tests', () => {
     });
 
     test('should maintain referential integrity across related endpoints', async () => {
-      const teamKey = TEST_TEAMS.CHEESY_POOFS;
+      const teamKey = TEST_TEAMS.TEAM_RESISTANCE;
       const year = TEST_YEARS.RECENT;
 
       const eventsResult = await mcpClient.callTool('get_team_events', {
@@ -172,12 +172,12 @@ test.describe('MCP Server Reliability Tests', () => {
       }
 
       const result = await mcpClient.callTool('get_team_simple', {
-        team_key: TEST_TEAMS.CHEESY_POOFS,
+        team_key: TEST_TEAMS.TEAM_RESISTANCE,
       });
 
       expect(result.content).toBeInstanceOf(Array);
       const teamData = JSON.parse(result.content[0]?.text || '');
-      expect(teamData.key).toBe(TEST_TEAMS.CHEESY_POOFS);
+      expect(teamData.key).toBe(TEST_TEAMS.TEAM_RESISTANCE);
     });
   });
 });

@@ -37,7 +37,7 @@ test.describe('Basic MCP Server Tests', () => {
 
   test('should get team information', async () => {
     const result = await mcpClient.callTool('get_team', {
-      team_key: 'frc254',
+      team_key: 'frc86',
     });
 
     expect(result.content).toBeInstanceOf(Array);
@@ -45,8 +45,8 @@ test.describe('Basic MCP Server Tests', () => {
 
     try {
       const teamData = JSON.parse(result.content[0]?.text || '');
-      expect(teamData.key).toBe('frc254');
-      expect(teamData.team_number).toBe(254);
+      expect(teamData.key).toBe('frc86');
+      expect(teamData.team_number).toBe(86);
       expect(teamData.name).toBeDefined();
     } catch (error) {
       console.log('Response was not JSON:', result.content[0]?.text);

@@ -17,12 +17,12 @@ test.describe('MCP Server Error Handling Tests', () => {
   test.describe('Invalid Input Validation', () => {
     test('should reject invalid team key formats', async () => {
       const invalidTeamKeys = [
-        '254',
-        'team254',
+        '86',
+        'team86',
         'frcabc',
-        'FRC254',
+        'FRC86',
         'frc',
-        'frc-254',
+        'frc-86',
         '',
       ];
 
@@ -68,7 +68,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       await expect(mcpClient.callTool('get_events', {})).rejects.toThrow();
       await expect(
         mcpClient.callTool('get_team_events', {
-          team_key: 'frc254',
+          team_key: 'frc86',
         }),
       ).rejects.toThrow();
     });
@@ -110,7 +110,7 @@ test.describe('MCP Server Error Handling Tests', () => {
     test('should handle tool name typos', async () => {
       await expect(
         mcpClient.callTool('get_tema', {
-          team_key: 'frc254',
+          team_key: 'frc86',
         }),
       ).rejects.toThrow(/Unknown tool/);
     });
@@ -119,13 +119,13 @@ test.describe('MCP Server Error Handling Tests', () => {
   test.describe('Malformed Requests', () => {
     test('should handle requests with extra parameters', async () => {
       const result = await mcpClient.callTool('get_team', {
-        team_key: 'frc254',
+        team_key: 'frc86',
         extra_param: 'should_be_ignored',
       });
 
       expect(result.content).toBeInstanceOf(Array);
       const teamData = JSON.parse(result.content[0]?.text || '');
-      expect(teamData.key).toBe('frc254');
+      expect(teamData.key).toBe('frc86');
     });
 
     test('should handle null parameters', async () => {

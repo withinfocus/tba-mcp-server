@@ -16,7 +16,7 @@ test.describe('TBA API Integration Tests', () => {
   test.describe('Team Operations', () => {
     test('should get team information', async () => {
       const result = await mcpClient.callTool('get_team', {
-        team_key: 'frc254',
+        team_key: 'frc86',
       });
 
       expect(result.content).toBeInstanceOf(Array);
@@ -24,15 +24,15 @@ test.describe('TBA API Integration Tests', () => {
 
       const teamData = JSON.parse(result.content[0]?.text || '');
       expect(teamData).toMatchObject({
-        key: 'frc254',
-        team_number: 254,
+        key: 'frc86',
+        team_number: 86,
         name: expect.any(String),
       });
     });
 
     test('should get team events for a year', async () => {
       const result = await mcpClient.callTool('get_team_events', {
-        team_key: 'frc254',
+        team_key: 'frc86',
         year: 2023,
       });
 
@@ -53,7 +53,7 @@ test.describe('TBA API Integration Tests', () => {
 
     test('should get team awards for a year', async () => {
       const result = await mcpClient.callTool('get_team_awards', {
-        team_key: 'frc254',
+        team_key: 'frc86',
         year: 2023,
       });
 
@@ -66,7 +66,7 @@ test.describe('TBA API Integration Tests', () => {
 
     test('should get team matches for a year', async () => {
       const result = await mcpClient.callTool('get_team_matches', {
-        team_key: 'frc254',
+        team_key: 'frc86',
         year: 2023,
       });
 
@@ -87,7 +87,7 @@ test.describe('TBA API Integration Tests', () => {
 
     test('should get team years participated', async () => {
       const result = await mcpClient.callTool('get_team_years_participated', {
-        team_key: 'frc254',
+        team_key: 'frc86',
       });
 
       expect(result.content).toBeInstanceOf(Array);
@@ -100,7 +100,7 @@ test.describe('TBA API Integration Tests', () => {
 
     test('should get team districts', async () => {
       const result = await mcpClient.callTool('get_team_districts', {
-        team_key: 'frc254',
+        team_key: 'frc86',
       });
 
       expect(result.content).toBeInstanceOf(Array);
@@ -110,7 +110,7 @@ test.describe('TBA API Integration Tests', () => {
 
     test('should get team robots', async () => {
       const result = await mcpClient.callTool('get_team_robots', {
-        team_key: 'frc254',
+        team_key: 'frc86',
       });
 
       expect(result.content).toBeInstanceOf(Array);
@@ -386,14 +386,14 @@ test.describe('TBA API Integration Tests', () => {
   test.describe('Simple API Operations', () => {
     test('should get team simple information', async () => {
       const result = await mcpClient.callTool('get_team_simple', {
-        team_key: 'frc254',
+        team_key: 'frc86',
       });
 
       expect(result.content).toBeInstanceOf(Array);
       const teamData = JSON.parse(result.content[0]?.text || '');
       expect(teamData).toMatchObject({
-        key: 'frc254',
-        team_number: 254,
+        key: 'frc86',
+        team_number: 86,
         name: expect.any(String),
       });
     });
@@ -451,7 +451,7 @@ test.describe('TBA API Integration Tests', () => {
     test('should handle invalid team key format', async () => {
       await expect(
         mcpClient.callTool('get_team', {
-          team_key: '254',
+          team_key: '86',
         }),
       ).rejects.toThrow();
     });
@@ -476,7 +476,7 @@ test.describe('TBA API Integration Tests', () => {
   test.describe('Complex Workflow Tests', () => {
     test('should retrieve team event status workflow', async () => {
       const teamResult = await mcpClient.callTool('get_team_events', {
-        team_key: 'frc254',
+        team_key: 'frc86',
         year: 2023,
       });
 
@@ -486,7 +486,7 @@ test.describe('TBA API Integration Tests', () => {
         const eventKey = events[0].key;
 
         const statusResult = await mcpClient.callTool('get_team_event_status', {
-          team_key: 'frc254',
+          team_key: 'frc86',
           event_key: eventKey,
         });
 
@@ -500,7 +500,7 @@ test.describe('TBA API Integration Tests', () => {
 
     test('should retrieve team event matches workflow', async () => {
       const teamResult = await mcpClient.callTool('get_team_events', {
-        team_key: 'frc254',
+        team_key: 'frc86',
         year: 2023,
       });
 
@@ -512,7 +512,7 @@ test.describe('TBA API Integration Tests', () => {
         const matchesResult = await mcpClient.callTool(
           'get_team_event_matches',
           {
-            team_key: 'frc254',
+            team_key: 'frc86',
             event_key: eventKey,
           },
         );

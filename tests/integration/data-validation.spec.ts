@@ -17,7 +17,7 @@ test.describe('Data Validation Integration Tests', () => {
   test.describe('Schema Validation', () => {
     test('should return valid team schema', async () => {
       const result = await mcpClient.callTool('get_team', {
-        team_key: 'frc254',
+        team_key: 'frc86',
       });
 
       expect(result.content).toBeInstanceOf(Array);
@@ -29,8 +29,8 @@ test.describe('Data Validation Integration Tests', () => {
         name: expect.any(String),
       });
 
-      expect(teamData.key).toBe('frc254');
-      expect(teamData.team_number).toBe(254);
+      expect(teamData.key).toBe('frc86');
+      expect(teamData.team_number).toBe(86);
     });
 
     test('should return valid event schema', async () => {
@@ -127,7 +127,7 @@ test.describe('Data Validation Integration Tests', () => {
 
   test.describe('Data Consistency', () => {
     test('should return consistent team data across different endpoints', async () => {
-      const teamKey = 'frc254';
+      const teamKey = 'frc86';
 
       const fullTeamResult = await mcpClient.callTool('get_team', {
         team_key: teamKey,
@@ -311,7 +311,7 @@ test.describe('Data Validation Integration Tests', () => {
     test('should always return properly formatted MCP responses', async () => {
       const tools = [
         { name: 'get_status', args: {} },
-        { name: 'get_team', args: { team_key: 'frc254' } },
+        { name: 'get_team', args: { team_key: 'frc86' } },
         { name: 'get_events', args: { year: 2023 } },
         { name: 'get_teams', args: { page_num: 0 } },
       ];
