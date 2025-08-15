@@ -23,7 +23,7 @@ test.describe('TBA MCP Server Integration Tests', () => {
       }),
       serverInfo: expect.objectContaining({
         name: 'The Blue Alliance MCP Server',
-        version: '0.1.0',
+        version: '0.2.0',
       }),
     });
   });
