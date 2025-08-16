@@ -27,7 +27,7 @@ jobs:
         run: |
           VERSION=$(curl "https://api.github.com/repos/withinfocus/tba-mcp-server/releases" | jq -c '.[] | select(.tag_name | contains("v")) | .tag_name' | head -1 | grep -ohE '20[0-9]{2}\.([1-9]|1[0-2])\.[0-9]+')
           echo "Latest released version: $VERSION"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Deployment
         uses: chrnorm/deployment-action@v2
@@ -70,7 +70,7 @@ jobs:
         run: npm install -g husky
 
       - name: Publish
-        run: npm publish --access public --registry=https://npm.pkg.github.com/  --userconfig=./.npmrc
+        run: npm publish --access public --registry=https://npm.pkg.github.com/ --userconfig=./.npmrc
 
   publish-ghcr:
     name: GHCR
