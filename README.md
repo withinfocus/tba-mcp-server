@@ -47,15 +47,14 @@ TBA_API_KEY=your_api_key_here
 
 ## Usage
 
-### With Claude Desktop
-
-Add to your Claude Desktop configuration (`claude_desktop_config.json`):
+Open up your application configuration, e.g. for Claude Desktop:
 
 ```json
 {
   "mcpServers": {
     "tba": {
-      "command": "mcp-server-tba",
+      "command": "npx",
+      "args": ["-y", "@withinfocus/tba-mcp-server"],
       "env": {
         "TBA_API_KEY": "your_api_key_here"
       }
@@ -64,17 +63,9 @@ Add to your Claude Desktop configuration (`claude_desktop_config.json`):
 }
 ```
 
-### With MCP Inspector
-
-For development and testing:
-
-```bash
-npm run inspect
-```
-
 ## Available Tools
 
-This MCP server provides **61 tools** for accessing The Blue Alliance API. All tools validate input parameters and return structured, type-safe data.
+This MCP server provides many tools for accessing The Blue Alliance API. All tools validate input parameters and return structured, type-safe data.
 
 ### Team Information Tools
 
