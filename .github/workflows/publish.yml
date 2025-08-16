@@ -16,10 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_version: ${{ steps.version-output.outputs.version }}
-      deployment_id: ${{ steps.deployment.outputs.deployment_id }}
     permissions:
       contents: read
-      deployments: write
 
     steps:
       - name: Version
@@ -29,6 +27,17 @@ jobs:
           echo "Latest released version: $VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+  deploy-npm:
+    name: Deploy NPM
+    runs-on: ubuntu-latest
+    needs: setup
+    outputs:
+      deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
       - name: Deployment
         uses: chrnorm/deployment-action@v2
         id: deployment
@@ -36,13 +45,36 @@ jobs:
           token: "${{ secrets.GITHUB_TOKEN }}"
           initial-status: "in_progress"
           environment: "NPM"
-          description: "Deployment ${{ steps.version-output.outputs.version }} from branch ${{ github.ref_name }}"
+          description: "Deployment ${{ needs.setup.outputs.release_version }} from branch ${{ github.ref_name }}"
+          task: release
+
+  deploy-docker:
+    name: Deploy Docker
+    runs-on: ubuntu-latest
+    needs: setup
+    outputs:
+      deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Deployment
+        uses: chrnorm/deployment-action@v2
+        id: deployment
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          initial-status: "in_progress"
+          environment: "Docker"
+          description: "Deployment ${{ needs.setup.outputs.release_version }} from branch ${{ github.ref_name }}"
           task: release
 
   publish-ghpr:
     name: GHPR
     runs-on: ubuntu-latest
-    needs: setup
+    needs:
+      - setup
+      - deploy-npm
     permissions:
       packages: write
     env:
@@ -75,7 +107,9 @@ jobs:
   publish-npm:
     name: NPM
     runs-on: ubuntu-latest
-    needs: setup
+    needs:
+      - setup
+      - deploy-npm
     permissions:
       packages: read
       id-token: write
@@ -109,7 +143,9 @@ jobs:
   publish-ghcr:
     name: GHCR
     runs-on: ubuntu-latest
-    needs: setup
+    needs:
+      - setup
+      - deploy-docker
     permissions:
       contents: read
       packages: write
@@ -134,12 +170,13 @@ jobs:
       - name: Logout
         run: docker logout ghcr.io
 
-  update-deployment:
+  update-deployment-npm:
     name: Status
     runs-on: ubuntu-latest
     needs:
-      - setup
+      - deploy-npm
       - publish-ghpr
+      - publish-npm
     permissions:
       contents: read
       deployments: write
@@ -155,7 +192,7 @@ jobs:
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "success"
-          deployment-id: ${{ needs.setup.outputs.deployment_id }}
+          deployment-id: ${{ needs.deploy-npm.outputs.deployment_id }}
 
       - name: Failure
         if: ${{ failure() }}
@@ -163,4 +200,35 @@ jobs:
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "failure"
-          deployment-id: ${{ needs.setup.outputs.deployment_id }}
+          deployment-id: ${{ needs.deploy-npm.outputs.deployment_id }}
+
+  update-deployment-docker:
+    name: Status
+    runs-on: ubuntu-latest
+    needs:
+      - deploy-docker
+      - publish-ghcr
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - name: Check
+        if: contains(needs.*.result, 'failure')
+        run: exit 1
+
+      - name: Success
+        if: ${{ success() }}
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          state: "success"
+          deployment-id: ${{ needs.deploy-docker.outputs.deployment_id }}
+
+      - name: Failure
+        if: ${{ failure() }}
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          state: "failure"
+          deployment-id: ${{ needs.deploy-docker.outputs.deployment_id }}
