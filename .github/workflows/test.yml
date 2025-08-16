@@ -35,9 +35,8 @@ jobs:
         run: npm run test:unit --coverage
 
       - name: Integration tests
-        env:
-          TBA_API_KEY: ${{ secrets.TBA_API_KEY }}
-        run: npm run test:integration
+        run: |
+          TBA_API_KEY: ${{ secrets.TBA_API_KEY }} npm run test:integration
 
       - name: Report
         uses: dorny/test-reporter@v2
