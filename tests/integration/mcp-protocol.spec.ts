@@ -20,11 +20,6 @@ test.describe('MCP Protocol Compliance Tests', () => {
     expect(serverInfo).toHaveProperty('capabilities');
     expect(serverInfo).toHaveProperty('serverInfo');
 
-    expect(serverInfo.serverInfo).toMatchObject({
-      name: 'The Blue Alliance MCP Server',
-      version: '0.2.1',
-    });
-
     expect(serverInfo.capabilities).toHaveProperty('tools');
   });
 

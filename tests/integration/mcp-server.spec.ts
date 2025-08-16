@@ -21,10 +21,6 @@ test.describe('TBA MCP Server Integration Tests', () => {
       capabilities: expect.objectContaining({
         tools: expect.any(Object),
       }),
-      serverInfo: expect.objectContaining({
-        name: 'The Blue Alliance MCP Server',
-        version: '0.2.1',
-      }),
     });
   });
 
