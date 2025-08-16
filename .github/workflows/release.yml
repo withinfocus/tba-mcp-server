@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: read
+      packages: write
       actions: read
     env:
       _IMAGE_NAME: ghcr.io/withinfocus/tba-mcp-server
