@@ -25,7 +25,7 @@ jobs:
       - name: Version
         id: version-output
         run: |
-          VERSION=$(curl "https://api.github.com/repos/withinfocus/tba-mcp-server/releases" | jq -c '.[] | select(.tag_name | contains("v")) | .tag_name' | head -1 | grep -ohE '20[0-9]{2}\.([1-9]|1[0-2])\.[0-9]+')
+          VERSION=$(curl "https://api.github.com/repos/withinfocus/tba-mcp-server/releases" | jq -r '.[] | select(.tag_name | contains("v")) | .tag_name' | head -1 | sed 's/^v//')
           echo "Latest released version: $VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
