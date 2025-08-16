@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+      actions: read
+    env:
+      _IMAGE_NAME: ghcr.io/withinfocus/tba-mcp-server
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Version
+        id: version
+        run: |
+          version=$( jq -r ".version" package.json )
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Download
+        uses: actions/download-artifact@v5
+        id: retrieve-package-version
+        with:
+          name: mcp-server-${{ steps.version.outputs.version }}.zip
+
+      - name: Create
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "./mcp-server-${{ steps.version.outputs.version }}.zip"
+          commit: ${{ github.sha }}
+          tag: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          body: "<insert release notes here>"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true
+
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker
+        run: |
+          docker pull ${{ env._IMAGE_NAME }}:dev
+          docker tag ${{ env._IMAGE_NAME }}:dev ${{ env._IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          docker push ${{ env._IMAGE_NAME }}:${{ steps.version.outputs.version }}
+
+      - name: Logout
+        run: docker logout ghcr.io
