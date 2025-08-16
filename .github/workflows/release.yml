@@ -27,11 +27,22 @@ jobs:
           version=$( jq -r ".version" package.json )
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
+      - name: Run
+        id: latest-build
+        run: |
+          latest_run=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/build.yml/runs?branch=main&status=success&per_page=1" \
+            | jq -r '.workflow_runs[0].id')
+          echo "run_id=$latest_run" >> "$GITHUB_OUTPUT"
+
       - name: Download
         uses: actions/download-artifact@v5
         id: retrieve-package-version
         with:
           name: mcp-server-${{ steps.version.outputs.version }}.zip
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.latest-build.outputs.run_id }}
 
       - name: Create
         uses: ncipollo/release-action@v1
