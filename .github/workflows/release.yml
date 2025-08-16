@@ -53,9 +53,9 @@ jobs:
 
       - name: Docker
         run: |
-          docker pull ${{ env._IMAGE_NAME }}:dev
-          docker tag ${{ env._IMAGE_NAME }}:dev ${{ env._IMAGE_NAME }}:${{ steps.version.outputs.version }}
-          docker push ${{ env._IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          docker pull "${{ env._IMAGE_NAME }}:dev"
+          docker tag "${{ env._IMAGE_NAME }}:dev" "${{ env._IMAGE_NAME }}:${{ steps.version.outputs.version }}"
+          docker push "${{ env._IMAGE_NAME }}:${{ steps.version.outputs.version }}"
 
       - name: Logout
         run: docker logout ghcr.io

@@ -53,8 +53,8 @@ jobs:
 
       - name: Download
         run: |
-          wget https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip
-          unzip mcp-server-${{ env._PKG_VERSION }}.zip
+          wget "https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip"
+          unzip "mcp-server-${{ env._PKG_VERSION }}.zip"
 
       - name: Setup
         run: |
@@ -90,9 +90,9 @@ jobs:
 
       - name: Docker
         run: |
-          docker pull ${{ env._IMAGE_NAME }}:${{ env._RELEASE_TAG }}
-          docker tag ${{ env._IMAGE_NAME }}:${{ env._RELEASE_TAG }} ${{ env._IMAGE_NAME }}:latest
-          docker push ${{ env._IMAGE_NAME }}:latest
+          docker pull "${{ env._IMAGE_NAME }}:${{ env._RELEASE_TAG }}"
+          docker tag "${{ env._IMAGE_NAME }}:${{ env._RELEASE_TAG }}" "${{ env._IMAGE_NAME }}:latest"
+          docker push "${{ env._IMAGE_NAME }}:latest"
 
       - name: Logout
         run: docker logout ghcr.io
