@@ -24,7 +24,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY package.json ./
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD export BW_SESSION="dummy" && echo '{ "jsonrpc": "2.0", "id": "123", "method": "ping" }' | \
+    CMD export TBA_API_KEY="dummy" && echo '{ "jsonrpc": "2.0", "id": "123", "method": "ping" }' | \
     ./dist/index.js | grep -q '"result": {}' || exit 1
 
 CMD ["dist/index.js"]
