@@ -29,7 +29,7 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
 
       - name: Install
-        run: npm install
+        run: npm ci
 
       - name: Test
         run: npm run test:unit --coverage
@@ -58,7 +58,7 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
 
       - name: Install
-        run: npm install
+        run: npm ci
 
       - name: Playwright
         run: npx playwright install --with-deps

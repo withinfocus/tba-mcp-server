@@ -7,7 +7,7 @@ This directory contains comprehensive Playwright-based integration tests for the
 1. Install dependencies:
 
    ```bash
-   npm install
+   npm ci
    ```
 
 2. Build the project:

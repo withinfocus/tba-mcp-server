@@ -27,7 +27,7 @@ npm install -g @withinfocus/tba-mcp-server
 ```bash
 git clone https://github.com/withinfocus/tba-mcp-server.git
 cd tba-mcp-server
-npm install
+npm ci
 npm run build
 ```
 
@@ -422,7 +422,7 @@ npm run lint:fix
 
 ```bash
 # Install dependencies
-npm install
+npm ci
 
 # Run unit tests in watch mode during development
 npm run test:watch

@@ -98,9 +98,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install
-        run: npm install -g husky
-
       - name: Publish
         run: npm publish --access public --registry=https://npm.pkg.github.com/ --userconfig=./.npmrc
 
@@ -133,9 +130,6 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ./.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-
-      - name: Install
-        run: npm install -g husky
 
       - name: Publish
         run: npm publish --access public --registry=https://registry.npmjs.org/  --userconfig=./.npmrc
