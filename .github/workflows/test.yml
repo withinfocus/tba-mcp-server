@@ -14,8 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Test
+  unit:
+    name: Unit test
     runs-on: ubuntu-latest
 
     steps:
@@ -31,19 +31,51 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Unit tests
+      - name: Test
         run: npm run test:unit --coverage
 
-      - name: Integration tests
-        env:
-          TBA_API_KEY: ${{ secrets.TBA_API_KEY }}
+      - name: Report
+        uses: dorny/test-reporter@v2
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository && !cancelled() }}
+        with:
+          name: Unit Test Results
+          path: "junit.xml"
+          reporter: jest-junit
+          fail-on-error: true
+
+  integration:
+    name: Integration test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Install
+        run: npm install
+
+      - name: Playwright
+        run: npx playwright install --with-deps
+
+      - name: Environment
+        run: |
+          touch .env
+          echo "TBA_API_KEY=\"${{ secrets.TBA_API_KEY }}\"" >> .env
+
+      - name: Test
         run: npm run test:integration
 
       - name: Report
         uses: dorny/test-reporter@v2
         if: ${{ github.event.pull_request.head.repo.full_name == github.repository && !cancelled() }}
         with:
-          name: Test Results
+          name: Integration Test Results
           path: "junit.xml"
           reporter: jest-junit
           fail-on-error: true

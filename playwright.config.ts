@@ -12,7 +12,7 @@ export default defineConfig({
       ? ['github', { printSteps: true }]
       : ['list', { printSteps: true }],
     ['html', { open: 'never', outputFolder: 'test-summary' }],
-    ['json', { outputFile: 'test-summary/test-results.json' }],
+    ['junit', { outputFile: 'junit.xml' }],
   ],
   use: {
     trace: 'on-first-retry',
