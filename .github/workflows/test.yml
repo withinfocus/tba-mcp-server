@@ -36,7 +36,7 @@ jobs:
 
       - name: Report
         uses: dorny/test-reporter@v2
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository && !cancelled() }}
+        if: ${{ !cancelled() }}
         with:
           name: Unit Test Results
           path: "junit.xml"
@@ -73,7 +73,7 @@ jobs:
 
       - name: Report
         uses: dorny/test-reporter@v2
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository && !cancelled() }}
+        if: ${{ !cancelled() }}
         with:
           name: Integration Test Results
           path: "junit.xml"
