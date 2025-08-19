@@ -35,11 +35,19 @@ jobs:
           PKG_VERSION=$(jq -r .version package.json)
           echo "package_version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Node version
+        id: retrieve-node-version
+        run: |
+          NODE_NVMRC=$(cat .nvmrc)
+          NODE_VERSION=${NODE_NVMRC/v/''}
+          echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Node
         uses: actions/setup-node@v4
         with:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
+          node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
 
       - name: Install
         run: npm ci
