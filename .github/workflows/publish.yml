@@ -82,7 +82,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: refs/tags/v${{ env._PKG_VERSION }}
 
@@ -115,24 +115,34 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: refs/tags/v${{ env._PKG_VERSION }}
+
+      - name: Node version
+        id: retrieve-node-version
+        run: |
+          NODE_NVMRC=$(cat .nvmrc)
+          NODE_VERSION=${NODE_NVMRC/v/''}
+          echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+          node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
+
+      - name: NPM
+        run: npm install -g npm@latest
 
       - name: Download
         run: |
           wget https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip
           unzip mcp-server-${{ env._PKG_VERSION }}.zip
 
-      - name: Setup
-        run: |
-          echo 'registry="https://registry.npmjs.org/"' > ./.npmrc
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ./.npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-
       - name: Publish
-        run: npm publish --access public --registry=https://registry.npmjs.org/  --userconfig=./.npmrc
+        run: npm publish --access public
 
   publish-ghcr:
     name: GHCR
