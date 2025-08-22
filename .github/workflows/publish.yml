@@ -68,7 +68,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish
-        run: HUSKY=0 npm publish --access public --registry=https://npm.pkg.github.com/ --userconfig=./.npmrc
+        run: |
+          export HUSKY=0
+          npm publish --access public --registry=https://npm.pkg.github.com/ --userconfig=./.npmrc
 
       - name: Success
         if: ${{ success() }}
@@ -138,7 +140,9 @@ jobs:
           unzip mcp-server-${{ env._PKG_VERSION }}.zip
 
       - name: Publish
-        run: HUSKY=0 npm publish --access public
+        run: |
+          export HUSKY=0
+          npm publish --access public
 
       - name: Success
         if: ${{ success() }}
