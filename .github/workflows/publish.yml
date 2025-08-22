@@ -79,6 +79,7 @@ jobs:
       packages: write
     env:
       _PKG_VERSION: ${{ needs.setup.outputs.release_version }}
+      HUSKY: 0
 
     steps:
       - name: Checkout
@@ -112,6 +113,7 @@ jobs:
       id-token: write
     env:
       _PKG_VERSION: ${{ needs.setup.outputs.release_version }}
+      HUSKY: 0
 
     steps:
       - name: Checkout
