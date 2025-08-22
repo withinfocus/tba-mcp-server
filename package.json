@@ -18,7 +18,7 @@
     "zod": "4.0.17"
   },
   "devDependencies": {
-    "@eslint/js": "9.32.0",
+    "@eslint/js": "9.33.0",
     "@jest/globals": "30.0.5",
     "@modelcontextprotocol/inspector": "0.16.2",
     "@playwright/test": "1.54.2",
