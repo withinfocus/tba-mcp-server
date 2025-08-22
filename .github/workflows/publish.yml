@@ -55,6 +55,23 @@ jobs:
           description: "Deployment ${{ needs.setup.outputs.release_version }} from branch ${{ github.ref_name }}"
           task: release
 
+      - name: Node version
+        id: retrieve-node-version
+        run: |
+          NODE_NVMRC=$(cat .nvmrc)
+          NODE_VERSION=${NODE_NVMRC/v/''}
+          echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+          node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
+
+      - name: NPM
+        run: npm install -g npm@latest husky
+
       - name: Download
         run: |
           wget "https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip"
@@ -130,7 +147,7 @@ jobs:
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
 
       - name: NPM
-        run: npm install -g npm@latest
+        run: npm install -g npm@latest husky
 
       - name: Download
         run: |
