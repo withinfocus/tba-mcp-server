@@ -518,36 +518,57 @@ export async function makeApiRequest(endpoint: string): Promise<unknown> {
   } catch (error) {
     if (error instanceof Error) {
       console.error(
-        `API request error for endpoint ${endpoint}:`,
-        error.message,
+        `API request error for endpoint ${endpoint}: ${error.message}`,
       );
       throw error;
     }
     const errorMessage = `Unknown error during API request for endpoint ${endpoint}`;
-    console.error(errorMessage, error);
+    console.error(`${errorMessage}: ${error}`);
     throw new Error(errorMessage);
   }
 }
 
 async function runServer(): Promise<void> {
+  // Create server first so we can use its logging method
+  let server: Server | null = null;
+
+  // Common logging method that uses MCP server's sendLoggingMessage
+  const log = async (
+    level: 'debug' | 'info' | 'notice' | 'warning' | 'error',
+    data: unknown,
+    logger?: string,
+  ) => {
+    if (server) {
+      try {
+        await server.sendLoggingMessage({ level, data, logger });
+      } catch {
+        // Fallback to console if MCP logging fails
+        console.error(data);
+      }
+    } else {
+      // Fallback to console if server not initialized yet
+      console.error(data);
+    }
+  };
+
   try {
-    console.error('The Blue Alliance MCP Server starting ...');
+    await log('info', 'The Blue Alliance MCP Server starting ...');
 
     // Validate API key availability early
     try {
       getApiKey();
-      console.error('TBA API key validated successfully');
+      await log('info', 'TBA API key validated successfully');
     } catch (error) {
       const errorMessage = 'Failed to get TBA API key';
-      console.error(
-        errorMessage,
-        error instanceof Error ? error.message : error,
+      await log(
+        'error',
+        `${errorMessage}: ${error instanceof Error ? error.message : error}`,
       );
       throw new Error(errorMessage);
     }
 
-    console.error('Initializing MCP server ...');
-    const server = new Server(
+    await log('info', 'Initializing MCP server ...');
+    server = new Server(
       {
         name: 'The Blue Alliance MCP Server',
         version: '0.2.4',
@@ -559,7 +580,7 @@ async function runServer(): Promise<void> {
       },
     );
 
-    console.error('Setting up request handlers ...');
+    await log('info', 'Setting up request handlers ...');
 
     server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
@@ -1569,7 +1590,7 @@ async function runServer(): Promise<void> {
 
     server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
-      console.error(`Processing tool request: ${name}`);
+      await log('debug', `Processing tool request: ${name}`);
 
       try {
         switch (name) {
@@ -2665,7 +2686,7 @@ async function runServer(): Promise<void> {
         }
       } catch (error) {
         const errorMessage = `Tool execution error for '${name}': ${error instanceof Error ? error.message : String(error)}`;
-        console.error(errorMessage, error);
+        await log('error', errorMessage);
         return {
           content: [
             {
@@ -2678,16 +2699,16 @@ async function runServer(): Promise<void> {
       }
     });
 
-    console.error('Setting up transport connection ...');
+    await log('info', 'Setting up transport connection ...');
     try {
       const transport = new StdioServerTransport();
       await server.connect(transport);
-      console.error('The Blue Alliance MCP Server running on stdio');
+      await log('info', 'The Blue Alliance MCP Server running on stdio');
     } catch (error) {
       const errorMessage = 'Failed to connect to transport';
-      console.error(
-        errorMessage,
-        error instanceof Error ? error.message : error,
+      await log(
+        'error',
+        `${errorMessage}: ${error instanceof Error ? error.message : error}`,
       );
       throw new Error(errorMessage);
     }
@@ -2709,10 +2730,9 @@ async function runServer(): Promise<void> {
     });
   } catch (error) {
     const errorMessage = 'Fatal error during server initialization';
+    // Use console.error as fallback since server may not be available yet
     console.error(
-      errorMessage,
-      error instanceof Error ? error.message : error,
-      error,
+      `${errorMessage}: ${error instanceof Error ? error.message : error}`,
     );
     throw error;
   }
@@ -2724,12 +2744,10 @@ const isMainModule = process.argv[1] && process.argv[1].endsWith('index.js');
 if (isMainModule) {
   runServer().catch((error) => {
     console.error(
-      'Fatal error running server:',
-      error instanceof Error ? error.message : error,
+      `Fatal error running server: ${error instanceof Error ? error.message : error}`,
     );
     console.error(
-      'Stack trace:',
-      error instanceof Error ? error.stack : 'No stack trace available',
+      `Stack trace: ${error instanceof Error ? error.stack : 'No stack trace available'}`,
     );
     console.error('Server will now exit');
     process.exit(1);
