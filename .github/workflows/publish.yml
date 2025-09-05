@@ -63,7 +63,7 @@ jobs:
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
@@ -140,7 +140,7 @@ jobs:
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
