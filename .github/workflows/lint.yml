@@ -27,7 +27,7 @@ jobs:
 
       - name: Lint
         id: ml
-        uses: oxsecurity/megalinter/flavors/javascript@v8
+        uses: oxsecurity/megalinter/flavors/javascript@v9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
