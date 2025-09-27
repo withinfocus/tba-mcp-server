@@ -55,6 +55,8 @@ export class MCPClient extends EventEmitter {
       }
 
       let buffer = '';
+      let serverReady = false;
+
       this.serverProcess.stdout.on('data', (chunk) => {
         buffer += chunk.toString();
         const lines = buffer.split('\n');
@@ -65,6 +67,11 @@ export class MCPClient extends EventEmitter {
             try {
               const response: MCPResponse = JSON.parse(line);
               this.handleResponse(response);
+              // If we get any valid JSON-RPC response, the server is ready
+              if (!serverReady) {
+                serverReady = true;
+                resolve();
+              }
             } catch (error) {
               console.error('Failed to parse response:', line, error);
             }
@@ -74,9 +81,7 @@ export class MCPClient extends EventEmitter {
 
       this.serverProcess.stderr.on('data', (chunk) => {
         const output = chunk.toString();
-        if (output.includes('MCP Server running')) {
-          resolve();
-        }
+        console.error('Server stderr:', output);
       });
 
       this.serverProcess.on('error', (error) => {
@@ -84,14 +89,34 @@ export class MCPClient extends EventEmitter {
       });
 
       this.serverProcess.on('exit', (code) => {
-        if (code !== 0) {
+        if (code !== 0 && !serverReady) {
           reject(new Error(`Server process exited with code ${code}`));
         }
       });
 
+      // Send an initialization request to check if server is ready
       setTimeout(() => {
-        reject(new Error('Server startup timeout'));
-      }, 30000);
+        if (!serverReady) {
+          try {
+            // Try to send an initialization request to test server readiness
+            const initRequest = {
+              jsonrpc: '2.0' as const,
+              id: 'startup-test',
+              method: 'initialize',
+            };
+            const requestLine = JSON.stringify(initRequest) + '\n';
+            this.serverProcess!.stdin!.write(requestLine);
+          } catch {
+            // Ignore errors during initialization test
+          }
+        }
+      }, 1000);
+
+      setTimeout(() => {
+        if (!serverReady) {
+          reject(new Error('Server startup timeout'));
+        }
+      }, 10000);
     });
   }
 
