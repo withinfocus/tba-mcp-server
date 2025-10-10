@@ -25,7 +25,7 @@ describe('The Blue Alliance MCP Server', () => {
     it('should throw error when TBA_API_KEY is not set', async () => {
       delete process.env['TBA_API_KEY'];
 
-      const { makeApiRequest } = await import('../src/index.js');
+      const { makeApiRequest } = await import('../src/utils.js');
 
       await expect(makeApiRequest('/test')).rejects.toThrow(
         'TBA_API_KEY environment variable is required',
@@ -38,7 +38,7 @@ describe('The Blue Alliance MCP Server', () => {
         json: async () => ({ test: 'data' }),
       } as Response);
 
-      const { makeApiRequest } = await import('../src/index.js');
+      const { makeApiRequest } = await import('../src/utils.js');
 
       await makeApiRequest('/test');
 
@@ -66,7 +66,7 @@ describe('The Blue Alliance MCP Server', () => {
         json: async () => mockData,
       } as Response);
 
-      const { makeApiRequest } = await import('../src/index.js');
+      const { makeApiRequest } = await import('../src/utils.js');
 
       const result = await makeApiRequest('/team/frc86');
 
@@ -80,7 +80,7 @@ describe('The Blue Alliance MCP Server', () => {
         statusText: 'Not Found',
       } as Response);
 
-      const { makeApiRequest } = await import('../src/index.js');
+      const { makeApiRequest } = await import('../src/utils.js');
 
       await expect(makeApiRequest('/team/invalid')).rejects.toThrow(
         'TBA API request failed: 404 Not Found',
@@ -90,7 +90,7 @@ describe('The Blue Alliance MCP Server', () => {
 
   describe('Schema validation', () => {
     it('should validate team key format', async () => {
-      const { TeamKeySchema } = await import('../src/index.js');
+      const { TeamKeySchema } = await import('../src/schemas.js');
 
       expect(() => TeamKeySchema.parse('frc86')).not.toThrow();
       expect(() => TeamKeySchema.parse('frc1234')).not.toThrow();
@@ -100,7 +100,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate year range', async () => {
-      const { YearSchema } = await import('../src/index.js');
+      const { YearSchema } = await import('../src/schemas.js');
 
       expect(() => YearSchema.parse(2023)).not.toThrow();
       expect(() => YearSchema.parse(1992)).not.toThrow();
@@ -110,7 +110,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate team schema', async () => {
-      const { TeamSchema } = await import('../src/index.js');
+      const { TeamSchema } = await import('../src/schemas.js');
 
       const validTeam = {
         key: 'frc86',
@@ -133,7 +133,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate event schema', async () => {
-      const { EventSchema } = await import('../src/index.js');
+      const { EventSchema } = await import('../src/schemas.js');
 
       const validEvent = {
         key: '2025hop',
@@ -150,7 +150,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate match schema', async () => {
-      const { MatchSchema } = await import('../src/index.js');
+      const { MatchSchema } = await import('../src/schemas.js');
 
       const validMatch = {
         key: '2025hop_qm112',
@@ -174,7 +174,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate status schema', async () => {
-      const { StatusSchema } = await import('../src/index.js');
+      const { StatusSchema } = await import('../src/schemas.js');
 
       const validStatus = {
         current_season: 2025,
@@ -203,7 +203,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate event OPRs schema', async () => {
-      const { EventOPRsSchema } = await import('../src/index.js');
+      const { EventOPRsSchema } = await import('../src/schemas.js');
 
       const validOPRs = {
         oprs: {
@@ -230,7 +230,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate team event status schema', async () => {
-      const { TeamEventStatusSchema } = await import('../src/index.js');
+      const { TeamEventStatusSchema } = await import('../src/schemas.js');
 
       const validStatus = {
         qual: {
@@ -274,7 +274,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate district ranking schema', async () => {
-      const { DistrictRankingSchema } = await import('../src/index.js');
+      const { DistrictRankingSchema } = await import('../src/schemas.js');
 
       const validRanking = {
         team_key: 'frc86',
@@ -314,7 +314,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate team simple schema', async () => {
-      const { TeamSimpleSchema } = await import('../src/index.js');
+      const { TeamSimpleSchema } = await import('../src/schemas.js');
 
       const validTeamSimple = {
         key: 'frc86',
@@ -338,7 +338,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate event simple schema', async () => {
-      const { EventSimpleSchema } = await import('../src/index.js');
+      const { EventSimpleSchema } = await import('../src/schemas.js');
 
       const validEventSimple = {
         key: '2025hop',
@@ -357,7 +357,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate match simple schema', async () => {
-      const { MatchSimpleSchema } = await import('../src/index.js');
+      const { MatchSimpleSchema } = await import('../src/schemas.js');
 
       const validMatchSimple = {
         key: '2025hop_qm112',
@@ -385,7 +385,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate zebra schema', async () => {
-      const { ZebraSchema } = await import('../src/index.js');
+      const { ZebraSchema } = await import('../src/schemas.js');
 
       const validZebra = {
         key: '2025hop_qm112',
@@ -412,7 +412,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate prediction schema', async () => {
-      const { PredictionSchema } = await import('../src/index.js');
+      const { PredictionSchema } = await import('../src/schemas.js');
 
       const validPrediction = {
         match_predictions: {
@@ -442,7 +442,7 @@ describe('The Blue Alliance MCP Server', () => {
     });
 
     it('should validate team history schema', async () => {
-      const { TeamHistorySchema } = await import('../src/index.js');
+      const { TeamHistorySchema } = await import('../src/schemas.js');
 
       const validHistory = {
         awards: [
