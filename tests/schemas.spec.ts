@@ -1,10 +1,18 @@
 import { describe, it, expect } from '@jest/globals';
 import {
   TeamKeySchema,
+  EventKeySchema,
   YearSchema,
   TeamSchema,
   EventSchema,
   MatchSchema,
+  AwardSchema,
+  RankingSchema,
+  AllianceSchema,
+  DistrictPointsSchema,
+  MediaSchema,
+  RobotSchema,
+  DistrictSchema,
   StatusSchema,
   EventOPRsSchema,
   TeamEventStatusSchema,
@@ -429,6 +437,127 @@ describe('Schema validation', () => {
       };
 
       expect(() => TeamHistorySchema.parse(validHistory)).not.toThrow();
+    });
+  });
+
+  describe('EventKeySchema', () => {
+    it('should validate event key format', () => {
+      expect(() => EventKeySchema.parse('2024hop')).not.toThrow();
+      expect(() => EventKeySchema.parse('2025flor')).not.toThrow();
+      expect(() => EventKeySchema.parse('2024cmp')).not.toThrow();
+    });
+  });
+
+  describe('Schema exports', () => {
+    it('should export AwardSchema', () => {
+      expect(AwardSchema).toBeDefined();
+    });
+
+    it('should export RankingSchema', () => {
+      expect(RankingSchema).toBeDefined();
+    });
+
+    it('should export AllianceSchema', () => {
+      expect(AllianceSchema).toBeDefined();
+    });
+
+    it('should export DistrictPointsSchema', () => {
+      expect(DistrictPointsSchema).toBeDefined();
+    });
+  });
+
+  describe('MediaSchema', () => {
+    it('should validate media schema', () => {
+      const validMedia = {
+        type: 'youtube',
+        foreign_key: 'dQw4w9WgXcQ',
+        details: {},
+        preferred: true,
+        view_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      };
+
+      expect(() => MediaSchema.parse(validMedia)).not.toThrow();
+    });
+  });
+
+  describe('RobotSchema', () => {
+    it('should validate robot schema', () => {
+      const validRobot = {
+        year: 2025,
+        robot_name: 'Resistance Bot',
+        key: 'frc86_2025',
+        team_key: 'frc86',
+      };
+
+      expect(() => RobotSchema.parse(validRobot)).not.toThrow();
+    });
+  });
+
+  describe('DistrictSchema', () => {
+    it('should validate district schema', () => {
+      const validDistrict = {
+        abbreviation: 'FIM',
+        display_name: 'FIRST In Michigan',
+        key: '2024fim',
+        year: 2024,
+      };
+
+      expect(() => DistrictSchema.parse(validDistrict)).not.toThrow();
+    });
+  });
+
+  describe('Schema edge cases', () => {
+    it('should handle null and undefined for optional fields', () => {
+      const teamWithNulls = {
+        key: 'frc86',
+        team_number: 86,
+        name: 'Team Resistance',
+        nickname: null,
+        city: null,
+        state_prov: null,
+        country: null,
+      };
+
+      expect(() => TeamSchema.parse(teamWithNulls)).not.toThrow();
+    });
+
+    it('should reject invalid types for required fields', () => {
+      const invalidTeam = {
+        key: 'frc86',
+        team_number: '86', // should be number
+        name: 'Team Resistance',
+      };
+
+      expect(() => TeamSchema.parse(invalidTeam)).toThrow();
+    });
+
+    it('should validate nested objects', () => {
+      const matchWithAlliances = {
+        key: '2024hop_qm1',
+        comp_level: 'qm',
+        set_number: 1,
+        match_number: 1,
+        alliances: {
+          red: {
+            score: 100,
+            team_keys: ['frc86', 'frc254', 'frc1323'],
+          },
+          blue: {
+            score: 90,
+            team_keys: ['frc111', 'frc222', 'frc333'],
+          },
+        },
+        event_key: '2024hop',
+      };
+
+      expect(() => MatchSchema.parse(matchWithAlliances)).not.toThrow();
+    });
+
+    it('should validate arrays of primitives', () => {
+      const yearsArray = [2020, 2021, 2022, 2023];
+      expect(() => {
+        yearsArray.forEach((year) => YearSchema.parse(year));
+      }).not.toThrow();
     });
   });
 });

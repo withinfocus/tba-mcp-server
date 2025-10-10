@@ -220,9 +220,11 @@ case 'get_team_media': {
 - Parse and validate the response using Zod schemas
 - Return formatted result with `content` array
 
-### 4. Add Unit Tests (`tests/schemas.spec.ts` or `tests/utils.spec.ts`)
+### 4. Add Unit Tests
 
-If you added a new schema, add tests:
+Add unit tests based on what you modified:
+
+**If you added a new schema** (`tests/schemas.spec.ts`):
 
 ```typescript
 describe('MediaSchema', () => {
@@ -237,10 +239,49 @@ describe('MediaSchema', () => {
 
     expect(() => MediaSchema.parse(validMedia)).not.toThrow();
   });
+
+  it('should reject invalid media schema', () => {
+    const invalidMedia = {
+      type: 123, // Should be string
+      foreign_key: 'dQw4w9WgXcQ',
+    };
+
+    expect(() => MediaSchema.parse(invalidMedia)).toThrow();
+  });
 });
 ```
 
-If you modified utils, add tests to `tests/utils.spec.ts`.
+**If you added a new tool** (`tests/tools.spec.ts`):
+
+```typescript
+it('should include get_team_media tool', () => {
+  const tool = tools.find((t) => t.name === 'get_team_media');
+  expect(tool).toBeDefined();
+  expect(tool?.description).toContain('media');
+  expect(tool?.inputSchema.required).toContain('team_key');
+  expect(tool?.inputSchema.required).toContain('year');
+});
+```
+
+**If you added a new handler** (`tests/handlers.spec.ts`):
+
+```typescript
+it('should handle get_team_media', async () => {
+  const result = await handleToolCall('get_team_media', {
+    team_key: 'frc86',
+    year: 2024,
+  });
+
+  expect(result.content).toBeDefined();
+  expect(result.content[0].type).toBe('text');
+  const data = JSON.parse(result.content[0].text);
+  expect(Array.isArray(data)).toBe(true);
+});
+```
+
+**If you modified utility functions** (`tests/utils.spec.ts`):
+
+Add tests to validate the utility function behavior.
 
 ### 5. Add Integration Tests (`tests/integration/tba-api.spec.ts`)
 
