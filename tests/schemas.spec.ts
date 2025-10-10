@@ -1,117 +1,45 @@
+import { describe, it, expect } from '@jest/globals';
 import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  jest,
-} from '@jest/globals';
+  TeamKeySchema,
+  YearSchema,
+  TeamSchema,
+  EventSchema,
+  MatchSchema,
+  StatusSchema,
+  EventOPRsSchema,
+  TeamEventStatusSchema,
+  DistrictRankingSchema,
+  TeamSimpleSchema,
+  EventSimpleSchema,
+  MatchSimpleSchema,
+  ZebraSchema,
+  PredictionSchema,
+  TeamHistorySchema,
+} from '../src/schemas.js';
 
-global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
-
-const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
-
-describe('The Blue Alliance MCP Server', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    process.env['TBA_API_KEY'] = 'test-api-key';
-  });
-
-  afterEach(() => {
-    delete process.env['TBA_API_KEY'];
-  });
-
-  describe('API Key validation', () => {
-    it('should throw error when TBA_API_KEY is not set', async () => {
-      delete process.env['TBA_API_KEY'];
-
-      const { makeApiRequest } = await import('../src/utils.js');
-
-      await expect(makeApiRequest('/test')).rejects.toThrow(
-        'TBA_API_KEY environment variable is required',
-      );
-    });
-
-    it('should use TBA_API_KEY from environment', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ test: 'data' }),
-      } as Response);
-
-      const { makeApiRequest } = await import('../src/utils.js');
-
-      await makeApiRequest('/test');
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://www.thebluealliance.com/api/v3/test',
-        {
-          headers: {
-            'X-TBA-Auth-Key': 'test-api-key',
-            Accept: 'application/json',
-          },
-        },
-      );
-    });
-  });
-
-  describe('API Request handling', () => {
-    it('should handle successful API responses', async () => {
-      const mockData = {
-        key: 'frc86',
-        team_number: 86,
-        name: 'Team Resistance',
-      };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockData,
-      } as Response);
-
-      const { makeApiRequest } = await import('../src/utils.js');
-
-      const result = await makeApiRequest('/team/frc86');
-
-      expect(result).toEqual(mockData);
-    });
-
-    it('should handle API errors', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found',
-      } as Response);
-
-      const { makeApiRequest } = await import('../src/utils.js');
-
-      await expect(makeApiRequest('/team/invalid')).rejects.toThrow(
-        'TBA API request failed: 404 Not Found',
-      );
-    });
-  });
-
-  describe('Schema validation', () => {
-    it('should validate team key format', async () => {
-      const { TeamKeySchema } = await import('../src/schemas.js');
-
+describe('Schema validation', () => {
+  describe('TeamKeySchema', () => {
+    it('should validate team key format', () => {
       expect(() => TeamKeySchema.parse('frc86')).not.toThrow();
       expect(() => TeamKeySchema.parse('frc1234')).not.toThrow();
       expect(() => TeamKeySchema.parse('86')).toThrow();
       expect(() => TeamKeySchema.parse('team86')).toThrow();
       expect(() => TeamKeySchema.parse('frcabc')).toThrow();
     });
+  });
 
-    it('should validate year range', async () => {
-      const { YearSchema } = await import('../src/schemas.js');
-
+  describe('YearSchema', () => {
+    it('should validate year range', () => {
       expect(() => YearSchema.parse(2023)).not.toThrow();
       expect(() => YearSchema.parse(1992)).not.toThrow();
       expect(() => YearSchema.parse(new Date().getFullYear())).not.toThrow();
       expect(() => YearSchema.parse(1991)).toThrow();
       expect(() => YearSchema.parse(new Date().getFullYear() + 2)).toThrow();
     });
+  });
 
-    it('should validate team schema', async () => {
-      const { TeamSchema } = await import('../src/schemas.js');
-
+  describe('TeamSchema', () => {
+    it('should validate team schema', () => {
       const validTeam = {
         key: 'frc86',
         team_number: 86,
@@ -131,10 +59,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => TeamSchema.parse(invalidTeam)).toThrow();
     });
+  });
 
-    it('should validate event schema', async () => {
-      const { EventSchema } = await import('../src/schemas.js');
-
+  describe('EventSchema', () => {
+    it('should validate event schema', () => {
       const validEvent = {
         key: '2025hop',
         name: 'Hopper Division',
@@ -148,10 +76,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => EventSchema.parse(validEvent)).not.toThrow();
     });
+  });
 
-    it('should validate match schema', async () => {
-      const { MatchSchema } = await import('../src/schemas.js');
-
+  describe('MatchSchema', () => {
+    it('should validate match schema', () => {
       const validMatch = {
         key: '2025hop_qm112',
         comp_level: 'qm',
@@ -172,10 +100,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => MatchSchema.parse(validMatch)).not.toThrow();
     });
+  });
 
-    it('should validate status schema', async () => {
-      const { StatusSchema } = await import('../src/schemas.js');
-
+  describe('StatusSchema', () => {
+    it('should validate status schema', () => {
       const validStatus = {
         current_season: 2025,
         max_season: 2025,
@@ -201,10 +129,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => StatusSchema.parse(invalidStatus)).toThrow();
     });
+  });
 
-    it('should validate event OPRs schema', async () => {
-      const { EventOPRsSchema } = await import('../src/schemas.js');
-
+  describe('EventOPRsSchema', () => {
+    it('should validate event OPRs schema', () => {
       const validOPRs = {
         oprs: {
           frc86: 45.2,
@@ -228,10 +156,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => EventOPRsSchema.parse(invalidOPRs)).toThrow();
     });
+  });
 
-    it('should validate team event status schema', async () => {
-      const { TeamEventStatusSchema } = await import('../src/schemas.js');
-
+  describe('TeamEventStatusSchema', () => {
+    it('should validate team event status schema', () => {
       const validStatus = {
         qual: {
           num_teams: 64,
@@ -272,10 +200,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => TeamEventStatusSchema.parse(validStatus)).not.toThrow();
     });
+  });
 
-    it('should validate district ranking schema', async () => {
-      const { DistrictRankingSchema } = await import('../src/schemas.js');
-
+  describe('DistrictRankingSchema', () => {
+    it('should validate district ranking schema', () => {
       const validRanking = {
         team_key: 'frc86',
         rank: 5,
@@ -312,10 +240,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => DistrictRankingSchema.parse(invalidRanking)).toThrow();
     });
+  });
 
-    it('should validate team simple schema', async () => {
-      const { TeamSimpleSchema } = await import('../src/schemas.js');
-
+  describe('TeamSimpleSchema', () => {
+    it('should validate team simple schema', () => {
       const validTeamSimple = {
         key: 'frc86',
         team_number: 86,
@@ -336,10 +264,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => TeamSimpleSchema.parse(invalidTeamSimple)).toThrow();
     });
+  });
 
-    it('should validate event simple schema', async () => {
-      const { EventSimpleSchema } = await import('../src/schemas.js');
-
+  describe('EventSimpleSchema', () => {
+    it('should validate event simple schema', () => {
       const validEventSimple = {
         key: '2025hop',
         name: 'Hopper Division',
@@ -355,10 +283,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => EventSimpleSchema.parse(validEventSimple)).not.toThrow();
     });
+  });
 
-    it('should validate match simple schema', async () => {
-      const { MatchSimpleSchema } = await import('../src/schemas.js');
-
+  describe('MatchSimpleSchema', () => {
+    it('should validate match simple schema', () => {
       const validMatchSimple = {
         key: '2025hop_qm112',
         comp_level: 'qm',
@@ -383,10 +311,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => MatchSimpleSchema.parse(validMatchSimple)).not.toThrow();
     });
+  });
 
-    it('should validate zebra schema', async () => {
-      const { ZebraSchema } = await import('../src/schemas.js');
-
+  describe('ZebraSchema', () => {
+    it('should validate zebra schema', () => {
       const validZebra = {
         key: '2025hop_qm112',
         times: [0.0, 0.5, 1.0, 1.5],
@@ -410,10 +338,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => ZebraSchema.parse(validZebra)).not.toThrow();
     });
+  });
 
-    it('should validate prediction schema', async () => {
-      const { PredictionSchema } = await import('../src/schemas.js');
-
+  describe('PredictionSchema', () => {
+    it('should validate prediction schema', () => {
       const validPrediction = {
         match_predictions: {
           '2025hop_qm112': {
@@ -440,10 +368,10 @@ describe('The Blue Alliance MCP Server', () => {
 
       expect(() => PredictionSchema.parse(emptyPrediction)).not.toThrow();
     });
+  });
 
-    it('should validate team history schema', async () => {
-      const { TeamHistorySchema } = await import('../src/schemas.js');
-
+  describe('TeamHistorySchema', () => {
+    it('should validate team history schema', () => {
       const validHistory = {
         awards: [
           {
