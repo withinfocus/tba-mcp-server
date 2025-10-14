@@ -15,12 +15,9 @@ async function runServer(): Promise<void> {
   let server: Server | null = null;
 
   try {
-    await log('info', 'The Blue Alliance MCP Server starting ...', server);
-
     // Validate API key availability early
     try {
       getApiKey();
-      await log('info', 'TBA API key validated successfully', server);
     } catch (error) {
       const errorMessage = 'Failed to get TBA API key';
       await log(
@@ -31,7 +28,6 @@ async function runServer(): Promise<void> {
       throw new Error(errorMessage);
     }
 
-    await log('info', 'Initializing MCP server ...', server);
     server = new Server(
       {
         name: 'The Blue Alliance MCP Server',
