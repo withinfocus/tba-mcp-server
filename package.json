@@ -13,7 +13,7 @@
     "url": "https://github.com/withinfocus/tba-mcp-server/issues"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.20.0",
+    "@modelcontextprotocol/sdk": "1.20.2",
     "shx": "0.4.0",
     "zod": "4.1.12"
   },
