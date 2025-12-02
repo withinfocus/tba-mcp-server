@@ -1,0 +1,297 @@
+{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "name": "@withinfocus/tba-mcp-server",
+  "version": "0.3.0",
+  "description": "Provides access to The Blue Alliance API for FIRST Robotics Competition data. This server enables AI assistants and other MCP clients to retrieve comprehensive FRC team, event, and match information.",
+  "maintainers": ["withinfocus"],
+  "homepage": "https://github.com/withinfocus/tba-mcp-server",
+  "repository": "https://github.com/withinfocus/tba-mcp-server.git",
+  "issues": "https://github.com/withinfocus/tba-mcp-server/issues",
+  "license": "MIT",
+  "keywords": [
+    "first-robotics",
+    "frc",
+    "the-blue-alliance",
+    "tba",
+    "robotics",
+    "competition-data",
+    "api",
+    "typescript"
+  ],
+  "categories": ["data", "api", "sports"],
+  "installation": {
+    "npm": {
+      "package": "@withinfocus/tba-mcp-server"
+    }
+  },
+  "configuration": {
+    "command": "npx",
+    "args": ["-y", "@withinfocus/tba-mcp-server"],
+    "env": {
+      "TBA_API_KEY": {
+        "description": "The Blue Alliance API key (register at https://www.thebluealliance.com/account)",
+        "required": true,
+        "type": "string"
+      }
+    }
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": false,
+    "prompts": false
+  },
+  "tools": [
+    {
+      "name": "get_team",
+      "description": "Get detailed information about a specific FRC team including location, website, rookie year, and motto"
+    },
+    {
+      "name": "get_team_simple",
+      "description": "Get simplified information about a specific team"
+    },
+    {
+      "name": "get_team_events",
+      "description": "Get events that a team has participated in for a given year"
+    },
+    {
+      "name": "get_team_events_simple",
+      "description": "Get simplified events for a team in a specific year"
+    },
+    {
+      "name": "get_team_events_keys",
+      "description": "Get event keys for a team in a specific year"
+    },
+    {
+      "name": "get_team_events_all",
+      "description": "Get all events a team has participated in across all years"
+    },
+    {
+      "name": "get_team_awards",
+      "description": "Get awards won by a team in a specific year"
+    },
+    {
+      "name": "get_team_awards_all",
+      "description": "Get all awards won by a team across all years"
+    },
+    {
+      "name": "get_team_event_awards",
+      "description": "Get awards won by a team at a specific event"
+    },
+    {
+      "name": "get_team_matches",
+      "description": "Get matches played by a team in a specific year"
+    },
+    {
+      "name": "get_team_matches_simple",
+      "description": "Get simplified matches for a team in a specific year"
+    },
+    {
+      "name": "get_team_matches_keys",
+      "description": "Get match keys for a team in a specific year"
+    },
+    {
+      "name": "get_team_event_matches",
+      "description": "Get matches for a team at a specific event"
+    },
+    {
+      "name": "get_team_event_matches_simple",
+      "description": "Get simplified matches for a team at a specific event"
+    },
+    {
+      "name": "get_team_event_matches_keys",
+      "description": "Get match keys for a team at a specific event"
+    },
+    {
+      "name": "get_team_years_participated",
+      "description": "Get years that a team has participated in competition"
+    },
+    {
+      "name": "get_team_districts",
+      "description": "Get district history for a team"
+    },
+    {
+      "name": "get_team_robots",
+      "description": "Get robot names for a team by year"
+    },
+    {
+      "name": "get_team_media",
+      "description": "Get media for a team in a specific year"
+    },
+    {
+      "name": "get_team_media_by_tag",
+      "description": "Get media for a team filtered by tag"
+    },
+    {
+      "name": "get_team_media_by_tag_year",
+      "description": "Get media for a team filtered by tag and year"
+    },
+    {
+      "name": "get_team_social_media",
+      "description": "Get social media information for a team"
+    },
+    {
+      "name": "get_team_event_status",
+      "description": "Get team competition rank and status at a specific event"
+    },
+    {
+      "name": "get_team_event_statuses",
+      "description": "Get team event statuses for all events in a year"
+    },
+    {
+      "name": "get_team_history",
+      "description": "Get historical data for a team across all years"
+    },
+    {
+      "name": "get_events",
+      "description": "Get all FRC events for a specific year"
+    },
+    {
+      "name": "get_events_simple",
+      "description": "Get simplified list of events for a year"
+    },
+    {
+      "name": "get_events_keys",
+      "description": "Get list of event keys for a year"
+    },
+    {
+      "name": "get_event",
+      "description": "Get detailed information about a specific event"
+    },
+    {
+      "name": "get_event_simple",
+      "description": "Get simplified information about a specific event"
+    },
+    {
+      "name": "get_event_teams",
+      "description": "Get teams participating in a specific event"
+    },
+    {
+      "name": "get_event_teams_simple",
+      "description": "Get simplified teams participating in an event"
+    },
+    {
+      "name": "get_event_teams_keys",
+      "description": "Get team keys participating in an event"
+    },
+    {
+      "name": "get_event_rankings",
+      "description": "Get team rankings for a specific event"
+    },
+    {
+      "name": "get_event_alliances",
+      "description": "Get elimination alliances for a specific event"
+    },
+    {
+      "name": "get_event_matches",
+      "description": "Get matches for a specific event"
+    },
+    {
+      "name": "get_event_matches_simple",
+      "description": "Get simplified matches for an event"
+    },
+    {
+      "name": "get_event_matches_keys",
+      "description": "Get match keys for an event"
+    },
+    {
+      "name": "get_event_awards",
+      "description": "Get awards from a specific event"
+    },
+    {
+      "name": "get_event_insights",
+      "description": "Get event-specific insights and statistics"
+    },
+    {
+      "name": "get_event_oprs",
+      "description": "Get OPR, DPR, and CCWM ratings for teams at an event"
+    },
+    {
+      "name": "get_event_predictions",
+      "description": "Get TBA-generated predictions for an event"
+    },
+    {
+      "name": "get_event_district_points",
+      "description": "Get district points for teams at an event"
+    },
+    {
+      "name": "get_match",
+      "description": "Get detailed information about a specific match"
+    },
+    {
+      "name": "get_match_simple",
+      "description": "Get simplified information about a specific match"
+    },
+    {
+      "name": "get_match_zebra",
+      "description": "Get Zebra MotionWorks data for a match (robot tracking)"
+    },
+    {
+      "name": "get_districts",
+      "description": "Get all districts for a specific year"
+    },
+    {
+      "name": "get_district_rankings",
+      "description": "Get team rankings within a district"
+    },
+    {
+      "name": "get_district_events",
+      "description": "Get events in a specific district"
+    },
+    {
+      "name": "get_district_events_simple",
+      "description": "Get simplified events in a specific district"
+    },
+    {
+      "name": "get_district_events_keys",
+      "description": "Get event keys in a specific district"
+    },
+    {
+      "name": "get_district_teams",
+      "description": "Get teams in a specific district"
+    },
+    {
+      "name": "get_district_teams_simple",
+      "description": "Get simplified teams in a specific district"
+    },
+    {
+      "name": "get_district_teams_keys",
+      "description": "Get team keys in a specific district"
+    },
+    {
+      "name": "get_teams",
+      "description": "Get paginated list of all teams (detailed)"
+    },
+    {
+      "name": "get_teams_simple",
+      "description": "Get paginated list of teams (simplified)"
+    },
+    {
+      "name": "get_teams_keys",
+      "description": "Get paginated list of team keys"
+    },
+    {
+      "name": "get_teams_by_year",
+      "description": "Get teams that competed in a specific year (detailed)"
+    },
+    {
+      "name": "get_teams_by_year_simple",
+      "description": "Get teams from a year (simplified)"
+    },
+    {
+      "name": "get_teams_by_year_keys",
+      "description": "Get team keys from a specific year"
+    },
+    {
+      "name": "get_status",
+      "description": "Get TBA API status information"
+    }
+  ],
+  "author": {
+    "name": "Matt Bishop",
+    "email": "matt@withinfocus.com"
+  },
+  "requirements": {
+    "node": "~22",
+    "npm": "~10"
+  }
+}
