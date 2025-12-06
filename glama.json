@@ -1,7 +1,7 @@
 {
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "name": "@withinfocus/tba-mcp-server",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Provides access to The Blue Alliance API for FIRST Robotics Competition data. This server enables AI assistants and other MCP clients to retrieve comprehensive FRC team, event, and match information.",
   "maintainers": ["withinfocus"],
   "homepage": "https://github.com/withinfocus/tba-mcp-server",
