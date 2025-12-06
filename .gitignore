@@ -36,3 +36,5 @@ junit.xml
 
 # Distribution
 dist/
+.mcpregistry_github_token
+.mcpregistry_registry_token

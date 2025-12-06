@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.withinfocus/tba",
+  "description": "The Blue Alliance MCP Server",
+  "repository": {
+    "url": "https://github.com/withinfocus/tba-mcp-server",
+    "source": "github"
+  },
+  "version": "0.3.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@withinfocus/tba-mcp-server",
+      "version": "0.3.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "The Blue Alliance API key",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true,
+          "name": "TBA_API_KEY"
+        }
+      ]
+    }
+  ]
+}
