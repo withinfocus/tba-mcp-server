@@ -2,7 +2,7 @@ name: PR Validation
 
 on:
   pull_request:
-  workflow_dispatch:
+  workflow_dispatch: # checkov:skip=CKV_GHA_7:Input only used to select PR for validation, does not affect build output
     inputs:
       pull_request_number:
         description: "Pull Request Number"
