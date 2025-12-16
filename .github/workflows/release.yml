@@ -18,16 +18,16 @@ jobs:
       _IMAGE_NAME: ghcr.io/withinfocus/tba-mcp-server
 
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Version
-        id: version
+      - name: Get package version
+        id: retrieve-package-version
         run: |
           version=$( jq -r ".version" package.json )
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: Run
+      - name: Get latest build run
         id: latest-build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,38 +35,37 @@ jobs:
           latest_run=$(gh run list --workflow=build.yml --branch=main --status=success --limit=1 --json=databaseId --jq='.[0].databaseId')
           echo "run_id=$latest_run" >> "$GITHUB_OUTPUT"
 
-      - name: Download
+      - name: Download build artifact
         uses: actions/download-artifact@v6
-        id: retrieve-package-version
         with:
-          name: mcp-server-${{ steps.version.outputs.version }}.zip
+          name: mcp-server-${{ steps.retrieve-package-version.outputs.version }}.zip
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           run-id: ${{ steps.latest-build.outputs.run_id }}
 
-      - name: Create
+      - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "./mcp-server-${{ steps.version.outputs.version }}.zip"
+          artifacts: "./mcp-server-${{ steps.retrieve-package-version.outputs.version }}.zip"
           commit: ${{ github.sha }}
-          tag: v${{ steps.version.outputs.version }}
-          name: v${{ steps.version.outputs.version }}
+          tag: v${{ steps.retrieve-package-version.outputs.version }}
+          name: v${{ steps.retrieve-package-version.outputs.version }}
           body: "<insert release notes here>"
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
 
-      - name: Login
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker
+      - name: Tag and push Docker image
         run: |
           docker pull "${{ env._IMAGE_NAME }}:dev"
-          docker tag "${{ env._IMAGE_NAME }}:dev" "${{ env._IMAGE_NAME }}:${{ steps.version.outputs.version }}"
-          docker push "${{ env._IMAGE_NAME }}:${{ steps.version.outputs.version }}"
+          docker tag "${{ env._IMAGE_NAME }}:dev" "${{ env._IMAGE_NAME }}:${{ steps.retrieve-package-version.outputs.version }}"
+          docker push "${{ env._IMAGE_NAME }}:${{ steps.retrieve-package-version.outputs.version }}"
 
-      - name: Logout
+      - name: Log out from GitHub Container Registry
         run: docker logout ghcr.io

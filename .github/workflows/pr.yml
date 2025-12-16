@@ -1,0 +1,347 @@
+name: PR Validation
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      pull_request_number:
+        description: "Pull Request Number"
+        required: true
+        type: number
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Get PR details
+        id: pr-details
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Fetching details for PR #$PR_NUMBER"
+
+            PR_DATA=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json headRefName,headRepository,author)
+            HEAD_REF=$(echo "$PR_DATA" | jq -r '.headRefName')
+            AUTHOR_LOGIN=$(echo "$PR_DATA" | jq -r '.author.login')
+            HEAD_REPO=$(echo "$PR_DATA" | jq -r '.headRepository.nameWithOwner')
+
+            {
+              echo "head_ref=$HEAD_REF"
+              echo "author_login=$AUTHOR_LOGIN"
+              echo "head_repo=$HEAD_REPO"
+            } >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "head_ref=$PR_HEAD_REF"
+              echo "author_login=$PR_AUTHOR_LOGIN"
+              echo "head_repo=$PR_HEAD_REPO"
+            } >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ inputs.pull_request_number }}
+          REPO: ${{ github.repository }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
+          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pr-details.outputs.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Run MegaLinter
+        id: ml
+        uses: oxsecurity/megalinter/flavors/javascript@v9
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LLM_ADVISOR_ENABLED: >-
+            ${{
+              steps.pr-details.outputs.author_login != 'dependabot[bot]' &&
+              steps.pr-details.outputs.author_login != 'github-actions[bot]' &&
+              !startsWith(steps.pr-details.outputs.author_login, 'dependabot')
+            }}
+
+      - name: Upload lint reports
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: Lint Report
+          path: |
+            megalinter-reports
+            mega-linter.log
+
+      - name: Prepare git directory
+        if: >-
+          steps.ml.outputs.has_updated_sources == 1 &&
+          steps.pr-details.outputs.head_repo == github.repository
+        run: sudo chown -Rc $UID .git/
+
+      - name: Commit and push MegaLinter fixes
+        if: >-
+          steps.ml.outputs.has_updated_sources == 1 &&
+          steps.pr-details.outputs.head_repo == github.repository
+        run: |
+          git config user.name "megalinter-bot"
+          git config user.email "129584137+megalinter-bot@users.noreply.github.com"
+
+          if [[ -n $(git status -s) ]]; then
+            git add .
+            git commit -m "Apply lint fixes"
+
+            for i in {1..4}; do
+              if git push; then
+                echo "✅ MegaLinter fixes pushed successfully"
+                break
+              else
+                if [[ "$i" -lt 4 ]]; then
+                  WAIT_TIME=$((2 ** i))
+                  echo "⚠️ Push failed, retrying in ${WAIT_TIME}s..."
+                  sleep "$WAIT_TIME"
+                else
+                  echo "❌ Push failed after 4 attempts"
+                  exit 1
+                fi
+              fi
+            done
+          else
+            echo "ℹ️ No MegaLinter changes to commit"
+          fi
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Get PR details
+        id: pr-details
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Fetching details for PR #$PR_NUMBER"
+
+            PR_DATA=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json headRefName,number)
+            HEAD_REF=$(echo "$PR_DATA" | jq -r '.headRefName')
+            PR_NUM=$(echo "$PR_DATA" | jq -r '.number')
+
+            {
+              echo "head_ref=$HEAD_REF"
+              echo "pr_number=$PR_NUM"
+            } >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "head_ref=$PR_HEAD_REF"
+              echo "pr_number=$PR_NUMBER"
+            } >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ inputs.pull_request_number || github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pr-details.outputs.head_ref }}
+
+      - name: Get package version
+        id: retrieve-package-version
+        run: |
+          PKG_VERSION=$(jq -r .version package.json)
+          echo "package_version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Get Node version
+        id: retrieve-node-version
+        run: |
+          NODE_NVMRC=$(cat .nvmrc)
+          NODE_VERSION=${NODE_NVMRC/v/''}
+          echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+          node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Archive build
+        run: |
+          zip -r mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip dist
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
+          path: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
+          if-no-files-found: error
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          file: Dockerfile
+          platforms: linux/amd64
+          push: false
+          tags: ghcr.io/withinfocus/tba-mcp-server:pr-${{ steps.pr-details.outputs.pr_number }}
+
+      - name: Log out from GitHub Container Registry
+        run: docker logout ghcr.io
+
+  unit:
+    name: Unit test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR details
+        id: pr-details
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Fetching details for PR #$PR_NUMBER"
+
+            PR_DATA=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json headRefName)
+            HEAD_REF=$(echo "$PR_DATA" | jq -r '.headRefName')
+
+            echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+          else
+            echo "head_ref=$PR_HEAD_REF" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ inputs.pull_request_number }}
+          REPO: ${{ github.repository }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pr-details.outputs.head_ref }}
+
+      - name: Get Node version
+        id: retrieve-node-version
+        run: |
+          NODE_NVMRC=$(cat .nvmrc)
+          NODE_VERSION=${NODE_NVMRC/v/''}
+          echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+          node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit --coverage
+
+      - name: Report test results
+        uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
+        with:
+          name: Unit Test Results
+          path: "junit.xml"
+          reporter: jest-junit
+          fail-on-error: true
+
+  integration:
+    name: Integration test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR details
+        id: pr-details
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Fetching details for PR #$PR_NUMBER"
+
+            PR_DATA=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json headRefName)
+            HEAD_REF=$(echo "$PR_DATA" | jq -r '.headRefName')
+
+            echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+          else
+            echo "head_ref=$PR_HEAD_REF" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ inputs.pull_request_number }}
+          REPO: ${{ github.repository }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pr-details.outputs.head_ref }}
+
+      - name: Get Node version
+        id: retrieve-node-version
+        run: |
+          NODE_NVMRC=$(cat .nvmrc)
+          NODE_VERSION=${NODE_NVMRC/v/''}
+          echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+          node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: Set up environment
+        run: echo "TBA_API_KEY=${{ secrets.TBA_API_KEY }}" >> .env
+
+      - name: Build project
+        run: npm run build
+
+      - name: Run integration tests
+        run: npm run test:integration
+
+      - name: Report test results
+        uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
+        with:
+          name: Integration Test Results
+          path: "junit.xml"
+          reporter: jest-junit
+          fail-on-error: true

@@ -1,13 +1,11 @@
-name: Build
+name: CI
 
 on:
-  pull_request:
   push:
-    branches:
-      - "main"
+    branches: [main]
+  workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -19,77 +17,71 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write
       packages: write
       id-token: write
+
     env:
       _IMAGE_NAME: ghcr.io/withinfocus/tba-mcp-server
 
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Package version
+      - name: Get package version
         id: retrieve-package-version
         run: |
           PKG_VERSION=$(jq -r .version package.json)
           echo "package_version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Node version
+      - name: Get Node version
         id: retrieve-node-version
         run: |
           NODE_NVMRC=$(cat .nvmrc)
           NODE_VERSION=${NODE_NVMRC/v/''}
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Node
+      - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
 
-      - name: Install
+      - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build project
         run: npm run build
 
-      - name: Archive
+      - name: Archive build
         run: |
           zip -r mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip dist
 
-      - name: Upload
+      - name: Upload build artifact
         uses: actions/upload-artifact@v5
         with:
           name: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
           path: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
           if-no-files-found: error
 
-      - name: Login
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker version
+      - name: Get Docker version
         id: tag
-        env:
-          EVENT_TYPE: ${{ contains(github.event_name, 'pull_request') && 'pull_request' || '' }}
         run: |
-          if [[ "$EVENT_TYPE" == "pull_request" ]]; then
-            IMAGE_TAG="pr-${{ github.event.pull_request.number }}"
-          else
-            IMAGE_TAG="${GITHUB_REF:11}"
-            IMAGE_TAG="${IMAGE_TAG//\//-}"  # slash safe branch name
-            if [[ "$IMAGE_TAG" == "main" ]]; then
-              IMAGE_TAG=dev
-            fi
+          IMAGE_TAG="${GITHUB_REF:11}"
+          IMAGE_TAG="${IMAGE_TAG//\//-}"  # slash safe branch name
+          if [[ "$IMAGE_TAG" == "main" ]]; then
+            IMAGE_TAG=dev
           fi
           echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Tag generation
+      - name: Generate image tags
         id: image-tags
         env:
           IMAGE_TAG: ${{ steps.tag.outputs.image_tag }}
@@ -103,14 +95,59 @@ jobs:
           fi
           echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
 
-      - name: Docker
-        id: build-docker
+      - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           file: Dockerfile
           platforms: linux/amd64
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: true
           tags: ${{ steps.image-tags.outputs.tags }}
 
-      - name: Logout
+      - name: Log out from GitHub Container Registry
         run: docker logout ghcr.io
+
+  scan:
+    name: Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["javascript"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Get Node version
+        id: retrieve-node-version
+        run: |
+          NODE_NVMRC=$(cat .nvmrc)
+          NODE_VERSION=${NODE_NVMRC/v/''}
+          echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+          node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Clean build artifacts
+        run: rm -rf dist
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v4
