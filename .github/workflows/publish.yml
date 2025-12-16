@@ -15,13 +15,13 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     outputs:
-      release_version: ${{ steps.version-output.outputs.version }}
+      release_version: ${{ steps.retrieve-release-version.outputs.version }}
     permissions:
       contents: read
 
     steps:
-      - name: Version
-        id: version-output
+      - name: Get release version
+        id: retrieve-release-version
         run: |
           VERSION=$(curl "https://api.github.com/repos/withinfocus/tba-mcp-server/releases" | jq -r '.[] | select(.tag_name | contains("v")) | .tag_name' | head -1 | sed 's/^v//')
           echo "Latest released version: $VERSION"
@@ -40,12 +40,12 @@ jobs:
       _PKG_VERSION: ${{ needs.setup.outputs.release_version }}
 
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v6
         with:
           ref: refs/tags/v${{ env._PKG_VERSION }}
 
-      - name: Deployment
+      - name: Create deployment
         uses: chrnorm/deployment-action@v2
         id: deployment
         with:
@@ -55,39 +55,39 @@ jobs:
           description: "Deployment ${{ needs.setup.outputs.release_version }} from branch ${{ github.ref_name }}"
           task: release
 
-      - name: Node version
+      - name: Get Node version
         id: retrieve-node-version
         run: |
           NODE_NVMRC=$(cat .nvmrc)
           NODE_VERSION=${NODE_NVMRC/v/''}
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Node
+      - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
 
-      - name: NPM
+      - name: Install NPM and Husky
         run: npm install -g npm@latest husky
 
-      - name: Download
+      - name: Download release artifact
         run: |
           wget "https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip"
           unzip "mcp-server-${{ env._PKG_VERSION }}.zip"
 
-      - name: Setup
+      - name: Configure NPM registry
         run: |
           echo 'registry="https://npm.pkg.github.com/"' > ./.npmrc
           echo "//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ./.npmrc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish
+      - name: Publish to GitHub Package Registry
         run: npm publish --access public --registry=https://npm.pkg.github.com/ --userconfig=./.npmrc
 
-      - name: Success
+      - name: Update deployment status (success)
         if: ${{ success() }}
         uses: chrnorm/deployment-status@v2
         with:
@@ -95,7 +95,7 @@ jobs:
           state: "success"
           deployment-id: ${{ steps.deployment.outputs.deployment_id }}
 
-      - name: Failure
+      - name: Update deployment status (failure)
         if: ${{ failure() }}
         uses: chrnorm/deployment-status@v2
         with:
@@ -117,12 +117,12 @@ jobs:
       _PKG_VERSION: ${{ needs.setup.outputs.release_version }}
 
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v6
         with:
           ref: refs/tags/v${{ env._PKG_VERSION }}
 
-      - name: Deployment
+      - name: Create deployment
         uses: chrnorm/deployment-action@v2
         id: deployment
         with:
@@ -132,32 +132,32 @@ jobs:
           description: "Deployment ${{ needs.setup.outputs.release_version }} from branch ${{ github.ref_name }}"
           task: release
 
-      - name: Node version
+      - name: Get Node version
         id: retrieve-node-version
         run: |
           NODE_NVMRC=$(cat .nvmrc)
           NODE_VERSION=${NODE_NVMRC/v/''}
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Node
+      - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
 
-      - name: NPM
+      - name: Install NPM and Husky
         run: npm install -g npm@latest husky
 
-      - name: Download
+      - name: Download release artifact
         run: |
           wget https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip
           unzip mcp-server-${{ env._PKG_VERSION }}.zip
 
-      - name: Publish
+      - name: Publish to NPM
         run: npm publish --access public
 
-      - name: Success
+      - name: Update deployment status (success)
         if: ${{ success() }}
         uses: chrnorm/deployment-status@v2
         with:
@@ -165,7 +165,7 @@ jobs:
           state: "success"
           deployment-id: ${{ steps.deployment.outputs.deployment_id }}
 
-      - name: Failure
+      - name: Update deployment status (failure)
         if: ${{ failure() }}
         uses: chrnorm/deployment-status@v2
         with:
@@ -187,7 +187,7 @@ jobs:
       _IMAGE_NAME: ghcr.io/withinfocus/tba-mcp-server
 
     steps:
-      - name: Deployment
+      - name: Create deployment
         uses: chrnorm/deployment-action@v2
         id: deployment
         with:
@@ -197,20 +197,20 @@ jobs:
           description: "Deployment ${{ needs.setup.outputs.release_version }} from branch ${{ github.ref_name }}"
           task: release
 
-      - name: Login
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker
+      - name: Tag and push Docker image
         run: |
           docker pull "${{ env._IMAGE_NAME }}:${{ env._RELEASE_TAG }}"
           docker tag "${{ env._IMAGE_NAME }}:${{ env._RELEASE_TAG }}" "${{ env._IMAGE_NAME }}:latest"
           docker push "${{ env._IMAGE_NAME }}:latest"
 
-      - name: Success
+      - name: Update deployment status (success)
         if: ${{ success() }}
         uses: chrnorm/deployment-status@v2
         with:
@@ -218,7 +218,7 @@ jobs:
           state: "success"
           deployment-id: ${{ steps.deployment.outputs.deployment_id }}
 
-      - name: Failure
+      - name: Update deployment status (failure)
         if: ${{ failure() }}
         uses: chrnorm/deployment-status@v2
         with:
@@ -226,7 +226,7 @@ jobs:
           state: "failure"
           deployment-id: ${{ steps.deployment.outputs.deployment_id }}
 
-      - name: Logout
+      - name: Log out from GitHub Container Registry
         run: docker logout ghcr.io
 
   publish-mcp-registry:
@@ -243,12 +243,12 @@ jobs:
       _PKG_VERSION: ${{ needs.setup.outputs.release_version }}
 
     steps:
-      - name: Checkout
+      - name: Check out repository
         uses: actions/checkout@v6
         with:
           ref: refs/tags/v${{ env._PKG_VERSION }}
 
-      - name: Deployment
+      - name: Create deployment
         uses: chrnorm/deployment-action@v2
         id: deployment
         with:
@@ -258,20 +258,20 @@ jobs:
           description: "Deployment ${{ needs.setup.outputs.release_version }} from branch ${{ github.ref_name }}"
           task: release
 
-      - name: Download
+      - name: Download MCP publisher
         run: |
           curl -L "https://github.com/modelcontextprotocol/publisher/releases/latest/download/mcp-publisher-linux-amd64.tar.gz" -o mcp-publisher.tar.gz
           tar -xzf mcp-publisher.tar.gz
           chmod +x mcp-publisher
           ./mcp-publisher --version
 
-      - name: Authenticate
+      - name: Authenticate with MCP registry
         run: ./mcp-publisher login github-oidc
 
-      - name: Publish
+      - name: Publish to MCP registry
         run: ./mcp-publisher publish
 
-      - name: Success
+      - name: Update deployment status (success)
         if: ${{ success() }}
         uses: chrnorm/deployment-status@v2
         with:
@@ -279,7 +279,7 @@ jobs:
           state: "success"
           deployment-id: ${{ steps.deployment.outputs.deployment_id }}
 
-      - name: Failure
+      - name: Update deployment status (failure)
         if: ${{ failure() }}
         uses: chrnorm/deployment-status@v2
         with:
