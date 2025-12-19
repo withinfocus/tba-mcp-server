@@ -58,7 +58,7 @@ jobs:
           zip -r mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip dist
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
           path: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
