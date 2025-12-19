@@ -85,7 +85,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to GitHub Package Registry
-        run: npm publish --access public --registry=https://npm.pkg.github.com/ --userconfig=./.npmrc
+        run: |
+          if npm publish --access public --registry=https://npm.pkg.github.com/ --userconfig=./.npmrc 2>&1 | tee publish.log; then
+            echo "✓ Successfully published to GitHub Package Registry"
+          elif grep -q "cannot publish over the previously published versions" publish.log || grep -q "You cannot publish over the previously published versions" publish.log || grep -q "version already exists" publish.log; then
+            echo "ℹ️ Package version already exists in GitHub Package Registry - skipping"
+            exit 0
+          else
+            echo "✗ Failed to publish to GitHub Package Registry"
+            exit 1
+          fi
 
       - name: Update deployment status (success)
         if: ${{ success() }}
@@ -155,7 +164,16 @@ jobs:
           unzip mcp-server-${{ env._PKG_VERSION }}.zip
 
       - name: Publish to NPM
-        run: npm publish --access public
+        run: |
+          if npm publish --access public 2>&1 | tee publish.log; then
+            echo "✓ Successfully published to NPM"
+          elif grep -q "cannot publish over the previously published versions" publish.log || grep -q "You cannot publish over the previously published versions" publish.log || grep -q "version already exists" publish.log; then
+            echo "ℹ️ Package version already exists on NPM - skipping"
+            exit 0
+          else
+            echo "✗ Failed to publish to NPM"
+            exit 1
+          fi
 
       - name: Update deployment status (success)
         if: ${{ success() }}
@@ -208,7 +226,15 @@ jobs:
         run: |
           docker pull "${{ env._IMAGE_NAME }}:${{ env._RELEASE_TAG }}"
           docker tag "${{ env._IMAGE_NAME }}:${{ env._RELEASE_TAG }}" "${{ env._IMAGE_NAME }}:latest"
-          docker push "${{ env._IMAGE_NAME }}:latest"
+          if docker push "${{ env._IMAGE_NAME }}:latest" 2>&1 | tee push.log; then
+            echo "✓ Successfully pushed Docker image to GHCR"
+          elif grep -q "already exists" push.log || grep -q "already pushed" push.log; then
+            echo "ℹ️ Docker image already exists in GHCR - skipping"
+            exit 0
+          else
+            echo "✗ Failed to push Docker image to GHCR"
+            exit 1
+          fi
 
       - name: Update deployment status (success)
         if: ${{ success() }}
@@ -270,7 +296,16 @@ jobs:
         run: ./mcp-publisher login github-oidc
 
       - name: Publish to MCP registry
-        run: ./mcp-publisher publish
+        run: |
+          if ./mcp-publisher publish 2>&1 | tee publish.log; then
+            echo "✓ Successfully published to MCP registry"
+          elif grep -q "already exists" publish.log || grep -q "already published" publish.log || grep -q "duplicate" publish.log; then
+            echo "ℹ️ Server already exists in MCP registry - skipping"
+            exit 0
+          else
+            echo "✗ Failed to publish to MCP registry"
+            exit 1
+          fi
 
       - name: Update deployment status (success)
         if: ${{ success() }}
