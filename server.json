@@ -6,12 +6,12 @@
     "url": "https://github.com/withinfocus/tba-mcp-server",
     "source": "github"
   },
-  "version": "0.3.2",
+  "version": "1.0.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@withinfocus/tba-mcp-server",
-      "version": "0.3.2",
+      "version": "1.0.0",
       "transport": {
         "type": "stdio"
       },
