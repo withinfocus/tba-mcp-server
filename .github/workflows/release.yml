@@ -32,7 +32,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          latest_run=$(gh run list --workflow=build.yml --branch=main --status=success --limit=1 --json=databaseId --jq='.[0].databaseId')
+          latest_run=$(gh run list --workflow=ci.yml --branch=main --status=success --limit=1 --json=databaseId --jq='.[0].databaseId')
           echo "run_id=$latest_run" >> "$GITHUB_OUTPUT"
 
       - name: Download build artifact
