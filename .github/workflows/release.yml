@@ -36,7 +36,7 @@ jobs:
           echo "run_id=$latest_run" >> "$GITHUB_OUTPUT"
 
       - name: Download build artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: mcp-server-${{ steps.retrieve-package-version.outputs.version }}.zip
           github-token: ${{ secrets.GITHUB_TOKEN }}
