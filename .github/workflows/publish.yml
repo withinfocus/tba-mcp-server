@@ -235,6 +235,7 @@ jobs:
     needs:
       - setup
       - publish-npm
+    if: ${{ success() }}
     permissions:
       contents: read
       deployments: write
@@ -260,7 +261,7 @@ jobs:
 
       - name: Download MCP publisher
         run: |
-          curl -L "https://github.com/modelcontextprotocol/publisher/releases/latest/download/mcp-publisher-linux-amd64.tar.gz" -o mcp-publisher.tar.gz
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" -o mcp-publisher.tar.gz
           tar -xzf mcp-publisher.tar.gz
           chmod +x mcp-publisher
           ./mcp-publisher --version
