@@ -24,7 +24,7 @@
     "@modelcontextprotocol/inspector": "0.17.5",
     "@playwright/test": "1.57.0",
     "@types/jest": "30.0.0",
-    "@types/node": "22.19.1",
+    "@types/node": "24.10.4",
     "eslint": "9.39.2",
     "globals": "16.5.0",
     "husky": "9.1.7",
@@ -63,7 +63,7 @@
     "start:test": "node dist/index.js"
   },
   "engines": {
-    "node": "~22",
-    "npm": "~10"
+    "node": "~24",
+    "npm": "~11"
   }
 }
