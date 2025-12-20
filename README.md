@@ -11,7 +11,7 @@ A Model Context Protocol (MCP) server that provides access to The Blue Alliance 
 
 ## Prerequisites
 
-- Node.js 22
+- Node.js 24
 - The Blue Alliance API key (register at [thebluealliance.com/account](https://www.thebluealliance.com/account))
 
 ## Installation
