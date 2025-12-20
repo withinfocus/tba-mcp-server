@@ -1,0 +1,130 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Version bump type"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Node version
+        id: retrieve-node-version
+        run: |
+          NODE_NVMRC=$(cat .nvmrc)
+          NODE_VERSION=${NODE_NVMRC/v/''}
+          echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+          node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get current version
+        id: current-version
+        run: |
+          CURRENT_VERSION=$(jq -r '.version' package.json)
+          echo "version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Calculate new version
+        id: new-version
+        run: |
+          CURRENT_VERSION="${{ steps.current-version.outputs.version }}"
+          BUMP_TYPE="${{ github.event.inputs.bump_type }}"
+
+          # Split version into parts
+          IFS='.' read -r -a version_parts <<< "$CURRENT_VERSION"
+          MAJOR="${version_parts[0]}"
+          MINOR="${version_parts[1]}"
+          PATCH="${version_parts[2]}"
+
+          # Calculate new version based on bump type
+          if [ "$BUMP_TYPE" = "major" ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [ "$BUMP_TYPE" = "minor" ]; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          elif [ "$BUMP_TYPE" = "patch" ]; then
+            PATCH=$((PATCH + 1))
+          fi
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "New version: $NEW_VERSION"
+
+      - name: Update package.json
+        run: |
+          jq '.version = "${{ steps.new-version.outputs.version }}"' package.json > package.json.tmp
+          mv package.json.tmp package.json
+          echo "✓ Updated package.json"
+
+      - name: Update package-lock.json
+        run: |
+          npm install --package-lock-only
+          echo "✓ Updated package-lock.json"
+
+      - name: Update glama.json
+        run: |
+          jq '.version = "${{ steps.new-version.outputs.version }}"' glama.json > glama.json.tmp
+          mv glama.json.tmp glama.json
+          echo "✓ Updated glama.json"
+
+      - name: Update server.json
+        run: |
+          jq '.version = "${{ steps.new-version.outputs.version }}" | .packages[0].version = "${{ steps.new-version.outputs.version }}"' server.json > server.json.tmp
+          mv server.json.tmp server.json
+          echo "✓ Updated server.json"
+
+      - name: Update src/index.ts
+        run: |
+          sed -i.bak "s/version: '[0-9]\+\.[0-9]\+\.[0-9]\+'/version: '${{ steps.new-version.outputs.version }}'/" src/index.ts
+          rm src/index.ts.bak
+          echo "✓ Updated src/index.ts"
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit version bump
+        run: |
+          git add package.json package-lock.json glama.json server.json src/index.ts
+          git commit -m "Bump version to ${{ steps.new-version.outputs.version }}"
+          git push
+          echo "✓ Committed and pushed version bump"
+
+      - name: Create summary
+        run: |
+          echo "## Version Bump Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bump Type**: ${{ github.event.inputs.bump_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Previous Version**: ${{ steps.current-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **New Version**: ${{ steps.new-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
