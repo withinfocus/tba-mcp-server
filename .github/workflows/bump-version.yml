@@ -12,8 +12,7 @@ on:
           - minor
           - major
 
-permissions:
-  contents: write
+permissions: {}
 
 jobs:
   bump-version:
@@ -21,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Check out repository
@@ -114,26 +114,43 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit version bump
+      - name: Create branch and commit changes
         run: |
+          BRANCH_NAME="version-bump-${{ steps.new-version.outputs.version }}"
+          git checkout -b "$BRANCH_NAME"
           git add package.json package-lock.json glama.json server.json src/index.ts
           git commit -m "Bump version to ${{ steps.new-version.outputs.version }}"
-          git push
-          echo "✓ Committed and pushed version bump"
+          git push -u origin "$BRANCH_NAME"
+          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+        id: create-branch
+
+      - name: Create pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_BODY="## Version Bump: ${{ steps.current-version.outputs.version }} → ${{ steps.new-version.outputs.version }}
+
+          **Bump Type**: ${{ github.event.inputs.bump_type }}
+          ---
+          *This pull request was automatically created by the Bump Version workflow.*"
+
+          PR_URL=$(gh pr create \
+            --title "Bump version to ${{ steps.new-version.outputs.version }}" \
+            --body "$PR_BODY" \
+            --base main \
+            --head "${{ steps.create-branch.outputs.branch_name }}")
+
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          echo "✓ Created pull request: $PR_URL"
+        id: create-pr
 
       - name: Create summary
         run: |
           {
-            echo "## Version Bump Complete"
+            echo "## Version Bump Pull Request Created"
             echo ""
             echo "- **Bump Type**: ${{ github.event.inputs.bump_type }}"
             echo "- **Previous Version**: ${{ steps.current-version.outputs.version }}"
             echo "- **New Version**: ${{ steps.new-version.outputs.version }}"
-            echo ""
-            echo "### Updated Files"
-            echo "- package.json"
-            echo "- package-lock.json"
-            echo "- glama.json"
-            echo "- server.json"
-            echo "- src/index.ts"
+            echo "- **Pull Request**: ${{ steps.create-pr.outputs.pr_url }}"
           } >> "$GITHUB_STEP_SUMMARY"
