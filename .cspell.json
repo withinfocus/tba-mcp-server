@@ -8,12 +8,11 @@
     "**/node_modules/**",
     "**/package-lock.json"
   ],
-  "patterns": [
+  "languageSettings": [
     {
-      "name": "markdownCodeBlock",
-      "pattern": "/^```[\\s\\S]*?^```/gm"
+      "languageId": "markdown",
+      "ignoreRegExpList": ["/`+([\\s\\S]*?)`+/g", "/^```[\\s\\S]*?^```/gm"]
     }
   ],
-  "ignoreRegExpList": ["markdownCodeBlock"],
   "words": ["withinfocus"]
 }
