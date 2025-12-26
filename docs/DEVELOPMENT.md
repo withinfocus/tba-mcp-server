@@ -221,5 +221,5 @@ git push origin feature/your-feature-name
 
 - [The Blue Alliance](https://www.thebluealliance.com/) - Official FRC data source
 - [TBA API Documentation](https://www.thebluealliance.com/apidocs/v3) - Official API docs
-- [Model Context Protocol](https://spec.modelcontextprotocol.io/) - MCP specification
+- [Model Context Protocol](https://modelcontextprotocol.io/) - MCP specification
 - [FIRST Robotics Competition](https://www.firstinspires.org/robotics/frc) - Official FRC site
