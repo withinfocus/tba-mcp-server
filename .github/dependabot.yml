@@ -7,14 +7,8 @@ updates:
       day: "friday"
       time: "02:00"
       timezone: "America/New_York"
-    allow:
-      # Only allow Node 24.x updates (LTS)
-      - dependency-name: "node"
-        dependency-type: "all"
-        update-types:
-          ["version-update:semver-minor", "version-update:semver-patch"]
     ignore:
-      # Ignore all versions except 24.x
+      # Only allow Node 24.x (LTS), block all other versions
       - dependency-name: "node"
         versions: ["<24", ">=25"]
 
