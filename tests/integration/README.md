@@ -1,6 +1,6 @@
 # Integration Tests for TBA MCP Server
 
-This directory contains comprehensive Playwright-based integration tests for the Blue Alliance MCP Server.
+Comprehensive Playwright-based integration tests for the Blue Alliance MCP Server.
 
 ## Setup
 

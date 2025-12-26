@@ -130,9 +130,7 @@ jobs:
         run: |
           PR_BODY="## Version Bump: ${{ steps.current-version.outputs.version }} → ${{ steps.new-version.outputs.version }}
 
-          **Bump Type**: ${{ github.event.inputs.bump_type }}
-          ---
-          *This pull request was automatically created by the Bump Version workflow.*"
+          **Bump Type**: ${{ github.event.inputs.bump_type }}"
 
           PR_URL=$(gh pr create \
             --title "Bump version to ${{ steps.new-version.outputs.version }}" \
