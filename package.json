@@ -6,7 +6,7 @@
   "description": "The Blue Alliance MCP Server",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/withinfocus/tba-mcp-server.git"
+    "url": "https://github.com/withinfocus/tba-mcp-server"
   },
   "author": "Matt Bishop <matt@withinfocus.com>",
   "license": "MIT",
