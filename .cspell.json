@@ -1,0 +1,19 @@
+{
+  "language": "en,en-US",
+  "version": "0.2",
+  "ignorePaths": [
+    "**/.cspell.json",
+    "**/.gitignore",
+    "**/.git/**",
+    "**/node_modules/**",
+    "**/package-lock.json"
+  ],
+  "patterns": [
+    {
+      "name": "markdownCodeBlock",
+      "pattern": "/^```[\\s\\S]*?^```/gm"
+    }
+  ],
+  "ignoreRegExpList": ["markdownCodeBlock"],
+  "words": ["withinfocus"]
+}
