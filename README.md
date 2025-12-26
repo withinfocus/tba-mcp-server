@@ -43,7 +43,7 @@ export TBA_API_KEY=your_api_key_here
 
 Or create a `.env` file:
 
-```
+```bash
 TBA_API_KEY=your_api_key_here
 ```
 

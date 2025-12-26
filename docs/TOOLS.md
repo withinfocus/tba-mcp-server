@@ -355,7 +355,7 @@ Get district points for teams at an event
 
 ## Match Information Tools
 
-#### `get_match`
+### `get_match`
 
 Get detailed information about a specific match
 
@@ -363,14 +363,14 @@ Get detailed information about a specific match
 - **Returns**: Complete match data with scores, alliances, breakdown
 - **Example**: `get_match(match_key="2023casj_qm1")`
 
-#### `get_match_simple`
+### `get_match_simple`
 
 Get simplified match information
 
 - **Parameters**: `match_key` (string)
 - **Returns**: Basic match data
 
-#### `get_match_zebra`
+### `get_match_zebra`
 
 Get Zebra MotionWorks data for a match (robot tracking)
 
@@ -379,7 +379,7 @@ Get Zebra MotionWorks data for a match (robot tracking)
 
 ## District Tools
 
-#### `get_districts`
+### `get_districts`
 
 Get all districts for a specific year
 
@@ -438,49 +438,49 @@ Get team keys in a district
 
 ## General/Utility Tools
 
-#### `get_teams`
+### `get_teams`
 
 Get paginated list of all teams (detailed)
 
 - **Parameters**: `page_num` (number, 0-indexed)
 - **Returns**: Array of complete team objects (500 teams per page)
 
-#### `get_teams_simple`
+### `get_teams_simple`
 
 Get paginated list of teams (simplified)
 
 - **Parameters**: `page_num` (number, 0-indexed)
 - **Returns**: Array of basic team data
 
-#### `get_teams_keys`
+### `get_teams_keys`
 
 Get paginated list of team keys
 
 - **Parameters**: `page_num` (number, 0-indexed)
 - **Returns**: Array of team key strings
 
-#### `get_teams_by_year`
+### `get_teams_by_year`
 
 Get teams that competed in a specific year (detailed)
 
 - **Parameters**: `year` (number), `page_num` (number, 0-indexed)
 - **Returns**: Array of complete team objects
 
-#### `get_teams_by_year_simple`
+### `get_teams_by_year_simple`
 
 Get teams from a year (simplified)
 
 - **Parameters**: `year` (number), `page_num` (number, 0-indexed)
 - **Returns**: Array of basic team data
 
-#### `get_teams_by_year_keys`
+### `get_teams_by_year_keys`
 
 Get team keys from a specific year
 
 - **Parameters**: `year` (number), `page_num` (number, 0-indexed)
 - **Returns**: Array of team key strings
 
-#### `get_status`
+### `get_status`
 
 Get TBA API status information
 
