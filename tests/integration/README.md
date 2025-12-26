@@ -6,23 +6,23 @@ Comprehensive Playwright-based integration tests for the Blue Alliance MCP Serve
 
 1. Install dependencies:
 
-   ```bash
-   npm ci
-   ```
+```bash
+npm ci
+```
 
 2. Build the project:
 
-   ```bash
-   npm run build
-   ```
+```bash
+npm run build
+```
 
 3. Set up your TBA API key:
 
-   ```bash
-   export TBA_API_KEY=your_api_key_here
-   ```
+```bash
+export TBA_API_KEY=your_api_key_here
+```
 
-   You can get an API key from: https://www.thebluealliance.com/account
+You can get an API key from: https://www.thebluealliance.com/account
 
 ## Running Tests
 

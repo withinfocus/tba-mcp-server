@@ -163,29 +163,41 @@ The Blue Alliance API has rate limits. The server will pass through any rate lim
 
 1. **Fork the repository**
 2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
 3. **Make your changes**
-   - Follow existing TypeScript patterns
-   - Maintain separation of concerns (tools → schemas → handlers → tests)
+
+- Follow existing TypeScript patterns
+- Maintain separation of concerns (tools → schemas → handlers → tests)
+
 4. **Add tests for new functionality**
-   - Add unit tests for new schemas, utilities, or handlers
-   - Add integration tests for new tools
+
+- Add unit tests for new schemas, utilities, or handlers
+- Add integration tests for new tools
+
 5. **Run the test suite**
-   ```bash
-   npm run build
-   npm run lint
-   npm run test:all
-   ```
+
+```bash
+npm run build
+npm run lint
+npm run test:all
+```
+
 6. **Commit your changes**
-   ```bash
-   git commit -m "Add feature: description"
-   ```
+
+```bash
+git commit -m "Add feature: description"
+```
+
 7. **Push to your fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+
+```bash
+git push origin feature/your-feature-name
+```
+
 8. **Submit a pull request**
 
 ### Code Standards
