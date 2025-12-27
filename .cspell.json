@@ -1,0 +1,18 @@
+{
+  "language": "en,en-US",
+  "version": "0.2",
+  "ignorePaths": [
+    "**/.cspell.json",
+    "**/.gitignore",
+    "**/.git/**",
+    "**/node_modules/**",
+    "**/package-lock.json",
+    ".github/workflows/*.yml"
+  ],
+  "ignoreRegExpList": [
+    "/`+([\\s\\S]*?)`+/g",
+    "/^```[\\s\\S]*?^```/gm",
+    "/\\w*\\_\\w*/g"
+  ],
+  "words": ["CCWM", "DPR", "glama", "offseason", "OPR", "withinfocus"]
+}

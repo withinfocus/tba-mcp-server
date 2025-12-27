@@ -1,11 +1,11 @@
 # Claude Instructions for TBA MCP Server
 
-This project is a Model Context Protocol (MCP) server that provides access to The Blue Alliance API for FIRST Robotics Competition data.
+Model Context Protocol (MCP) server that provides access to The Blue Alliance API for FIRST Robotics Competition data.
 
 ## Project Overview
 
 - **Language**: TypeScript with Node.js
-- **Framework**: MCP SDK (@modelcontextprotocol/sdk)
+- **Framework**: Model Context Protocol SDK
 - **Package Manager**: npm
 - **Main Entry**: `src/index.ts`
 - **Build Output**: `dist/`
@@ -70,7 +70,7 @@ Tests are organized to mirror the source structure:
 
 ## Testing Requirements
 
-This project has two types of tests that should both be run:
+Two types of tests exist that should both be run:
 
 ### Unit Tests (Jest)
 
@@ -321,7 +321,7 @@ npm test                     # Run unit tests
 npm run test:integration     # Run integration tests
 ```
 
-## When Working on This Project
+## When Working on The Project
 
 1. Always run `npm run build` after making changes
 2. Run `npm run lint` to ensure code quality
