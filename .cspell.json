@@ -12,7 +12,11 @@
   "languageSettings": [
     {
       "languageId": "markdown",
-      "ignoreRegExpList": ["/`+([\\s\\S]*?)`+/g", "/^```[\\s\\S]*?^```/gm"]
+      "ignoreRegExpList": [
+        "/`+([\\s\\S]*?)`+/g",
+        "/^```[\\s\\S]*?^```/gm",
+        "/\\w*\\_\\w*/g"
+      ]
     }
   ],
   "words": ["CCWM", "DPR", "glama", "offseason", "OPR", "withinfocus"]
