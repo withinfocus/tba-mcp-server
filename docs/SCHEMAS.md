@@ -23,7 +23,7 @@ All API responses are validated using Zod schemas ensuring type safety and consi
 
 Complete team information including:
 
-- `key` (string) - Team identifier (e.g., "frc86")
+- `key` (string) - Team identifier
 - `team_number` (number) - Numeric team number
 - `nickname` (string) - Team nickname/informal name
 - `name` (string) - Official team name
@@ -44,7 +44,7 @@ Simplified team data:
 
 Complete event information including:
 
-- `key` (string) - Event identifier (e.g., "2023casj")
+- `key` (string) - Event identifier
 - `name` (string) - Official event name
 - `event_code` (string) - Short event code
 - `event_type` (number) - Event type identifier
@@ -68,7 +68,7 @@ Basic event data:
 
 Complete match information:
 
-- `key` (string) - Match identifier (e.g., "2023casj_qm1")
+- `key` (string) - Match identifier
 - `comp_level` (string) - Competition level (qm, ef, qf, sf, f)
 - `set_number`, `match_number` (number) - Match identifiers
 - `alliances` - Red and blue alliance objects containing:

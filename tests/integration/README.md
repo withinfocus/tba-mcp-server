@@ -22,7 +22,7 @@ npm run build
 export TBA_API_KEY=your_api_key_here
 ```
 
-You can get an API key from [The Blue Alliance](https://www.thebluealliance.com/account).
+You can get an API key from [The Blue Alliance](https://www.thebluealliance.com/).
 
 ## Running Tests
 

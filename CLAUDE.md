@@ -5,7 +5,7 @@ Model Context Protocol (MCP) server that provides access to The Blue Alliance AP
 ## Project Overview
 
 - **Language**: TypeScript with Node.js
-- **Framework**: MCP SDK (@modelcontextprotocol/sdk)
+- **Framework**: Model Context Protocol SDK
 - **Package Manager**: npm
 - **Main Entry**: `src/index.ts`
 - **Build Output**: `dist/`
