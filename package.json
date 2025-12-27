@@ -2,7 +2,7 @@
   "type": "module",
   "name": "@withinfocus/tba-mcp-server",
   "mcpName": "io.github.withinfocus/tba",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The Blue Alliance MCP Server",
   "repository": {
     "type": "git",
