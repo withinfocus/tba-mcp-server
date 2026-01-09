@@ -14,5 +14,14 @@
     "/^```[\\s\\S]*?^```/gm",
     "/\\w*\\_\\w*/g"
   ],
-  "words": ["CCWM", "DPR", "glama", "offseason", "OPR", "withinfocus"]
+  "words": [
+    "CCWM",
+    "DPR",
+    "glama",
+    "MCP",
+    "modelcontextprotocol",
+    "offseason",
+    "OPR",
+    "withinfocus"
+  ]
 }
