@@ -3,15 +3,33 @@ import { z } from 'zod';
 // Input validation schemas
 export const TeamKeySchema = z
   .string()
-  .regex(/^frc\d+$/, 'Team key must be in format frcXXXX');
+  .regex(/^frc\d+$/, 'Team key must be in format frcXXXX')
+  .describe('Team key in format frcXXXX (e.g., frc86)');
 
-export const EventKeySchema = z.string();
+export const EventKeySchema = z.string().describe('Event key (e.g., 2023casj)');
+
+export const MatchKeySchema = z
+  .string()
+  .describe('Match key (e.g., 2023casj_qm1)');
+
+export const DistrictKeySchema = z
+  .string()
+  .describe('District key (e.g., 2023fim)');
+
+export const MediaTagSchema = z.string().describe('Media tag to filter by');
+
+export const PageNumSchema = z
+  .number()
+  .int()
+  .min(0)
+  .describe('Page number (0-indexed)');
 
 export const YearSchema = z
   .number()
   .int()
   .min(1992)
-  .max(new Date().getFullYear() + 1);
+  .max(new Date().getFullYear() + 1)
+  .describe('Competition year');
 
 // API response schemas
 export const TeamSchema = z.object({
@@ -32,7 +50,7 @@ export const TeamSchema = z.object({
   website: z.string().nullish(),
   rookie_year: z.number().nullish(),
   motto: z.string().nullish(),
-  home_championship: z.record(z.string(), z.any()).nullish(),
+  home_championship: z.record(z.string(), z.unknown()).nullish(),
 });
 
 export const EventSchema = z.object({
@@ -109,7 +127,7 @@ export const MatchSchema = z.object({
   actual_time: z.number().nullish(),
   predicted_time: z.number().nullish(),
   post_result_time: z.number().nullish(),
-  score_breakdown: z.record(z.string(), z.any()).nullish(),
+  score_breakdown: z.record(z.string(), z.unknown()).nullish(),
   videos: z
     .array(
       z.object({
@@ -226,14 +244,14 @@ export const DistrictPointsSchema = z.object({
 });
 
 export const InsightsSchema = z.object({
-  qual: z.record(z.string(), z.any()).nullish(),
-  playoff: z.record(z.string(), z.any()).nullish(),
+  qual: z.record(z.string(), z.unknown()).nullish(),
+  playoff: z.record(z.string(), z.unknown()).nullish(),
 });
 
 export const MediaSchema = z.object({
   type: z.string(),
   foreign_key: z.string().nullish(),
-  details: z.record(z.string(), z.any()).nullish(),
+  details: z.record(z.string(), z.unknown()).nullish(),
   preferred: z.boolean().nullish(),
   direct_url: z.string().nullish(),
   view_url: z.string().nullish(),
@@ -449,7 +467,7 @@ export const PredictionSchema = z.object({
           .optional(),
       }),
     )
-    .or(z.any())
+    .or(z.unknown())
     .nullish(),
   ranking_predictions: z
     .record(
@@ -458,9 +476,9 @@ export const PredictionSchema = z.object({
         rank: z.number(),
       }),
     )
-    .or(z.array(z.any()))
+    .or(z.array(z.unknown()))
     .nullish(),
-  stat_mean_vars: z.record(z.string(), z.any()).nullish(),
+  stat_mean_vars: z.record(z.string(), z.unknown()).nullish(),
 });
 
 export const TeamHistorySchema = z.object({
@@ -469,3 +487,286 @@ export const TeamHistorySchema = z.object({
   matches: z.array(MatchSchema).nullish(),
   robots: z.array(RobotSchema).nullish(),
 });
+
+// Input schemas for tools - these will be converted to JSON Schema
+export const GetTeamInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetTeamEventsInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
+
+export const GetTeamAwardsInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
+
+export const GetTeamMatchesInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
+
+export const GetEventsInputSchema = z.object({
+  year: YearSchema,
+});
+
+export const GetEventInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventTeamsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventRankingsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventMatchesInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventAlliancesInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventInsightsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventDistrictPointsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetTeamYearsParticipatedInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetTeamDistrictsInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetTeamRobotsInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetTeamMediaInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
+
+export const GetTeamEventMatchesInputSchema = z.object({
+  team_key: TeamKeySchema,
+  event_key: EventKeySchema,
+});
+
+export const GetTeamsInputSchema = z.object({
+  page_num: PageNumSchema,
+});
+
+export const GetStatusInputSchema = z.object({});
+
+export const GetMatchInputSchema = z.object({
+  match_key: MatchKeySchema,
+});
+
+export const GetEventOprsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventAwardsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetTeamAwardsAllInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetTeamEventsAllInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetTeamEventStatusInputSchema = z.object({
+  team_key: TeamKeySchema,
+  event_key: EventKeySchema,
+});
+
+export const GetDistrictsInputSchema = z.object({
+  year: YearSchema,
+});
+
+export const GetDistrictRankingsInputSchema = z.object({
+  district_key: DistrictKeySchema,
+});
+
+export const GetTeamsSimpleInputSchema = z.object({
+  page_num: PageNumSchema,
+});
+
+export const GetTeamsKeysInputSchema = z.object({
+  page_num: PageNumSchema,
+});
+
+export const GetTeamsByYearInputSchema = z.object({
+  year: YearSchema,
+  page_num: PageNumSchema,
+});
+
+export const GetTeamsByYearSimpleInputSchema = z.object({
+  year: YearSchema,
+  page_num: PageNumSchema,
+});
+
+export const GetTeamsByYearKeysInputSchema = z.object({
+  year: YearSchema,
+  page_num: PageNumSchema,
+});
+
+export const GetTeamSimpleInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetEventSimpleInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventsSimpleInputSchema = z.object({
+  year: YearSchema,
+});
+
+export const GetEventsKeysInputSchema = z.object({
+  year: YearSchema,
+});
+
+export const GetMatchSimpleInputSchema = z.object({
+  match_key: MatchKeySchema,
+});
+
+export const GetTeamEventsSimpleInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
+
+export const GetTeamEventsKeysInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
+
+export const GetTeamEventAwardsInputSchema = z.object({
+  team_key: TeamKeySchema,
+  event_key: EventKeySchema,
+});
+
+export const GetTeamMatchesSimpleInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
+
+export const GetTeamMatchesKeysInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
+
+export const GetTeamSocialMediaInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetTeamMediaByTagInputSchema = z.object({
+  team_key: TeamKeySchema,
+  media_tag: MediaTagSchema,
+});
+
+export const GetTeamMediaByTagYearInputSchema = z.object({
+  team_key: TeamKeySchema,
+  media_tag: MediaTagSchema,
+  year: YearSchema,
+});
+
+export const GetEventTeamsSimpleInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventTeamsKeysInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventMatchesSimpleInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventMatchesKeysInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventPredictionsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetMatchZebraInputSchema = z.object({
+  match_key: MatchKeySchema,
+});
+
+export const GetTeamHistoryInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetTeamEventStatusesInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
+
+export const GetTeamEventMatchesSimpleInputSchema = z.object({
+  team_key: TeamKeySchema,
+  event_key: EventKeySchema,
+});
+
+export const GetTeamEventMatchesKeysInputSchema = z.object({
+  team_key: TeamKeySchema,
+  event_key: EventKeySchema,
+});
+
+export const GetDistrictEventsInputSchema = z.object({
+  district_key: DistrictKeySchema,
+});
+
+export const GetDistrictEventsSimpleInputSchema = z.object({
+  district_key: DistrictKeySchema,
+});
+
+export const GetDistrictEventsKeysInputSchema = z.object({
+  district_key: DistrictKeySchema,
+});
+
+export const GetDistrictTeamsInputSchema = z.object({
+  district_key: DistrictKeySchema,
+});
+
+export const GetDistrictTeamsSimpleInputSchema = z.object({
+  district_key: DistrictKeySchema,
+});
+
+export const GetDistrictTeamsKeysInputSchema = z.object({
+  district_key: DistrictKeySchema,
+});
+
+// Helper function to convert Zod schema to MCP-compatible JSON Schema
+export function toMCPSchema(zodSchema: z.ZodType): {
+  type: 'object';
+  properties?: { [key: string]: object };
+  required?: string[];
+  [key: string]: unknown;
+} {
+  const jsonSchema = z.toJSONSchema(zodSchema) as {
+    type: 'object';
+    properties?: { [key: string]: object };
+    required?: string[];
+    [key: string]: unknown;
+  };
+
+  // Remove $schema field for MCP compatibility
+  delete jsonSchema['$schema'];
+
+  return jsonSchema;
+}
