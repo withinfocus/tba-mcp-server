@@ -93,7 +93,7 @@ export const EventSchema = z.object({
         channel: z.string(),
         date: z.string().nullish(),
         file: z.string().nullish(),
-      }),
+      })
     )
     .nullish(),
   division_keys: z.array(z.string()).nullish(),
@@ -133,7 +133,7 @@ export const MatchSchema = z.object({
       z.object({
         type: z.string(),
         key: z.string(),
-      }),
+      })
     )
     .nullish(),
 });
@@ -146,7 +146,7 @@ export const AwardSchema = z.object({
     z.object({
       team_key: z.string().nullish(),
       awardee: z.string().nullish(),
-    }),
+    })
   ),
   year: z.number(),
 });
@@ -168,14 +168,14 @@ export const RankingSchema = z.object({
         .nullish(),
       extra_stats: z.array(z.number()).nullish(),
       sort_orders: z.array(z.number()).nullish(),
-    }),
+    })
   ),
   extra_stats_info: z
     .array(
       z.object({
         name: z.string(),
         precision: z.number(),
-      }),
+      })
     )
     .nullish(),
   sort_order_info: z
@@ -183,7 +183,7 @@ export const RankingSchema = z.object({
       z.object({
         name: z.string(),
         precision: z.number(),
-      }),
+      })
     )
     .nullish(),
 });
@@ -230,7 +230,7 @@ export const DistrictPointsSchema = z.object({
       elim_points: z.number(),
       qual_points: z.number(),
       total: z.number(),
-    }),
+    })
   ),
   tiebreakers: z
     .record(
@@ -238,7 +238,7 @@ export const DistrictPointsSchema = z.object({
       z.object({
         highest_qual_scores: z.array(z.number()).nullish(),
         qual_wins: z.number().nullish(),
-      }),
+      })
     )
     .nullish(),
 });
@@ -319,7 +319,7 @@ export const TeamEventStatusSchema = z.object({
           z.object({
             name: z.string(),
             precision: z.number(),
-          }),
+          })
         )
         .nullish(),
       status: z.string().nullish(),
@@ -380,7 +380,7 @@ export const DistrictRankingSchema = z.object({
       award_points: z.number(),
       event_key: z.string(),
       qual_points: z.number(),
-    }),
+    })
   ),
 });
 
@@ -438,14 +438,14 @@ export const ZebraSchema = z.object({
         team_key: z.string(),
         xs: z.array(z.number()).nullish(),
         ys: z.array(z.number()).nullish(),
-      }),
+      })
     ),
     blue: z.array(
       z.object({
         team_key: z.string(),
         xs: z.array(z.number()).nullish(),
         ys: z.array(z.number()).nullish(),
-      }),
+      })
     ),
   }),
 });
@@ -465,7 +465,7 @@ export const PredictionSchema = z.object({
             score: z.number(),
           })
           .optional(),
-      }),
+      })
     )
     .or(z.unknown())
     .nullish(),
@@ -474,7 +474,7 @@ export const PredictionSchema = z.object({
       z.string(),
       z.object({
         rank: z.number(),
-      }),
+      })
     )
     .or(z.array(z.unknown()))
     .nullish(),

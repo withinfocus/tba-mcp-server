@@ -81,7 +81,7 @@ test.describe('TBA API Integration Tests', () => {
       await expect(
         mcpClient.callTool('get_team', {
           team_key: 'invalid_key',
-        }),
+        })
       ).rejects.toThrow();
     });
 
@@ -94,7 +94,7 @@ test.describe('TBA API Integration Tests', () => {
       const years = JSON.parse(result.content[0]?.text || '');
       expect(years).toBeInstanceOf(Array);
       expect(years.every((year: number) => typeof year === 'number')).toBe(
-        true,
+        true
       );
     });
 
@@ -452,7 +452,7 @@ test.describe('TBA API Integration Tests', () => {
       await expect(
         mcpClient.callTool('get_team', {
           team_key: '86',
-        }),
+        })
       ).rejects.toThrow();
     });
 
@@ -460,7 +460,7 @@ test.describe('TBA API Integration Tests', () => {
       await expect(
         mcpClient.callTool('get_events', {
           year: 1990,
-        }),
+        })
       ).rejects.toThrow();
     });
 
@@ -514,7 +514,7 @@ test.describe('TBA API Integration Tests', () => {
           {
             team_key: 'frc86',
             event_key: eventKey,
-          },
+          }
         );
 
         expect(matchesResult.content).toBeInstanceOf(Array);
@@ -536,14 +536,14 @@ test.describe('TBA API Integration Tests', () => {
           'get_event_predictions',
           {
             event_key: eventKey,
-          },
+          }
         );
 
         expect(predictionsResult.content).toBeInstanceOf(Array);
 
         try {
           const predictions = JSON.parse(
-            predictionsResult.content[0]?.text || '',
+            predictionsResult.content[0]?.text || ''
           );
           expect(predictions).toHaveProperty('match_predictions');
           expect(predictions).toHaveProperty('ranking_predictions');

@@ -31,7 +31,7 @@ test.describe('TBA MCP Server Integration Tests', () => {
     expect(toolsResponse.tools.length).toBeGreaterThan(0);
 
     const toolNames = toolsResponse.tools.map(
-      (tool: { name: string }) => tool.name,
+      (tool: { name: string }) => tool.name
     );
 
     const expectedTools = [

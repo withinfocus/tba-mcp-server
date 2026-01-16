@@ -28,7 +28,7 @@ describe('Utility functions', () => {
       const { makeApiRequest } = await import('../src/utils.js');
 
       await expect(makeApiRequest('/test')).rejects.toThrow(
-        'TBA_API_KEY environment variable is required',
+        'TBA_API_KEY environment variable is required'
       );
     });
 
@@ -77,7 +77,7 @@ describe('Utility functions', () => {
       const { makeApiRequest } = await import('../src/utils.js');
 
       await expect(makeApiRequest('/team/invalid')).rejects.toThrow(
-        'TBA API request failed: 404 Not Found',
+        'TBA API request failed: 404 Not Found'
       );
     });
 
@@ -93,7 +93,7 @@ describe('Utility functions', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         'https://www.thebluealliance.com/api/v3/status',
-        expect.any(Object),
+        expect.any(Object)
       );
     });
 
@@ -115,7 +115,7 @@ describe('Utility functions', () => {
       const { makeApiRequest } = await import('../src/utils.js');
 
       await expect(makeApiRequest('/test')).rejects.toThrow(
-        'TBA API request failed: 500 Internal Server Error',
+        'TBA API request failed: 500 Internal Server Error'
       );
     });
 
@@ -129,7 +129,7 @@ describe('Utility functions', () => {
       const { makeApiRequest } = await import('../src/utils.js');
 
       await expect(makeApiRequest('/test')).rejects.toThrow(
-        'TBA API request failed: 401 Unauthorized',
+        'TBA API request failed: 401 Unauthorized'
       );
     });
 
@@ -149,7 +149,7 @@ describe('Utility functions', () => {
           headers: expect.objectContaining({
             Accept: 'application/json',
           }),
-        }),
+        })
       );
     });
 

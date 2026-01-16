@@ -7,7 +7,7 @@ export async function log(
   level: 'debug' | 'info' | 'notice' | 'warning' | 'error',
   data: unknown,
   server?: Server | null,
-  logger?: string,
+  logger?: string
 ): Promise<void> {
   if (server) {
     try {

@@ -30,7 +30,7 @@ test.describe('MCP Server Error Handling Tests', () => {
         await expect(
           mcpClient.callTool('get_team', {
             team_key: invalidKey,
-          }),
+          })
         ).rejects.toThrow();
       }
     });
@@ -50,7 +50,7 @@ test.describe('MCP Server Error Handling Tests', () => {
         await expect(
           mcpClient.callTool('get_events', {
             year: invalidYear,
-          }),
+          })
         ).rejects.toThrow();
       }
     });
@@ -59,7 +59,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       await expect(
         mcpClient.callTool('get_teams', {
           page_num: -1,
-        }),
+        })
       ).rejects.toThrow();
     });
 
@@ -69,7 +69,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       await expect(
         mcpClient.callTool('get_team_events', {
           team_key: 'frc86',
-        }),
+        })
       ).rejects.toThrow();
     });
   });
@@ -79,7 +79,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       await expect(
         mcpClient.callTool('get_team', {
           team_key: 'frc999999',
-        }),
+        })
       ).rejects.toThrow(/TBA API request failed/);
     });
 
@@ -87,7 +87,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       await expect(
         mcpClient.callTool('get_event', {
           event_key: 'invalid_event',
-        }),
+        })
       ).rejects.toThrow(/TBA API request failed/);
     });
 
@@ -95,7 +95,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       await expect(
         mcpClient.callTool('get_match', {
           match_key: 'invalid_match',
-        }),
+        })
       ).rejects.toThrow(/TBA API request failed/);
     });
   });
@@ -103,7 +103,7 @@ test.describe('MCP Server Error Handling Tests', () => {
   test.describe('Tool Not Found', () => {
     test('should handle unknown tool calls', async () => {
       await expect(mcpClient.callTool('unknown_tool', {})).rejects.toThrow(
-        /Unknown tool/,
+        /Unknown tool/
       );
     });
 
@@ -111,7 +111,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       await expect(
         mcpClient.callTool('get_tema', {
           team_key: 'frc86',
-        }),
+        })
       ).rejects.toThrow(/Unknown tool/);
     });
   });
@@ -132,7 +132,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       await expect(
         mcpClient.callTool('get_team', {
           team_key: null,
-        }),
+        })
       ).rejects.toThrow();
     });
 
@@ -140,7 +140,7 @@ test.describe('MCP Server Error Handling Tests', () => {
       await expect(
         mcpClient.callTool('get_teams', {
           page_num: 'not_a_number',
-        }),
+        })
       ).rejects.toThrow();
     });
   });

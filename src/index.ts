@@ -23,7 +23,7 @@ async function runServer(): Promise<void> {
       await log(
         'error',
         `${errorMessage}: ${error instanceof Error ? error.message : error}`,
-        server,
+        server
       );
       throw new Error(errorMessage);
     }
@@ -37,7 +37,7 @@ async function runServer(): Promise<void> {
         capabilities: {
           tools: {},
         },
-      },
+      }
     );
 
     await log('info', 'Setting up request handlers ...', server);
@@ -74,14 +74,14 @@ async function runServer(): Promise<void> {
       await log(
         'info',
         'The Blue Alliance MCP Server running on stdio',
-        server,
+        server
       );
     } catch (error) {
       const errorMessage = 'Failed to connect to transport';
       await log(
         'error',
         `${errorMessage}: ${error instanceof Error ? error.message : error}`,
-        server,
+        server
       );
       throw new Error(errorMessage);
     }
@@ -97,7 +97,7 @@ async function runServer(): Promise<void> {
         'Unhandled rejection in MCP server:',
         reason,
         'at promise:',
-        promise,
+        promise
       );
       process.exit(1);
     });
@@ -105,7 +105,7 @@ async function runServer(): Promise<void> {
     const errorMessage = 'Fatal error during server initialization';
     // Use console.error as fallback since server may not be available yet
     console.error(
-      `${errorMessage}: ${error instanceof Error ? error.message : error}`,
+      `${errorMessage}: ${error instanceof Error ? error.message : error}`
     );
     throw error;
   }
@@ -117,10 +117,10 @@ const isMainModule = process.argv[1] && process.argv[1].endsWith('index.js');
 if (isMainModule) {
   runServer().catch((error) => {
     console.error(
-      `Fatal error running server: ${error instanceof Error ? error.message : error}`,
+      `Fatal error running server: ${error instanceof Error ? error.message : error}`
     );
     console.error(
-      `Stack trace: ${error instanceof Error ? error.stack : 'No stack trace available'}`,
+      `Stack trace: ${error instanceof Error ? error.stack : 'No stack trace available'}`
     );
     console.error('Server will now exit');
     process.exit(1);

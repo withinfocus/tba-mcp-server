@@ -47,7 +47,7 @@ test.describe('MCP Server Reliability Tests', () => {
       const teamKeys = Object.values(TEST_TEAMS).slice(0, 5);
 
       const promises = teamKeys.map((teamKey) =>
-        mcpClient.callTool('get_team_simple', { team_key: teamKey }),
+        mcpClient.callTool('get_team_simple', { team_key: teamKey })
       );
 
       const results = await Promise.all(promises);
@@ -71,7 +71,7 @@ test.describe('MCP Server Reliability Tests', () => {
         promises.push(
           mcpClient.callTool('get_team_simple', {
             team_key: `frc${86 + i}`,
-          }),
+          })
         );
       }
 
@@ -132,7 +132,7 @@ test.describe('MCP Server Reliability Tests', () => {
         const eventTeams = JSON.parse(teamsResult.content[0]?.text || '');
 
         const teamInEvent = eventTeams.find(
-          (t: { key: string }) => t.key === teamKey,
+          (t: { key: string }) => t.key === teamKey
         );
         expect(teamInEvent).toBeDefined();
         expect(teamInEvent.key).toBe(teamKey);
