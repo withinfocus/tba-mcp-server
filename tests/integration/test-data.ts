@@ -51,7 +51,7 @@ export function generateTestEventKey(year: number, code: string): string {
 export function generateTestMatchKey(
   eventKey: string,
   compLevel: string,
-  matchNumber: number
+  matchNumber: number,
 ): string {
   return `${eventKey}_${compLevel}${matchNumber}`;
 }

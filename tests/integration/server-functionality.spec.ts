@@ -16,7 +16,7 @@ test.describe('MCP Server Functionality Tests', () => {
   test('should have all expected TBA tools available', async () => {
     const toolsResponse = await mcpClient.listTools();
     const toolNames = toolsResponse.tools.map(
-      (tool: { name: string }) => tool.name
+      (tool: { name: string }) => tool.name,
     );
 
     const expectedCoreTools = [
@@ -76,7 +76,7 @@ test.describe('MCP Server Functionality Tests', () => {
       await mcpClient.callTool('get_team', {});
     } catch (error) {
       expect(String(error)).toMatch(
-        /required|missing|invalid input.*expected.*received undefined/i
+        /required|missing|invalid input.*expected.*received undefined/i,
       );
     }
   });

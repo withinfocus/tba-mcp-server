@@ -29,7 +29,7 @@ import {
 
 export async function handleToolCall(
   name: string,
-  args: unknown
+  args: unknown,
 ): Promise<{
   content: Array<{ type: string; text: string }>;
   isError?: boolean;
@@ -287,7 +287,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/event/${event_key}/matches`
+        `/team/${team_key}/event/${event_key}/matches`,
       );
       const matches = z.array(MatchSchema).parse(data);
       return {
@@ -407,7 +407,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/event/${event_key}/status`
+        `/team/${team_key}/event/${event_key}/status`,
       );
       const status = TeamEventStatusSchema.parse(data);
       return {
@@ -617,7 +617,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/events/${year}/simple`
+        `/team/${team_key}/events/${year}/simple`,
       );
       const events = z.array(EventSimpleSchema).parse(data);
       return {
@@ -638,7 +638,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/events/${year}/keys`
+        `/team/${team_key}/events/${year}/keys`,
       );
       const keys = z.array(z.string()).parse(data);
       return {
@@ -659,7 +659,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/event/${event_key}/awards`
+        `/team/${team_key}/event/${event_key}/awards`,
       );
       const awards = z.array(AwardSchema).parse(data);
       return {
@@ -680,7 +680,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/matches/${year}/simple`
+        `/team/${team_key}/matches/${year}/simple`,
       );
       const matches = z.array(MatchSimpleSchema).parse(data);
       return {
@@ -701,7 +701,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/matches/${year}/keys`
+        `/team/${team_key}/matches/${year}/keys`,
       );
       const keys = z.array(z.string()).parse(data);
       return {
@@ -736,7 +736,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/media/tag/${media_tag}`
+        `/team/${team_key}/media/tag/${media_tag}`,
       );
       const media = z.array(MediaSchema).parse(data);
       return {
@@ -758,7 +758,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/media/tag/${media_tag}/${year}`
+        `/team/${team_key}/media/tag/${media_tag}/${year}`,
       );
       const media = z.array(MediaSchema).parse(data);
       return {
@@ -849,7 +849,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/events/${year}/statuses`
+        `/team/${team_key}/events/${year}/statuses`,
       );
       const statuses = z.record(z.string(), TeamEventStatusSchema).parse(data);
       return {
@@ -870,7 +870,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/event/${event_key}/matches/simple`
+        `/team/${team_key}/event/${event_key}/matches/simple`,
       );
       const matches = z.array(MatchSimpleSchema).parse(data);
       return {
@@ -891,7 +891,7 @@ export async function handleToolCall(
         })
         .parse(args);
       const data = await makeApiRequest(
-        `/team/${team_key}/event/${event_key}/matches/keys`
+        `/team/${team_key}/event/${event_key}/matches/keys`,
       );
       const keys = z.array(z.string()).parse(data);
       return {
@@ -925,7 +925,7 @@ export async function handleToolCall(
         .object({ district_key: z.string() })
         .parse(args);
       const data = await makeApiRequest(
-        `/district/${district_key}/events/simple`
+        `/district/${district_key}/events/simple`,
       );
       const events = z.array(EventSimpleSchema).parse(data);
       return {
@@ -943,7 +943,7 @@ export async function handleToolCall(
         .object({ district_key: z.string() })
         .parse(args);
       const data = await makeApiRequest(
-        `/district/${district_key}/events/keys`
+        `/district/${district_key}/events/keys`,
       );
       const keys = z.array(z.string()).parse(data);
       return {
@@ -977,7 +977,7 @@ export async function handleToolCall(
         .object({ district_key: z.string() })
         .parse(args);
       const data = await makeApiRequest(
-        `/district/${district_key}/teams/simple`
+        `/district/${district_key}/teams/simple`,
       );
       const teams = z.array(TeamSimpleSchema).parse(data);
       return {

@@ -74,7 +74,7 @@ describe('Tool definitions', () => {
   describe('team_key validation in schemas', () => {
     it('should have pattern validation for team_key parameters', () => {
       const toolsWithTeamKey = tools.filter((t) =>
-        Object.keys(t.inputSchema.properties || {}).includes('team_key')
+        Object.keys(t.inputSchema.properties || {}).includes('team_key'),
       );
 
       expect(toolsWithTeamKey.length).toBeGreaterThan(0);
@@ -84,7 +84,7 @@ describe('Tool definitions', () => {
         if (typeof teamKeyProp === 'object' && teamKeyProp !== null) {
           expect(teamKeyProp).toHaveProperty('pattern');
           expect((teamKeyProp as { pattern?: string }).pattern).toContain(
-            'frc'
+            'frc',
           );
         }
       });
@@ -94,7 +94,7 @@ describe('Tool definitions', () => {
   describe('year validation in schemas', () => {
     it('should have range validation for year parameters', () => {
       const toolsWithYear = tools.filter((t) =>
-        Object.keys(t.inputSchema.properties || {}).includes('year')
+        Object.keys(t.inputSchema.properties || {}).includes('year'),
       );
 
       expect(toolsWithYear.length).toBeGreaterThan(0);
@@ -135,7 +135,7 @@ describe('Tool definitions', () => {
   describe('required parameters', () => {
     it('should specify required parameters where applicable', () => {
       const toolsWithRequired = tools.filter(
-        (t) => t.inputSchema.required && t.inputSchema.required.length > 0
+        (t) => t.inputSchema.required && t.inputSchema.required.length > 0,
       );
 
       expect(toolsWithRequired.length).toBeGreaterThan(0);
@@ -168,10 +168,10 @@ describe('Tool definitions', () => {
               if (typeof paramSchema === 'object' && paramSchema !== null) {
                 expect(paramSchema).toHaveProperty('description');
                 expect(
-                  typeof (paramSchema as { description?: unknown }).description
+                  typeof (paramSchema as { description?: unknown }).description,
                 ).toBe('string');
               }
-            }
+            },
           );
         }
       });

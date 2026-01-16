@@ -121,7 +121,7 @@ describe('Handler functions', () => {
       await expect(
         handleToolCall('get_team', {
           team_key: 'invalid',
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -132,7 +132,7 @@ describe('Handler functions', () => {
         handleToolCall('get_team_events', {
           team_key: 'frc86',
           year: 1990, // Before 1992
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -143,7 +143,7 @@ describe('Handler functions', () => {
         handleToolCall('get_team_events', {
           team_key: 'frc86',
           // missing year parameter
-        })
+        }),
       ).rejects.toThrow();
     });
 
@@ -151,7 +151,7 @@ describe('Handler functions', () => {
       const { handleToolCall } = await import('../src/handlers.js');
 
       await expect(handleToolCall('unknown_tool', {})).rejects.toThrow(
-        'Unknown tool: unknown_tool'
+        'Unknown tool: unknown_tool',
       );
     });
 
@@ -225,7 +225,7 @@ describe('Handler functions', () => {
       await expect(
         handleToolCall('get_team', {
           team_key: 'frc999999',
-        })
+        }),
       ).rejects.toThrow('TBA API request failed: 404 Not Found');
     });
 
@@ -281,7 +281,7 @@ describe('Handler functions', () => {
       await expect(
         handleToolCall('get_team', {
           team_key: 'frc86',
-        })
+        }),
       ).rejects.toThrow();
     });
   });

@@ -33,7 +33,7 @@ export class MCPClient extends EventEmitter {
 
   constructor(
     private serverPath: string,
-    private env: Record<string, string> = {}
+    private env: Record<string, string> = {},
   ) {
     super();
   }
@@ -128,7 +128,7 @@ export class MCPClient extends EventEmitter {
 
       if (response.error) {
         pending.reject(
-          new Error(`${response.error.code}: ${response.error.message}`)
+          new Error(`${response.error.code}: ${response.error.message}`),
         );
       } else {
         pending.resolve(response.result);
@@ -138,7 +138,7 @@ export class MCPClient extends EventEmitter {
 
   async sendRequest(
     method: string,
-    params?: Record<string, unknown> | undefined
+    params?: Record<string, unknown> | undefined,
   ): Promise<unknown> {
     if (!this.serverProcess || !this.serverProcess.stdin) {
       throw new Error('Server not started');
@@ -183,7 +183,7 @@ export class MCPClient extends EventEmitter {
 
   async callTool(
     name: string,
-    arguments_: Record<string, unknown>
+    arguments_: Record<string, unknown>,
   ): Promise<{ content: Array<{ type: string; text: string }> }> {
     const response = (await this.sendRequest('tools/call', {
       name,

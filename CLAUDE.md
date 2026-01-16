@@ -301,7 +301,7 @@ test('should get team media for a year', async ({ page }) => {
           },
         },
       },
-      CallToolResultSchema
+      CallToolResultSchema,
     );
   });
 

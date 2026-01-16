@@ -54,7 +54,7 @@ test.describe('MCP Protocol Compliance Tests', () => {
     const toolsResponse = await mcpClient.listTools();
 
     const teamTools = toolsResponse.tools.filter((tool: { name: string }) =>
-      tool.name.startsWith('get_team')
+      tool.name.startsWith('get_team'),
     );
 
     expect(teamTools.length).toBeGreaterThan(10);
@@ -77,14 +77,14 @@ test.describe('MCP Protocol Compliance Tests', () => {
           expect(teamKeyProp.type).toBe('string');
           expect(teamKeyProp.pattern).toBe('^frc\\d+$');
         }
-      }
+      },
     );
   });
 
   test('should enforce required parameters', async () => {
     const toolsResponse = await mcpClient.listTools();
     const getTeamTool = toolsResponse.tools.find(
-      (tool: { name: string }) => tool.name === 'get_team'
+      (tool: { name: string }) => tool.name === 'get_team',
     );
 
     expect(getTeamTool).toBeDefined();

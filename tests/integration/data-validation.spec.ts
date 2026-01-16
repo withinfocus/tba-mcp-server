@@ -158,7 +158,7 @@ test.describe('Data Validation Integration Tests', () => {
 
       const events = JSON.parse(eventsResult.content[0]?.text || '');
       const eventsSimple = JSON.parse(
-        eventsSimpleResult.content[0]?.text || ''
+        eventsSimpleResult.content[0]?.text || '',
       );
 
       expect(events.length).toBe(eventsSimple.length);
@@ -166,7 +166,7 @@ test.describe('Data Validation Integration Tests', () => {
       if (events.length > 0 && eventsSimple.length > 0) {
         const fullEvent = events[0];
         const simpleEvent = eventsSimple.find(
-          (e: { key: string }) => e.key === fullEvent.key
+          (e: { key: string }) => e.key === fullEvent.key,
         );
 
         if (simpleEvent) {
@@ -246,7 +246,7 @@ test.describe('Data Validation Integration Tests', () => {
 
       const championshipEvents = events.filter(
         (e: { event_type: number; event_type_string?: string }) =>
-          e.event_type === 3 || e.event_type_string?.includes('Championship')
+          e.event_type === 3 || e.event_type_string?.includes('Championship'),
       );
 
       if (championshipEvents.length > 0) {
@@ -268,7 +268,7 @@ test.describe('Data Validation Integration Tests', () => {
                 expect(team).toHaveProperty('key');
                 expect(team).toHaveProperty('team_number');
                 expect(team).toHaveProperty('name');
-              }
+              },
             );
         }
       }
@@ -301,7 +301,7 @@ test.describe('Data Validation Integration Tests', () => {
               expect(match).toHaveProperty('alliances');
               expect(match.alliances).toHaveProperty('red');
               expect(match.alliances).toHaveProperty('blue');
-            }
+            },
           );
       }
     });
