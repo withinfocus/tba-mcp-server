@@ -38,7 +38,7 @@ jobs:
       - name: Download build artifact
         uses: actions/download-artifact@v7
         with:
-          name: mcp-server-${{ steps.retrieve-package-version.outputs.version }}
+          name: mcp-server-${{ steps.retrieve-package-version.outputs.version }}.zip
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           run-id: ${{ steps.latest-build.outputs.run_id }}
