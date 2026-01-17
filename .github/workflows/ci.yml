@@ -53,13 +53,15 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Archive build
+        run: |
+          zip -r mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip dist
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
         with:
           name: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}
-          path: |
-            ./dist
-            dummy-file-to-keep-directory-structure.txt
+          path: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
           if-no-files-found: error
 
       - name: Log in to GitHub Container Registry
