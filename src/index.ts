@@ -31,7 +31,7 @@ async function runServer(): Promise<void> {
     server = new Server(
       {
         name: 'The Blue Alliance MCP Server',
-        version: '1.0.4',
+        version: '1.1.0',
       },
       {
         capabilities: {
