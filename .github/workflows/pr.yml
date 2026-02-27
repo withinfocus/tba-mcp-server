@@ -80,7 +80,7 @@ jobs:
 
       - name: Upload lint reports
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Lint Report
           path: |
@@ -196,7 +196,7 @@ jobs:
           zip -r mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip dist
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
           path: mcp-server-${{ steps.retrieve-package-version.outputs.package_version }}.zip
