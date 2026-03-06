@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { createRequire } from 'node:module';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -9,6 +10,9 @@ import {
 import { getApiKey, log } from './utils.js';
 import { tools } from './tools.js';
 import { handleToolCall } from './handlers.js';
+
+const require = createRequire(import.meta.url);
+const { version } = require('../package.json') as { version: string };
 
 async function runServer(): Promise<void> {
   // Create server first so we can use its logging method
@@ -31,7 +35,7 @@ async function runServer(): Promise<void> {
     server = new Server(
       {
         name: 'The Blue Alliance MCP Server',
-        version: '1.2.1',
+        version,
       },
       {
         capabilities: {
@@ -73,7 +77,7 @@ async function runServer(): Promise<void> {
       await server.connect(transport);
       await log(
         'info',
-        'The Blue Alliance MCP Server running on stdio',
+        `The Blue Alliance MCP Server v${version} running on stdio`,
         server,
       );
     } catch (error) {
@@ -111,18 +115,13 @@ async function runServer(): Promise<void> {
   }
 }
 
-// Only run the server if this file is executed directly
-// Check if this is the main module by comparing file paths
-const isMainModule = process.argv[1] && process.argv[1].endsWith('index.js');
-if (isMainModule) {
-  runServer().catch((error) => {
-    console.error(
-      `Fatal error running server: ${error instanceof Error ? error.message : error}`,
-    );
-    console.error(
-      `Stack trace: ${error instanceof Error ? error.stack : 'No stack trace available'}`,
-    );
-    console.error('Server will now exit');
-    process.exit(1);
-  });
-}
+runServer().catch((error) => {
+  console.error(
+    `Fatal error running server: ${error instanceof Error ? error.message : error}`,
+  );
+  console.error(
+    `Stack trace: ${error instanceof Error ? error.stack : 'No stack trace available'}`,
+  );
+  console.error('Server will now exit');
+  process.exit(1);
+});
