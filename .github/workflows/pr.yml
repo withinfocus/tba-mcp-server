@@ -271,7 +271,7 @@ jobs:
         run: npm run test:unit --coverage
 
       - name: Report test results
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         if: ${{ !cancelled() }}
         with:
           name: Unit Test Results
@@ -339,7 +339,7 @@ jobs:
         run: npm run test:integration
 
       - name: Report test results
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         if: ${{ !cancelled() }}
         with:
           name: Integration Test Results
