@@ -4,32 +4,50 @@ import { z } from 'zod';
 export const TeamKeySchema = z
   .string()
   .regex(/^frc\d+$/, 'Team key must be in format frcXXXX')
-  .describe('Team key in format frcXXXX (e.g., frc86)');
+  .describe(
+    "FRC team key formatted as 'frc' followed by the team number with no leading zeros (e.g., 'frc86', 'frc254', 'frc1114'). Uniquely identifies a FIRST Robotics Competition team on The Blue Alliance.",
+  );
 
-export const EventKeySchema = z.string().describe('Event key (e.g., 2023casj)');
+export const EventKeySchema = z
+  .string()
+  .describe(
+    "TBA event key combining the season year and event code (e.g., '2023casj' for the 2023 Silicon Valley Regional, '2024txhou' for the 2024 Houston Championship, '2024micmp4' for a Michigan State Championship division). Use get_events or get_events_keys to discover valid event keys for a year.",
+  );
 
 export const MatchKeySchema = z
   .string()
-  .describe('Match key (e.g., 2023casj_qm1)');
+  .describe(
+    "TBA match key in the form '{event_key}_{comp_level}{match_number}' (e.g., '2023casj_qm1' for qualification match 1, '2023casj_sf1m1' for semifinal set 1 match 1, '2023casj_f1m1' for finals match 1). Competition levels: qm (qualification), ef (eighth-final), qf (quarterfinal), sf (semifinal), f (final).",
+  );
 
 export const DistrictKeySchema = z
   .string()
-  .describe('District key (e.g., 2023fim)');
+  .describe(
+    "TBA district key combining the season year and district abbreviation (e.g., '2023fim' for FIRST in Michigan, '2024ne' for New England, '2024chs' for Chesapeake, '2024pnw' for Pacific Northwest, '2024fit' for FIRST In Texas). Use get_districts to enumerate valid district keys for a year.",
+  );
 
-export const MediaTagSchema = z.string().describe('Media tag to filter by');
+export const MediaTagSchema = z
+  .string()
+  .describe(
+    "TBA media tag identifier used to filter team-submitted media. Common tags include 'chairmans_video', 'chairmans_essay', 'chairmans_presentation', and 'imagery'. See https://www.thebluealliance.com/apidocs for the full list.",
+  );
 
 export const PageNumSchema = z
   .number()
   .int()
   .min(0)
-  .describe('Page number (0-indexed)');
+  .describe(
+    'Zero-indexed page number for paginated team listings. TBA returns up to 500 teams per page; increment until the response is empty to enumerate all teams.',
+  );
 
 export const YearSchema = z
   .number()
   .int()
   .min(1992)
   .max(new Date().getFullYear() + 1)
-  .describe('Competition year');
+  .describe(
+    'FRC competition season year. FRC began in 1992 and runs one game per year (e.g., 2023 = "Charged Up", 2024 = "Crescendo", 2025 = "Reefscape"). Must be between 1992 and next calendar year.',
+  );
 
 // API response schemas
 export const TeamSchema = z.object({
