@@ -28,10 +28,8 @@
     "@types/node": "24.12.0",
     "eslint": "9.39.2",
     "globals": "17.4.0",
-    "husky": "9.1.7",
     "jest": "30.2.0",
     "jest-junit": "16.0.0",
-    "lint-staged": "16.3.2",
     "prettier": "3.8.1",
     "ts-jest": "29.4.6",
     "typescript": "5.9.3",
@@ -43,12 +41,7 @@
   "files": [
     "dist"
   ],
-  "lint-staged": {
-    "*": "prettier --cache --write --ignore-unknown",
-    "*.ts": "eslint --cache --cache-strategy content --fix"
-  },
   "scripts": {
-    "prepare": "husky",
     "lint": "eslint . --cache --cache-strategy content && prettier --check .",
     "lint:fix": "eslint . --cache --cache-strategy content --fix",
     "build": "tsc && shx chmod +x dist/*.js",
