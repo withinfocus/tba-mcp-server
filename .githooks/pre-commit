@@ -1,0 +1,17 @@
+#!/bin/sh
+
+staged=$(git diff --cached --name-only --diff-filter=d)
+
+if [ -z "$staged" ]; then
+    exit 0
+fi
+
+echo "$staged" | xargs prettier --cache --write --ignore-unknown
+
+ts_staged=$(echo "$staged" | grep '\.ts$')
+
+if [ -n "$ts_staged" ]; then
+    echo "$ts_staged" | xargs eslint --cache --cache-strategy content --fix
+fi
+
+echo "$staged" | xargs git add
