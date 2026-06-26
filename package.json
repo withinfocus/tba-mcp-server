@@ -21,7 +21,7 @@
   "devDependencies": {
     "@eslint/js": "9.39.2",
     "@jest/globals": "30.2.0",
-    "@modelcontextprotocol/inspector": "0.21.1",
+    "@modelcontextprotocol/inspector": "0.22.0",
     "@playwright/test": "1.61.1",
     "@stylistic/eslint-plugin": "^5.7.0",
     "@types/jest": "30.0.0",
