@@ -68,6 +68,6 @@ export async function makeApiRequest(endpoint: string): Promise<unknown> {
     }
     const errorMessage = `Unknown error during API request for endpoint ${endpoint}`;
     await log('error', `${errorMessage}: ${error}`);
-    throw new Error(errorMessage);
+    throw new Error(errorMessage, { cause: error });
   }
 }

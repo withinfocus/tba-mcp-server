@@ -1,0 +1,16 @@
+# zizmor configuration. See https://docs.zizmor.sh/configuration/.
+
+rules:
+  # Actions are pinned to tags rather than commit hashes, and Dependabot keeps
+  # those tags current. Accept a ref pin instead of demanding a hash pin.
+  unpinned-uses:
+    config:
+      policies:
+        "*": ref-pin
+
+  # The build job caches pnpm downloads and also pushes the image. Poisoning
+  # that cache means writing to it first, which needs push access to this
+  # repository, and the job itself only runs on pushes to main. Low confidence.
+  cache-poisoning:
+    ignore:
+      - ci.yml
