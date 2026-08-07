@@ -71,6 +71,7 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISABLE_LINTERS: JAVASCRIPT_STANDARD,TYPESCRIPT_STANDARD
+          FILTER_REGEX_EXCLUDE: (pnpm-lock\.yaml)
           LLM_ADVISOR_ENABLED: >-
             ${{
               steps.pr-details.outputs.author_login != 'dependabot[bot]' &&
@@ -178,18 +179,21 @@ jobs:
           NODE_VERSION=${NODE_NVMRC/v/''}
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+          cache: "pnpm"
+          cache-dependency-path: "**/pnpm-lock.yaml"
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build project
-        run: npm run build
+        run: pnpm run build
 
       - name: Archive build
         run: |
@@ -257,18 +261,21 @@ jobs:
           NODE_VERSION=${NODE_NVMRC/v/''}
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+          cache: "pnpm"
+          cache-dependency-path: "**/pnpm-lock.yaml"
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run unit tests
-        run: npm run test:unit --coverage
+        run: pnpm run test:unit --coverage
 
       - name: Report test results
         uses: dorny/test-reporter@v3
@@ -316,27 +323,30 @@ jobs:
           NODE_VERSION=${NODE_NVMRC/v/''}
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+          cache: "pnpm"
+          cache-dependency-path: "**/pnpm-lock.yaml"
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright
-        run: npx playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
 
       - name: Set up environment
         run: echo "TBA_API_KEY=${{ secrets.TBA_API_KEY }}" >> .env
 
       - name: Build project
-        run: npm run build
+        run: pnpm run build
 
       - name: Run integration tests
-        run: npm run test:integration
+        run: pnpm run test:integration
 
       - name: Report test results
         uses: dorny/test-reporter@v3

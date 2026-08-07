@@ -35,6 +35,7 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.1"
   },
+  "packageManager": "pnpm@11.20.0",
   "bin": {
     "mcp-server-tba": "dist/index.js"
   },
@@ -45,7 +46,7 @@
     "lint": "eslint . --cache --cache-strategy content && prettier --check .",
     "lint:fix": "eslint . --cache --cache-strategy content --fix",
     "build": "tsc && shx chmod +x dist/*.js",
-    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
+    "inspect": "mcp-inspector node dist/index.js",
     "test": "jest --silent",
     "test:watch": "jest --watch",
     "test:unit": "jest --silent",
@@ -53,11 +54,11 @@
     "test:integration:ui": "playwright test --ui",
     "test:integration:debug": "playwright test --debug",
     "test:integration:headed": "playwright test --headed",
-    "test:all": "npm run test:unit && npm run test:integration",
+    "test:all": "pnpm run test:unit && pnpm run test:integration",
     "start:test": "node dist/index.js"
   },
   "engines": {
     "node": ">=24",
-    "npm": ">=11"
+    "pnpm": ">=11"
   }
 }

@@ -6,7 +6,7 @@ Model Context Protocol (MCP) server that provides access to The Blue Alliance AP
 
 - **Language**: TypeScript with Node.js
 - **Framework**: Model Context Protocol SDK
-- **Package Manager**: npm
+- **Package Manager**: pnpm (version pinned in `packageManager`; settings in `pnpm-workspace.yaml`)
 - **Main Entry**: `src/index.ts`
 - **Build Output**: `dist/`
 - **Transport**: stdio for MCP communication
@@ -75,31 +75,31 @@ Two types of tests exist that should both be run:
 ### Unit Tests (Jest)
 
 ```bash
-npm test                 # Run unit tests
-npm run test:watch       # Run unit tests in watch mode
+pnpm test                 # Run unit tests
+pnpm run test:watch       # Run unit tests in watch mode
 ```
 
 ### Integration Tests (Playwright)
 
 ```bash
-npm run test:integration         # Run all integration tests
-npm run test:integration:ui      # Run with Playwright UI
-npm run test:integration:debug   # Debug mode
-npm run test:all                 # Run both unit and integration tests
+pnpm run test:integration         # Run all integration tests
+pnpm run test:integration:ui      # Run with Playwright UI
+pnpm run test:integration:debug   # Debug mode
+pnpm run test:all                 # Run both unit and integration tests
 ```
 
 **IMPORTANT**: Always run both test suites when making changes:
 
-1. Run `npm test` for unit tests
-2. Run `npm run test:integration` for integration tests
-3. Or use `npm run test:all` to run everything
+1. Run `pnpm test` for unit tests
+2. Run `pnpm run test:integration` for integration tests
+3. Or use `pnpm run test:all` to run everything
 
 ### Integration Test Requirements
 
 The integration tests require:
 
 - A valid TBA API key set as `TBA_API_KEY` environment variable
-- The project to be built first (`npm run build`)
+- The project to be built first (`pnpm run build`)
 - Tests cover MCP protocol compliance, API endpoint functionality, error handling, performance, and data validation
 
 ### Key Integration Test Areas
@@ -114,23 +114,23 @@ The integration tests require:
 ## Development Workflow
 
 1. Make code changes
-2. Build the project: `npm run build`
-3. Run linting: `npm run lint` (fix with `npm run lint:fix`)
-4. Run unit tests: `npm test`
-5. Run integration tests: `npm run test:integration`
+2. Build the project: `pnpm run build`
+3. Run linting: `pnpm run lint` (fix with `pnpm run lint:fix`)
+4. Run unit tests: `pnpm test`
+5. Run integration tests: `pnpm run test:integration`
 6. Ensure both test suites pass before considering changes complete
 
 ## Development Commands
 
 ```bash
-npm run build                    # Build TypeScript to dist/
-npm run lint                     # Run ESLint and Prettier
-npm run lint:fix                 # Auto-fix linting issues
-npm test                         # Run Jest unit tests
-npm run test:watch               # Run tests in watch mode
-npm run test:integration         # Run Playwright integration tests
-npm run test:all                 # Run all tests (unit + integration)
-npm run inspect                  # Launch MCP inspector for debugging
+pnpm run build                    # Build TypeScript to dist/
+pnpm run lint                     # Run ESLint and Prettier
+pnpm run lint:fix                 # Auto-fix linting issues
+pnpm test                         # Run Jest unit tests
+pnpm run test:watch               # Run tests in watch mode
+pnpm run test:integration         # Run Playwright integration tests
+pnpm run test:all                 # Run all tests (unit + integration)
+pnpm run inspect                  # Launch MCP inspector for debugging
 ```
 
 ## MCP Server Details
@@ -315,18 +315,18 @@ test('should get team media for a year', async ({ page }) => {
 ### 6. Build and Test
 
 ```bash
-npm run build                # Build TypeScript
-npm run lint                 # Check code quality
-npm test                     # Run unit tests
-npm run test:integration     # Run integration tests
+pnpm run build                # Build TypeScript
+pnpm run lint                 # Check code quality
+pnpm test                     # Run unit tests
+pnpm run test:integration     # Run integration tests
 ```
 
 ## When Working on The Project
 
-1. Always run `npm run build` after making changes
-2. Run `npm run lint` to ensure code quality
-3. Run tests with `npm run test` and `npm run test:integration` before committing
-4. Use `npm run inspect` to debug MCP functionality
+1. Always run `pnpm run build` after making changes
+2. Run `pnpm run lint` to ensure code quality
+3. Run tests with `pnpm run test` and `pnpm run test:integration` before committing
+4. Use `pnpm run inspect` to debug MCP functionality
 5. Follow existing TypeScript patterns and MCP SDK conventions
 6. When adding new tools, follow the 6-step process outlined above
 7. Keep the separation of concerns: tools → schemas → handlers → tests

@@ -20,6 +20,7 @@ updates:
       time: "02:00"
       timezone: "America/New_York"
 
+  # The "npm" ecosystem covers pnpm projects and updates pnpm-lock.yaml.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
