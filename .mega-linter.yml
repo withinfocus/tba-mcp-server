@@ -14,19 +14,19 @@ TYPESCRIPT_ES_PRE_COMMANDS:
       && pnpm install --frozen-lockfile --ignore-scripts
     cwd: workspace
     continue_if_failed: false
-TYPESCRIPT_ES_CLI_EXECUTABLE: node_modules/.bin/eslint
+TYPESCRIPT_ES_CLI_EXECUTABLE:
+  - node_modules/.bin/eslint
 
 # The ref-confusion audit calls the GitHub API to list branches for each action
 # in a `uses:` clause, and fails the run with a 401 without a token.
 ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
   - GITHUB_TOKEN
 
-# Audit every workflow on every run, not just the ones a PR happens to touch, so
-# a finding surfaces when it is introduced rather than whenever that file is next
-# edited. Project mode ignores the changed-file list, hence passing the directory
-# explicitly. Gate on medium and above; lower findings stay visible in the log.
-# Rule configuration lives in .github/zizmor.yml, which zizmor discovers itself.
-ACTION_ZIZMOR_CLI_LINT_MODE: project
+# Audit every workflow, not just the one a PR happens to touch, by passing the
+# directory alongside the changed-file list MegaLinter builds. Whichever file
+# changed gets reported twice, which is noise in the log but does not affect the
+# result. Gate on medium and above; lower findings stay visible. Rule
+# configuration lives in .github/zizmor.yml, which zizmor discovers itself.
 ACTION_ZIZMOR_ARGUMENTS:
   - --min-severity
   - medium
