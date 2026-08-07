@@ -1,0 +1,11 @@
+# pnpm settings. As of pnpm 11 this file, not package.json or .npmrc, is where
+# pnpm-specific configuration lives. See https://pnpm.io/settings.
+
+# Save dependency versions exactly; upgrades are handled by Dependabot.
+savePrefix: ""
+
+# Dependencies allowed to run install lifecycle scripts. Everything else is
+# blocked by default; run `pnpm approve-builds` to review new requests.
+allowBuilds:
+  # Selects the prebuilt native binding for the current platform.
+  unrs-resolver: true

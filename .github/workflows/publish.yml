@@ -62,31 +62,25 @@ jobs:
           NODE_VERSION=${NODE_NVMRC/v/''}
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
-
-      - name: Install NPM and Husky
-        run: npm install -g npm@latest husky
+          registry-url: "https://npm.pkg.github.com"
 
       - name: Download release artifact
         run: |
           wget "https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip"
           unzip "mcp-server-${{ env._PKG_VERSION }}.zip"
 
-      - name: Configure NPM registry
-        run: |
-          echo 'registry="https://npm.pkg.github.com/"' > ./.npmrc
-          echo "//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ./.npmrc
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Publish to GitHub Package Registry
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if npm publish --access public --registry=https://npm.pkg.github.com/ --userconfig=./.npmrc 2>&1 | tee publish.log; then
+          if pnpm publish --access public --no-git-checks 2>&1 | tee publish.log; then
             echo "✓ Successfully published to GitHub Package Registry"
           elif grep -q "cannot publish over the previously published versions" publish.log || grep -q "You cannot publish over the previously published versions" publish.log || grep -q "version already exists" publish.log; then
             echo "ℹ️ Package version already exists in GitHub Package Registry - skipping"
@@ -148,24 +142,24 @@ jobs:
           NODE_VERSION=${NODE_NVMRC/v/''}
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
-
-      - name: Install NPM and Husky
-        run: npm install -g npm@latest husky
 
       - name: Download release artifact
         run: |
           wget https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip
           unzip mcp-server-${{ env._PKG_VERSION }}.zip
 
+      # Authentication is npm trusted publishing (OIDC) via the job's
+      # id-token: write permission; no static token is involved.
       - name: Publish to NPM
         run: |
-          if npm publish --access public 2>&1 | tee publish.log; then
+          if pnpm publish --access public --no-git-checks 2>&1 | tee publish.log; then
             echo "✓ Successfully published to NPM"
           elif grep -q "cannot publish over the previously published versions" publish.log || grep -q "You cannot publish over the previously published versions" publish.log || grep -q "version already exists" publish.log; then
             echo "ℹ️ Package version already exists on NPM - skipping"

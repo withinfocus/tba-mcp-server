@@ -6,12 +6,12 @@ if [ -z "$staged" ]; then
     exit 0
 fi
 
-echo "$staged" | xargs prettier --cache --write --ignore-unknown
+echo "$staged" | xargs pnpm exec prettier --cache --write --ignore-unknown
 
 ts_staged=$(echo "$staged" | grep '\.ts$')
 
 if [ -n "$ts_staged" ]; then
-    echo "$ts_staged" | xargs eslint --cache --cache-strategy content --fix
+    echo "$ts_staged" | xargs pnpm exec eslint --cache --cache-strategy content --fix
 fi
 
 echo "$staged" | xargs git add

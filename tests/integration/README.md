@@ -7,13 +7,13 @@ Comprehensive Playwright-based integration tests for the Blue Alliance MCP Serve
 1. Install dependencies:
 
 ```bash
-npm ci
+pnpm install --frozen-lockfile
 ```
 
 2. Build the project:
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 3. Set up your TBA API key:
@@ -29,19 +29,19 @@ You can get an API key from [The Blue Alliance](https://www.thebluealliance.com/
 ### All Integration Tests
 
 ```bash
-npm run test:integration
+pnpm run test:integration
 ```
 
 ### Debug Mode
 
 ```bash
-npm run test:integration:debug
+pnpm run test:integration:debug
 ```
 
 ### UI Mode
 
 ```bash
-npm run test:integration:ui
+pnpm run test:integration:ui
 ```
 
 ## Test Structure

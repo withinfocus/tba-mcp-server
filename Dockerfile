@@ -1,18 +1,29 @@
-FROM node:24-alpine AS dependencies
+FROM node:24-alpine AS base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 WORKDIR /app
 
-COPY package.json package-lock.json tsconfig.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN npm ci --ignore-scripts --omit-dev
+FROM base AS builder
 
-FROM dependencies AS builder
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
 
-WORKDIR /app
+COPY tsconfig.json ./
+COPY src ./src
 
-COPY . .
+RUN pnpm run build
 
-RUN npm run build
+FROM base AS dependencies
+
+# node-linker=hoisted produces a flat, symlink-free node_modules so the tree can
+# be copied verbatim into the distroless runtime image.
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile --prod --ignore-scripts --config.node-linker=hoisted
 
 FROM gcr.io/distroless/nodejs24-debian12:nonroot AS release
 

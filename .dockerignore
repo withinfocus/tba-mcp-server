@@ -1,0 +1,14 @@
+.git
+.github
+.githooks
+node_modules
+dist
+coverage
+test-results
+test-summary
+docs
+tests
+.env
+.eslintcache
+junit.xml
+*.md

@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Node.js 24
-- npm
+- pnpm 11+ (`corepack enable`)
 - A [The Blue Alliance API key](https://www.thebluealliance.com/account)
 
 ## Development Setup
@@ -13,7 +13,7 @@
 ```bash
 git clone https://github.com/withinfocus/tba-mcp-server.git
 cd tba-mcp-server
-npm ci
+pnpm install --frozen-lockfile
 ```
 
 ### 2. Configure Environment
@@ -33,31 +33,31 @@ TBA_API_KEY=your_api_key_here
 ### 3. Build the Project
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 ## Development Workflow
 
 1. Make code changes
-2. Build the project: `npm run build`
-3. Run linting: `npm run lint` (fix with `npm run lint:fix`)
-4. Run unit tests: `npm test`
-5. Run integration tests: `npm run test:integration`
+2. Build the project: `pnpm run build`
+3. Run linting: `pnpm run lint` (fix with `pnpm run lint:fix`)
+4. Run unit tests: `pnpm test`
+5. Run integration tests: `pnpm run test:integration`
 6. Ensure both test suites pass before committing
 
 ## Available Commands
 
 ```bash
-npm run build                    # Build TypeScript to dist/
-npm run lint                     # Run ESLint and Prettier
-npm run lint:fix                 # Auto-fix linting issues
-npm test                         # Run Jest unit tests
-npm run test:watch               # Run tests in watch mode
-npm run test:integration         # Run Playwright integration tests
-npm run test:integration:ui      # Run with Playwright UI
-npm run test:integration:debug   # Debug mode
-npm run test:all                 # Run all tests (unit + integration)
-npm run inspect                  # Launch MCP inspector for debugging
+pnpm run build                    # Build TypeScript to dist/
+pnpm run lint                     # Run ESLint and Prettier
+pnpm run lint:fix                 # Auto-fix linting issues
+pnpm test                         # Run Jest unit tests
+pnpm run test:watch               # Run tests in watch mode
+pnpm run test:integration         # Run Playwright integration tests
+pnpm run test:integration:ui      # Run with Playwright UI
+pnpm run test:integration:debug   # Debug mode
+pnpm run test:all                 # Run all tests (unit + integration)
+pnpm run inspect                  # Launch MCP inspector for debugging
 ```
 
 ## Testing
@@ -67,8 +67,8 @@ npm run inspect                  # Launch MCP inspector for debugging
 Unit tests validate individual components:
 
 ```bash
-npm test                 # Run once
-npm run test:watch       # Watch mode for development
+pnpm test                 # Run once
+pnpm run test:watch       # Watch mode for development
 ```
 
 Tests are located in `tests/*.spec.ts` and cover:
@@ -83,16 +83,16 @@ Tests are located in `tests/*.spec.ts` and cover:
 Integration tests validate the entire MCP server:
 
 ```bash
-npm run test:integration         # Run all integration tests
-npm run test:integration:ui      # Run with Playwright UI
-npm run test:integration:debug   # Debug mode
-npm run test:all                 # Run both unit and integration tests
+pnpm run test:integration         # Run all integration tests
+pnpm run test:integration:ui      # Run with Playwright UI
+pnpm run test:integration:debug   # Debug mode
+pnpm run test:all                 # Run both unit and integration tests
 ```
 
 **Requirements:**
 
 - Valid `TBA_API_KEY` environment variable
-- Project must be built first (`npm run build`)
+- Project must be built first (`pnpm run build`)
 
 **Coverage areas:**
 
@@ -336,18 +336,18 @@ test('should get team media for a year', async ({ page }) => {
 ### 6. Build and Test
 
 ```bash
-npm run build                # Build TypeScript
-npm run lint                 # Check code quality
-npm test                     # Run unit tests
-npm run test:integration     # Run integration tests
+pnpm run build                # Build TypeScript
+pnpm run lint                 # Check code quality
+pnpm test                     # Run unit tests
+pnpm run test:integration     # Run integration tests
 ```
 
 ## Best Practices
 
-1. Always run `npm run build` after making changes
-2. Run `npm run lint` to ensure code quality
-3. Run both test suites (`npm run test:all`) before committing
-4. Use `npm run inspect` to debug MCP functionality
+1. Always run `pnpm run build` after making changes
+2. Run `pnpm run lint` to ensure code quality
+3. Run both test suites (`pnpm run test:all`) before committing
+4. Use `pnpm run inspect` to debug MCP functionality
 5. Follow existing TypeScript patterns and MCP SDK conventions
 6. When adding new tools, follow the 6-step process outlined above
 7. Keep the separation of concerns: tools → schemas → handlers → tests
@@ -358,7 +358,7 @@ npm run test:integration     # Run integration tests
 Use the MCP inspector for interactive debugging:
 
 ```bash
-npm run inspect
+pnpm run inspect
 ```
 
 This launches a web interface where you can:
@@ -373,7 +373,7 @@ This launches a web interface where you can:
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes following the guidelines above
-4. Run all tests (`npm run test:all`)
+4. Run all tests (`pnpm run test:all`)
 5. Commit your changes (`git commit -m 'Add amazing feature'`)
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request

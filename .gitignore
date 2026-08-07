@@ -22,7 +22,8 @@ Thumbs.db
 
 # Node
 node_modules
-npm-debug.log
+.pnpm-store/
+pnpm-debug.log*
 
 # Testing
 coverage/

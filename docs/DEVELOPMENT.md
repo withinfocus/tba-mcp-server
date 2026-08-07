@@ -19,13 +19,17 @@ Building, testing, and contributing to the TBA MCP Server.
 
 ## Development Setup
 
+Requires Node.js 24 and pnpm 11. The pnpm version is pinned in the
+`packageManager` field of `package.json`, so `corepack enable` is enough to get
+the right one.
+
 ```bash
 # Clone the repository
 git clone https://github.com/withinfocus/tba-mcp-server.git
 cd tba-mcp-server
 
 # Install dependencies
-npm ci
+pnpm install --frozen-lockfile
 
 # Set up your API key
 export TBA_API_KEY=your_api_key_here
@@ -35,7 +39,7 @@ export TBA_API_KEY=your_api_key_here
 ## Building
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 which compiles TypeScript from `src/` to JavaScript in `dist/`.
@@ -45,8 +49,8 @@ which compiles TypeScript from `src/` to JavaScript in `dist/`.
 ### Unit Tests (Jest)
 
 ```bash
-npm test                 # Run unit tests once
-npm run test:watch       # Run unit tests in watch mode
+pnpm test                 # Run unit tests once
+pnpm run test:watch       # Run unit tests in watch mode
 ```
 
 Unit tests cover:
@@ -59,15 +63,15 @@ Unit tests cover:
 ### Integration Tests (Playwright)
 
 ```bash
-npm run test:integration         # Run all integration tests
-npm run test:integration:ui      # Run with Playwright UI
-npm run test:integration:debug   # Debug mode
+pnpm run test:integration         # Run all integration tests
+pnpm run test:integration:ui      # Run with Playwright UI
+pnpm run test:integration:debug   # Debug mode
 ```
 
 **Requirements**:
 
 - Valid TBA API key set as `TBA_API_KEY` environment variable
-- Project must be built first (`npm run build`)
+- Project must be built first (`pnpm run build`)
 
 Integration tests cover:
 
@@ -81,7 +85,7 @@ Integration tests cover:
 ### All Tests
 
 ```bash
-npm run test:all         # Run both unit and integration tests
+pnpm run test:all         # Run both unit and integration tests
 ```
 
 **IMPORTANT**: Always run both test suites when making changes. Consider the task incomplete unless both pass.
@@ -89,8 +93,8 @@ npm run test:all         # Run both unit and integration tests
 ## Linting
 
 ```bash
-npm run lint             # Check code quality
-npm run lint:fix         # Auto-fix linting issues
+pnpm run lint             # Check code quality
+pnpm run lint:fix         # Auto-fix linting issues
 ```
 
 The project uses:
@@ -103,28 +107,28 @@ The project uses:
 
 ```bash
 # 1. Install dependencies
-npm ci
+pnpm install --frozen-lockfile
 
 # 2. Run unit tests in watch mode during development
-npm run test:watch
+pnpm run test:watch
 
 # 3. Build the project
-npm run build
+pnpm run build
 
 # 4. Run all tests (unit + integration)
-npm run test:all
+pnpm run test:all
 
 # 5. Test with the MCP inspector
-npm run inspect
+pnpm run inspect
 ```
 
 ### Recommended Development Loop
 
 1. Make code changes
 2. Watch unit tests pass automatically
-3. Build: `npm run build`
-4. Check linting: `npm run lint`
-5. Run integration tests: `npm run test:integration`
+3. Build: `pnpm run build`
+4. Check linting: `pnpm run lint`
+5. Run integration tests: `pnpm run test:integration`
 6. Ensure both test suites pass before committing
 
 ## Debugging
@@ -132,7 +136,7 @@ npm run inspect
 ### MCP Inspector
 
 ```bash
-npm run inspect
+pnpm run inspect
 ```
 
 Launches the MCP inspector tool for debugging MCP functionality in a browser.
@@ -141,7 +145,7 @@ Launches the MCP inspector tool for debugging MCP functionality in a browser.
 
 ```bash
 # Build and test locally
-npm run build
+pnpm run build
 node dist/index.js
 ```
 
@@ -181,9 +185,9 @@ git checkout -b feature/your-feature-name
 5. **Run the test suite**
 
 ```bash
-npm run build
-npm run lint
-npm run test:all
+pnpm run build
+pnpm run lint
+pnpm run test:all
 ```
 
 6. **Commit your changes**

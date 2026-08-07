@@ -28,23 +28,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get Node version
-        id: retrieve-node-version
-        run: |
-          NODE_NVMRC=$(cat .nvmrc)
-          NODE_VERSION=${NODE_NVMRC/v/''}
-          echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
-          node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Get current version
         id: current-version
         run: |
@@ -86,11 +69,6 @@ jobs:
           mv package.json.tmp package.json
           echo "✓ Updated package.json"
 
-      - name: Update package-lock.json
-        run: |
-          npm install --package-lock-only
-          echo "✓ Updated package-lock.json"
-
       - name: Update glama.json
         run: |
           jq '.version = "${{ steps.new-version.outputs.version }}"' glama.json > glama.json.tmp
@@ -112,7 +90,7 @@ jobs:
         run: |
           BRANCH_NAME="version-bump-${{ steps.new-version.outputs.version }}"
           git checkout -b "$BRANCH_NAME"
-          git add package.json package-lock.json glama.json server.json
+          git add package.json glama.json server.json
           git commit -m "Bump version to ${{ steps.new-version.outputs.version }}"
           git push -u origin "$BRANCH_NAME"
           echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
