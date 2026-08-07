@@ -37,9 +37,10 @@ jobs:
 
       - name: Calculate new version
         id: new-version
+        env:
+          BUMP_TYPE: ${{ github.event.inputs.bump_type }}
         run: |
           CURRENT_VERSION="${{ steps.current-version.outputs.version }}"
-          BUMP_TYPE="${{ github.event.inputs.bump_type }}"
 
           # Split version into parts
           IFS='.' read -r -a version_parts <<< "$CURRENT_VERSION"
@@ -108,10 +109,11 @@ jobs:
       - name: Create pull request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUMP_TYPE: ${{ github.event.inputs.bump_type }}
         run: |
           PR_BODY="## Version Bump: ${{ steps.current-version.outputs.version }} → ${{ steps.new-version.outputs.version }}
 
-          **Bump Type**: ${{ github.event.inputs.bump_type }}"
+          **Bump Type**: $BUMP_TYPE"
 
           PR_URL=$(gh pr create \
             --title "Bump version to ${{ steps.new-version.outputs.version }}" \
@@ -124,11 +126,13 @@ jobs:
         id: create-pr
 
       - name: Create summary
+        env:
+          BUMP_TYPE: ${{ github.event.inputs.bump_type }}
         run: |
           {
             echo "## Version Bump Pull Request Created"
             echo ""
-            echo "- **Bump Type**: ${{ github.event.inputs.bump_type }}"
+            echo "- **Bump Type**: $BUMP_TYPE"
             echo "- **Previous Version**: ${{ steps.current-version.outputs.version }}"
             echo "- **New Version**: ${{ steps.new-version.outputs.version }}"
             echo "- **Pull Request**: ${{ steps.create-pr.outputs.pr_url }}"
