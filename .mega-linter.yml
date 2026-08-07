@@ -1,0 +1,16 @@
+# MegaLinter configuration. The Lint job in .github/workflows/pr.yml also sets
+# VALIDATE_ALL_CODEBASE, DISABLE_LINTERS, FILTER_REGEX_EXCLUDE, and
+# LLM_ADVISOR_ENABLED as env vars, which take precedence over this file.
+
+# eslint.config.js imports @eslint/js, globals, typescript-eslint, and
+# @stylistic/eslint-plugin. MegaLinter runs its own eslint against the config in
+# /github/workspace, so without the workspace node_modules those imports fail to
+# resolve and the linter aborts before checking anything.
+PRE_COMMANDS:
+  - command: corepack enable && pnpm install --frozen-lockfile
+    cwd: workspace
+
+# zizmor's ref-confusion audit calls the GitHub API to list branches for each
+# action in a `uses:` clause, which is rate limited to nothing without a token.
+ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
+  - GITHUB_TOKEN
