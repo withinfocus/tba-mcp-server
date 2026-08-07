@@ -7,5 +7,7 @@ savePrefix: ""
 # Dependencies allowed to run install lifecycle scripts. Everything else is
 # blocked by default; run `pnpm approve-builds` to review new requests.
 allowBuilds:
+  # Unpacks the bundled web, CLI, and TUI clients that `pnpm run inspect` runs.
+  "@modelcontextprotocol/inspector": true
   # Selects the prebuilt native binding for the current platform.
   unrs-resolver: true

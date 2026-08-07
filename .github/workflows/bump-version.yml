@@ -81,6 +81,15 @@ jobs:
           mv server.json.tmp server.json
           echo "✓ Updated server.json"
 
+      # jq reformats the JSON it rewrites, which does not always match Prettier
+      # (it expands short arrays in glama.json). Normalize before committing so
+      # the bump does not leave main failing the lint job.
+      - name: Format updated files
+        run: |
+          PRETTIER_VERSION=$(jq -r '.devDependencies.prettier' package.json)
+          npx --yes "prettier@${PRETTIER_VERSION}" --write package.json glama.json server.json
+          echo "✓ Formatted updated files"
+
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"

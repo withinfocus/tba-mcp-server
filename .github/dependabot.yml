@@ -28,6 +28,7 @@ updates:
       day: "friday"
       time: "02:00"
       timezone: "America/New_York"
+    open-pull-requests-limit: 15
     ignore:
       # Ignore all @types/node versions except 24.x
       - dependency-name: "@types/node"
