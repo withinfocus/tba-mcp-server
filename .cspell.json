@@ -3,6 +3,7 @@
   "version": "0.2",
   "ignorePaths": [
     "**/.cspell.json",
+    "**/.dockerignore",
     "**/.gitignore",
     "**/.git/**",
     "**/node_modules/**",
@@ -16,12 +17,15 @@
   ],
   "words": [
     "CCWM",
+    "distroless",
     "DPR",
     "glama",
     "MCP",
     "modelcontextprotocol",
+    "nonroot",
     "offseason",
     "OPR",
+    "unrs",
     "withinfocus"
   ]
 }
