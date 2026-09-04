@@ -13,3 +13,13 @@ allowBuilds:
   "@parcel/watcher": true
   # Selects the prebuilt native binding for the current platform.
   unrs-resolver: true
+
+# Transitive pins for advisories with no fix upstream yet. Drop an entry once
+# the dependency that pulls it in has moved on by itself.
+overrides:
+  # ajv 8.20.0 asks for ^3.0.1 and resolves 3.1.5, which is subject to four
+  # SSRF and host-confusion advisories: GHSA-5jgf-p345-68v8,
+  # GHSA-f65p-4m7j-42xc, GHSA-fph4-wmhf-6fwf, GHSA-jqff-g426-hqxp. ajv reaches
+  # production through @modelcontextprotocol/sdk. Caret, not an exact pin, so
+  # later 3.x patches still land without editing this.
+  fast-uri: "^3.1.6"
