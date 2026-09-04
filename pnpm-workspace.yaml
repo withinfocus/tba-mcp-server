@@ -9,5 +9,7 @@ savePrefix: ""
 allowBuilds:
   # Unpacks the bundled web, CLI, and TUI clients that `pnpm run inspect` runs.
   "@modelcontextprotocol/inspector": true
+  # Selects the prebuilt watcher binding jest-haste-map uses for --watch.
+  "@parcel/watcher": true
   # Selects the prebuilt native binding for the current platform.
   unrs-resolver: true
