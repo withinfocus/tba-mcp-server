@@ -9,17 +9,31 @@ savePrefix: ""
 allowBuilds:
   # Unpacks the bundled web, CLI, and TUI clients that `pnpm run inspect` runs.
   "@modelcontextprotocol/inspector": true
-  # Selects the prebuilt watcher binding jest-haste-map uses for --watch.
-  "@parcel/watcher": true
+  # Pulled in by jest-haste-map. Ships prebuilt platform bindings, so the
+  # build-from-source fallback never has to run.
+  "@parcel/watcher": false
   # Selects the prebuilt native binding for the current platform.
   unrs-resolver: true
 
-# Transitive pins for advisories with no fix upstream yet. Drop an entry once
-# the dependency that pulls it in has moved on by itself.
+# ajv pulls in fast-uri, and 3.1.5 carries four high-severity advisories:
+# host confusion via percent-encoded scheme normalization and skipped IDN
+# canonicalization, plus SSRF via malformed IPv6 normalization and repeated
+# hostname percent-decoding. All four are fixed in 3.1.6. Held to the 3.x
+# line because ajv asks for ^3.0.1; an unbounded floor resolves 4.x and
+# takes a transitive major that ajv has not declared support for. Drop this
+# once ajv requires a patched version on its own.
+#
+# postcss pulls in nanoid, and 3.3.17 carries a high-severity advisory: the
+# custom generators spin forever when handed a size of zero, hanging the
+# calling thread. Fixed in 3.3.18. Only the inspector's dev tree reaches it,
+# by way of `vite`. Held to the 3.x line because postcss asks for ^3.3.17.
+#
+# express and body-parser pull in qs, and 6.15.3 carries two medium-severity
+# denial-of-service advisories: improper validation in the stringify
+# function, and an array limit bypass in the query string parser. Both are
+# fixed in 6.16.0. express reaches production through the MCP SDK. Held to
+# the 6.x line because body-parser asks for ^6.15.2 and express for ^6.14.0.
 overrides:
-  # ajv 8.20.0 asks for ^3.0.1 and resolves 3.1.5, which is subject to four
-  # SSRF and host-confusion advisories: GHSA-5jgf-p345-68v8,
-  # GHSA-f65p-4m7j-42xc, GHSA-fph4-wmhf-6fwf, GHSA-jqff-g426-hqxp. ajv reaches
-  # production through @modelcontextprotocol/sdk. Caret, not an exact pin, so
-  # later 3.x patches still land without editing this.
   fast-uri: "^3.1.6"
+  nanoid: "^3.3.18"
+  qs: "^6.16.0"
