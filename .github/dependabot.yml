@@ -50,6 +50,13 @@ updates:
       # Ignore all @types/node versions except 24.x
       - dependency-name: "@types/node"
         versions: ["<24", ">=25"]
+      # TypeScript 7 is the native compiler and no longer exposes the
+      # JavaScript API that the toolchain builds on. typescript-eslint
+      # refuses to load against it and ts-jest cannot transform with it, so
+      # the major stays out until both catch up. Tracked in
+      # typescript-eslint#10940.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     # A dependency joins the first group it matches, so the toolchain groups
     # have to stay above the two catch-all groups at the bottom. Toolchain
     # groups take majors as well: packages in one of these families have to
