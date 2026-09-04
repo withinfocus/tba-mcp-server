@@ -10,6 +10,7 @@ updates:
     # Hold a new release for a day before opening a PR.
     cooldown:
       default-days: 1
+    open-pull-requests-limit: 5
     ignore:
       # Only allow Node 24.x (LTS), block all other versions
       - dependency-name: "node"
@@ -25,6 +26,7 @@ updates:
     # Hold a new release for a day before opening a PR.
     cooldown:
       default-days: 1
+    open-pull-requests-limit: 5
     groups:
       # Routine action bumps arrive as one PR. Majors are left out so a
       # breaking action change can be reviewed, and reverted, on its own.
