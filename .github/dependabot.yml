@@ -4,9 +4,13 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "friday"
+      day: "wednesday"
       time: "02:00"
       timezone: "America/New_York"
+    # Hold a new release for a day before opening a PR.
+    cooldown:
+      default-days: 1
+    open-pull-requests-limit: 5
     ignore:
       # Only allow Node 24.x (LTS), block all other versions
       - dependency-name: "node"
@@ -16,20 +20,77 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "friday"
+      day: "wednesday"
       time: "02:00"
       timezone: "America/New_York"
+    # Hold a new release for a day before opening a PR.
+    cooldown:
+      default-days: 1
+    open-pull-requests-limit: 5
+    groups:
+      # Majors are grouped too. Nearly every action here is pinned to a bare
+      # major tag, so leaving majors out would give the group almost nothing
+      # to collapse. CI validates the bump on the PR.
+      actions:
+        patterns: ["*"]
 
   # The "npm" ecosystem covers pnpm projects and updates pnpm-lock.yaml.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "friday"
+      day: "wednesday"
       time: "02:00"
       timezone: "America/New_York"
-    open-pull-requests-limit: 15
+    # Hold a new release for a day before opening a PR.
+    cooldown:
+      default-days: 1
+    open-pull-requests-limit: 10
     ignore:
       # Ignore all @types/node versions except 24.x
       - dependency-name: "@types/node"
         versions: ["<24", ">=25"]
+    # A dependency joins the first group it matches, so the toolchain groups
+    # have to stay above the two catch-all groups at the bottom. Toolchain
+    # groups take majors as well: packages in one of these families have to
+    # move together or the build breaks halfway through the upgrade.
+    groups:
+      mcp:
+        patterns:
+          - "@modelcontextprotocol/*"
+      eslint:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "@stylistic/*"
+          - "typescript-eslint"
+          # Only consumed by eslint.config.js.
+          - "globals"
+      jest:
+        patterns:
+          - "jest"
+          - "jest-*"
+          - "@jest/*"
+          - "@types/jest"
+          - "ts-jest"
+      playwright:
+        patterns:
+          - "playwright"
+          - "@playwright/*"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/node"
+      # Everything left over, one PR per dependency type. Majors are excluded
+      # so an unrelated breaking change never blocks a batch of routine bumps.
+      # Prettier lands here rather than in the eslint group: nothing pins the
+      # two together, so there is no lockstep to preserve.
+      development-dependencies:
+        dependency-type: "development"
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      production-dependencies:
+        dependency-type: "production"
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
