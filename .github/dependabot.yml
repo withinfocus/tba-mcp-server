@@ -28,11 +28,11 @@ updates:
       default-days: 1
     open-pull-requests-limit: 5
     groups:
-      # Routine action bumps arrive as one PR. Majors are left out so a
-      # breaking action change can be reviewed, and reverted, on its own.
+      # Majors are grouped too. Nearly every action here is pinned to a bare
+      # major tag, so leaving majors out would give the group almost nothing
+      # to collapse. CI validates the bump on the PR.
       actions:
         patterns: ["*"]
-        update-types: ["minor", "patch"]
 
   # The "npm" ecosystem covers pnpm projects and updates pnpm-lock.yaml.
   - package-ecosystem: "npm"
@@ -84,6 +84,8 @@ updates:
           - "@types/node"
       # Everything left over, one PR per dependency type. Majors are excluded
       # so an unrelated breaking change never blocks a batch of routine bumps.
+      # Prettier lands here rather than in the eslint group: nothing pins the
+      # two together, so there is no lockstep to preserve.
       development-dependencies:
         dependency-type: "development"
         patterns: ["*"]
