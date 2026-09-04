@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "friday"
+      day: "wednesday"
       time: "02:00"
       timezone: "America/New_York"
     # Hold a new release for a day before opening a PR.
@@ -20,7 +20,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "friday"
+      day: "wednesday"
       time: "02:00"
       timezone: "America/New_York"
     # Hold a new release for a day before opening a PR.
@@ -39,7 +39,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "friday"
+      day: "wednesday"
       time: "02:00"
       timezone: "America/New_York"
     # Hold a new release for a day before opening a PR.
