@@ -22,7 +22,7 @@
     "@eslint/js": "10.0.1",
     "@jest/globals": "30.5.2",
     "@modelcontextprotocol/inspector": "2.8.0",
-    "@playwright/test": "1.62.1",
+    "@playwright/test": "1.63.0",
     "@stylistic/eslint-plugin": "5.10.0",
     "@types/jest": "30.0.0",
     "@types/node": "24.13.3",
