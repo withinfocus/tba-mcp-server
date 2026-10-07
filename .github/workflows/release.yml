@@ -32,7 +32,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          latest_run=$(gh run list --workflow=ci.yml --branch=main --status=success --limit=1 --json=databaseId --jq='.[0].databaseId')
+          # Filter on conclusion client-side; the API's status filter can return stale runs
+          latest_run=$(gh run list --workflow=ci.yml --commit="$GITHUB_SHA" --limit=20 --json=databaseId,conclusion --jq='[.[] | select(.conclusion == "success")][0].databaseId')
+          if [ -z "$latest_run" ] || [ "$latest_run" = "null" ]; then
+            echo "::error::No successful CI run found for commit $GITHUB_SHA"
+            exit 1
+          fi
           echo "run_id=$latest_run" >> "$GITHUB_OUTPUT"
 
       - name: Download build artifact
