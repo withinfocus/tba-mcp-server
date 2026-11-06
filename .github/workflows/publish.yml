@@ -73,8 +73,8 @@ jobs:
 
       - name: Download release artifact
         run: |
-          wget "https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip"
-          unzip "mcp-server-${{ env._PKG_VERSION }}.zip"
+          wget "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/v${_PKG_VERSION}/mcp-server-${_PKG_VERSION}.zip"
+          unzip "mcp-server-${_PKG_VERSION}.zip"
 
       - name: Publish to GitHub Package Registry
         env:
@@ -152,8 +152,8 @@ jobs:
 
       - name: Download release artifact
         run: |
-          wget https://github.com/${{ github.repository }}/releases/download/v${{ env._PKG_VERSION }}/mcp-server-${{ env._PKG_VERSION }}.zip
-          unzip mcp-server-${{ env._PKG_VERSION }}.zip
+          wget "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/download/v${_PKG_VERSION}/mcp-server-${_PKG_VERSION}.zip"
+          unzip "mcp-server-${_PKG_VERSION}.zip"
 
       # Authentication is npm trusted publishing (OIDC) via the job's
       # id-token: write permission; no static token is involved.
