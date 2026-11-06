@@ -41,12 +41,12 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: refs/tags/v${{ env._PKG_VERSION }}
 
       - name: Create deployment
-        uses: chrnorm/deployment-action@v2
+        uses: chrnorm/deployment-action@500aa6a23c81ffa1acf71072aee3cfa2cc2e556a # v2.0.8
         id: deployment
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
@@ -63,10 +63,10 @@ jobs:
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
           registry-url: "https://npm.pkg.github.com"
@@ -92,7 +92,7 @@ jobs:
 
       - name: Update deployment status (success)
         if: ${{ success() }}
-        uses: chrnorm/deployment-status@v2
+        uses: chrnorm/deployment-status@6df8d036fd2fee9eb82936733953da1f8382b41e # v2.0.4
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "success"
@@ -100,7 +100,7 @@ jobs:
 
       - name: Update deployment status (failure)
         if: ${{ failure() }}
-        uses: chrnorm/deployment-status@v2
+        uses: chrnorm/deployment-status@6df8d036fd2fee9eb82936733953da1f8382b41e # v2.0.4
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "failure"
@@ -121,12 +121,12 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: refs/tags/v${{ env._PKG_VERSION }}
 
       - name: Create deployment
-        uses: chrnorm/deployment-action@v2
+        uses: chrnorm/deployment-action@500aa6a23c81ffa1acf71072aee3cfa2cc2e556a # v2.0.8
         id: deployment
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
@@ -143,10 +143,10 @@ jobs:
           echo "node_version=$NODE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ steps.retrieve-node-version.outputs.node_version }}
 
@@ -171,7 +171,7 @@ jobs:
 
       - name: Update deployment status (success)
         if: ${{ success() }}
-        uses: chrnorm/deployment-status@v2
+        uses: chrnorm/deployment-status@6df8d036fd2fee9eb82936733953da1f8382b41e # v2.0.4
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "success"
@@ -179,7 +179,7 @@ jobs:
 
       - name: Update deployment status (failure)
         if: ${{ failure() }}
-        uses: chrnorm/deployment-status@v2
+        uses: chrnorm/deployment-status@6df8d036fd2fee9eb82936733953da1f8382b41e # v2.0.4
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "failure"
@@ -200,7 +200,7 @@ jobs:
 
     steps:
       - name: Create deployment
-        uses: chrnorm/deployment-action@v2
+        uses: chrnorm/deployment-action@500aa6a23c81ffa1acf71072aee3cfa2cc2e556a # v2.0.8
         id: deployment
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
@@ -210,7 +210,7 @@ jobs:
           task: release
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v4.7.0
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -232,7 +232,7 @@ jobs:
 
       - name: Update deployment status (success)
         if: ${{ success() }}
-        uses: chrnorm/deployment-status@v2
+        uses: chrnorm/deployment-status@6df8d036fd2fee9eb82936733953da1f8382b41e # v2.0.4
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "success"
@@ -240,7 +240,7 @@ jobs:
 
       - name: Update deployment status (failure)
         if: ${{ failure() }}
-        uses: chrnorm/deployment-status@v2
+        uses: chrnorm/deployment-status@6df8d036fd2fee9eb82936733953da1f8382b41e # v2.0.4
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "failure"
@@ -265,12 +265,12 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: refs/tags/v${{ env._PKG_VERSION }}
 
       - name: Create deployment
-        uses: chrnorm/deployment-action@v2
+        uses: chrnorm/deployment-action@500aa6a23c81ffa1acf71072aee3cfa2cc2e556a # v2.0.8
         id: deployment
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
@@ -303,7 +303,7 @@ jobs:
 
       - name: Update deployment status (success)
         if: ${{ success() }}
-        uses: chrnorm/deployment-status@v2
+        uses: chrnorm/deployment-status@6df8d036fd2fee9eb82936733953da1f8382b41e # v2.0.4
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "success"
@@ -311,7 +311,7 @@ jobs:
 
       - name: Update deployment status (failure)
         if: ${{ failure() }}
-        uses: chrnorm/deployment-status@v2
+        uses: chrnorm/deployment-status@6df8d036fd2fee9eb82936733953da1f8382b41e # v2.0.4
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           state: "failure"
