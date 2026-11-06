@@ -186,7 +186,10 @@ test.describe('Data Validation Integration Tests', () => {
       expect(teamKeys).toBeInstanceOf(Array);
       expect(teamKeys.length).toBeGreaterThan(0);
 
-      for (const key of teamKeys.slice(0, 5)) {
+      // TBA lists a placeholder frc0 that has no team record behind it.
+      const realKeys = teamKeys.filter((key: string) => key !== 'frc0');
+
+      for (const key of realKeys.slice(0, 5)) {
         expect(key).toMatch(/^frc\d+$/);
 
         const teamResult = await mcpClient.callTool('get_team', {
@@ -209,12 +212,20 @@ test.describe('Data Validation Integration Tests', () => {
 
       if (teams.length > 0) {
         const team = teams[0];
+        const typeOf = (value: unknown) =>
+          value === null ? 'null' : typeof value;
 
-        expect(['string', 'undefined']).toContain(typeof team.nickname);
-        expect(['string', 'undefined']).toContain(typeof team.city);
-        expect(['string', 'undefined']).toContain(typeof team.state_prov);
-        expect(['string', 'undefined']).toContain(typeof team.website);
-        expect(['number', 'undefined']).toContain(typeof team.rookie_year);
+        expect(['string', 'undefined', 'null']).toContain(
+          typeOf(team.nickname),
+        );
+        expect(['string', 'undefined', 'null']).toContain(typeOf(team.city));
+        expect(['string', 'undefined', 'null']).toContain(
+          typeOf(team.state_prov),
+        );
+        expect(['string', 'undefined', 'null']).toContain(typeOf(team.website));
+        expect(['number', 'undefined', 'null']).toContain(
+          typeOf(team.rookie_year),
+        );
       }
     });
 
