@@ -14,26 +14,26 @@
     "url": "https://github.com/withinfocus/tba-mcp-server/issues"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.32.1",
+    "@modelcontextprotocol/sdk": "1.32.2",
     "shx": "0.4.0",
-    "zod": "4.6.5"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@jest/globals": "30.5.2",
-    "@modelcontextprotocol/inspector": "2.9.0",
-    "@playwright/test": "1.63.0",
+    "@modelcontextprotocol/inspector": "2.12.0",
+    "@playwright/test": "1.64.0",
     "@stylistic/eslint-plugin": "5.10.0",
     "@types/jest": "30.0.0",
-    "@types/node": "24.13.3",
-    "eslint": "10.12.0",
-    "globals": "17.13.0",
+    "@types/node": "24.19.2",
+    "eslint": "10.14.0",
+    "globals": "17.14.0",
     "jest": "30.5.2",
     "jest-junit": "17.0.0",
-    "prettier": "3.9.9",
-    "ts-jest": "29.4.14",
+    "prettier": "3.9.10",
+    "ts-jest": "29.4.15",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.71.1"
+    "typescript-eslint": "8.72.1"
   },
   "packageManager": "pnpm@11.20.0",
   "bin": {

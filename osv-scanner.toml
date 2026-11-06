@@ -1,0 +1,5 @@
+# OSV-Scanner configuration for MegaLinter's REPOSITORY_OSV_SCANNER linter.
+
+[[IgnoredVulns]]
+id = "GHSA-gcqx-w48m-w2h4"
+reason = "deepmerge <= 4.3.1 (the latest) has no fixed release. Pulled in by jest-config, which only merges jest's own config objects, so untrusted input never reaches it. Dev only. Mirrored in pnpm-workspace.yaml auditConfig. Remove once a fixed deepmerge ships."

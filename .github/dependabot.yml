@@ -28,9 +28,9 @@ updates:
       default-days: 1
     open-pull-requests-limit: 5
     groups:
-      # Majors are grouped too. Nearly every action here is pinned to a bare
-      # major tag, so leaving majors out would give the group almost nothing
-      # to collapse. CI validates the bump on the PR.
+      # Majors are grouped too, so one PR carries every action bump. Actions
+      # are pinned to commit hashes, and Dependabot moves the hash and the
+      # version comment together. CI validates the bump on the PR.
       actions:
         patterns: ["*"]
 
