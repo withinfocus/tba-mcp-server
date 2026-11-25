@@ -38,8 +38,9 @@ COPY --from=builder /app/dist ./dist
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY package.json ./
 
+COPY docker/healthcheck.mjs ./docker/healthcheck.mjs
+
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD export TBA_API_KEY="dummy" && echo '{ "jsonrpc": "2.0", "id": "123", "method": "ping" }' | \
-    ./dist/index.js | grep -q '"result": {}' || exit 1
+    CMD ["/nodejs/bin/node", "docker/healthcheck.mjs"]
 
 CMD ["dist/index.js"]
