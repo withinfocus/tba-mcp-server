@@ -47,6 +47,7 @@
     "lint": "eslint . --cache --cache-strategy content && prettier --check .",
     "lint:fix": "eslint . --cache --cache-strategy content --fix",
     "build": "tsc && shx chmod +x dist/*.js",
+    "skills:sync": "node scripts/sync-skills.mjs",
     "inspect": "mcp-inspector node dist/index.js",
     "test": "jest --silent",
     "test:watch": "jest --watch",
