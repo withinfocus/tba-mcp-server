@@ -1,23 +1,14 @@
 #!/usr/bin/env node
 
 import { createRequire } from 'node:module';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { getApiKey, log } from './utils.js';
-import { tools } from './tools.js';
-import { handleToolCall } from './handlers.js';
+import { createServer, SERVER_NAME } from './server.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../package.json') as { version: string };
 
 async function runServer(): Promise<void> {
-  // Create server first so we can use its logging method
-  let server: Server | null = null;
-
   try {
     // Validate API key availability early
     try {
@@ -27,65 +18,27 @@ async function runServer(): Promise<void> {
       await log(
         'error',
         `${errorMessage}: ${error instanceof Error ? error.message : error}`,
-        server,
       );
       throw new Error(errorMessage, { cause: error });
     }
 
-    server = new Server(
-      {
-        name: 'The Blue Alliance MCP Server',
-        version,
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      },
-    );
-
-    await log('info', 'Setting up request handlers ...', server);
-
-    server.setRequestHandler(ListToolsRequestSchema, async () => {
-      return { tools };
-    });
-
-    server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
-      await log('debug', `Processing tool request: ${name}`, server);
-
-      try {
-        return await handleToolCall(name, args);
-      } catch (error) {
-        const errorMessage = `Tool execution error for '${name}': ${error instanceof Error ? error.message : String(error)}`;
-        await log('error', errorMessage, server);
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Error: ${error instanceof Error ? error.message : String(error)}`,
-            },
-          ],
-          isError: true,
-        };
-      }
-    });
-
-    await log('info', 'Setting up transport connection ...', server);
+    await log('info', 'Setting up transport connection ...');
     try {
-      const transport = new StdioServerTransport();
-      await server.connect(transport);
-      await log(
-        'info',
-        `The Blue Alliance MCP Server v${version} running on stdio`,
-        server,
-      );
+      // serveStdio answers both the 2025-era `initialize` handshake and the
+      // 2026-07-28 `server/discover` opening, calling the factory once the
+      // first message picks the era. Anything that extends the server (such
+      // as attaching an extension) belongs in the factory, before it returns.
+      serveStdio(() => createServer(version), {
+        onerror: (error) => {
+          void log('error', `Transport error: ${error.message}`);
+        },
+      });
+      await log('info', `${SERVER_NAME} v${version} running on stdio`);
     } catch (error) {
       const errorMessage = 'Failed to connect to transport';
       await log(
         'error',
         `${errorMessage}: ${error instanceof Error ? error.message : error}`,
-        server,
       );
       throw new Error(errorMessage, { cause: error });
     }
@@ -107,7 +60,6 @@ async function runServer(): Promise<void> {
     });
   } catch (error) {
     const errorMessage = 'Fatal error during server initialization';
-    // Use console.error as fallback since server may not be available yet
     console.error(
       `${errorMessage}: ${error instanceof Error ? error.message : error}`,
     );

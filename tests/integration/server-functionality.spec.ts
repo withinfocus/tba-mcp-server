@@ -85,7 +85,7 @@ test.describe('MCP Server Functionality Tests', () => {
     try {
       await mcpClient.callTool('nonexistent_tool', {});
     } catch (error) {
-      expect(String(error)).toContain('Unknown tool');
+      expect(String(error)).toContain('Tool nonexistent_tool not found');
     }
   });
 

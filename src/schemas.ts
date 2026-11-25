@@ -506,7 +506,8 @@ export const TeamHistorySchema = z.object({
   robots: z.array(RobotSchema).nullish(),
 });
 
-// Input schemas for tools - these will be converted to JSON Schema
+// Tool input schemas. Registered with the MCP SDK, which converts them to
+// JSON Schema for tools/list and validates tools/call arguments against them.
 export const GetTeamInputSchema = z.object({
   team_key: TeamKeySchema,
 });
@@ -768,23 +769,3 @@ export const GetDistrictTeamsSimpleInputSchema = z.object({
 export const GetDistrictTeamsKeysInputSchema = z.object({
   district_key: DistrictKeySchema,
 });
-
-// Helper function to convert Zod schema to MCP-compatible JSON Schema
-export function toMCPSchema(zodSchema: z.ZodType): {
-  type: 'object';
-  properties?: { [key: string]: object };
-  required?: string[];
-  [key: string]: unknown;
-} {
-  const jsonSchema = z.toJSONSchema(zodSchema) as {
-    type: 'object';
-    properties?: { [key: string]: object };
-    required?: string[];
-    [key: string]: unknown;
-  };
-
-  // Remove $schema field for MCP compatibility
-  delete jsonSchema['$schema'];
-
-  return jsonSchema;
-}

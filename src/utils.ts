@@ -1,25 +1,13 @@
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-
 let API_KEY: string | undefined;
 
-// Logging method that uses MCP server's sendLoggingMessage when available
+// Server logs go to stderr. stdout carries the stdio JSON-RPC stream, and the
+// MCP `notifications/message` logging channel is deprecated as of protocol
+// 2026-07-28 (SEP-2577) in favor of stderr for stdio servers.
 export async function log(
   level: 'debug' | 'info' | 'notice' | 'warning' | 'error',
   data: unknown,
-  server?: Server | null,
-  logger?: string,
 ): Promise<void> {
-  if (server) {
-    try {
-      await server.sendLoggingMessage({ level, data, logger });
-    } catch {
-      // Fallback to console if MCP logging fails
-      console.error(data);
-    }
-  } else {
-    // Fallback to console if server not available
-    console.error(data);
-  }
+  console.error(`[${level}]`, data);
 }
 
 export function getApiKey(): string {

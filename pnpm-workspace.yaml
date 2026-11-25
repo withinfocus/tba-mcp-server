@@ -29,13 +29,6 @@ allowBuilds:
 # calling thread. Fixed in 3.3.18. Only the inspector's dev tree reaches it,
 # by way of `vite`. Held to the 3.x line because postcss asks for ^3.3.17.
 #
-# express and body-parser pull in qs, and 6.15.3 carries two medium-severity
-# denial-of-service advisories: improper validation in the stringify
-# function, and an array limit bypass in the query string parser. Both are
-# fixed in 6.16.0, and a third (GHSA-6pq8-jhm2-2vcw) in 6.16.1. express
-# reaches production through the MCP SDK. Held to the 6.x line because
-# body-parser asks for ^6.15.2 and express for ^6.14.0.
-#
 # jest's coverage loader (@istanbuljs/load-nyc-config) pulls in js-yaml, and
 # 3.15.1 carries a high-severity CPU denial of service through empty merge
 # sources (GHSA-2883-xcg3-v3hh). Fixed in 3.15.2. Dev only. Held to the 3.x
@@ -55,7 +48,6 @@ allowBuilds:
 overrides:
   fast-uri: "^3.1.9"
   nanoid: "^3.3.18"
-  qs: "^6.16.1"
   js-yaml@3: "^3.15.2"
   minimatch: "^11.0.1"
   glob: "^14.0.2"
