@@ -12,3 +12,4 @@ tests
 .eslintcache
 junit.xml
 *.md
+!skills/**

@@ -36,6 +36,7 @@ WORKDIR /app
 USER 65532:65532
 
 COPY --from=builder /app/dist ./dist
+COPY skills ./skills
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY package.json ./
 

@@ -41,7 +41,8 @@
     "mcp-server-tba": "dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "skills"
   ],
   "scripts": {
     "lint": "eslint . --cache --cache-strategy content && prettier --check .",

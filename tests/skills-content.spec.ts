@@ -1,4 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { loadScoutingSkills } from '../src/skills.js';
@@ -81,4 +82,25 @@ describe('skill content', () => {
       loadScoutingSkills(SKILLS_ROOT, { strict: true }),
     ).resolves.toBeDefined();
   });
+
+  it('npm package includes skills', () => {
+    const output = execFileSync('pnpm', ['pack', '--dry-run', '--json'], {
+      encoding: 'utf8',
+      timeout: 60_000,
+    });
+    const packed = (
+      JSON.parse(output) as { files: { path: string }[] }
+    ).files.map((f) => f.path);
+
+    for (const skill of [
+      'check-scouting-data',
+      'match-preview',
+      'pick-list',
+      'pre-scout-event',
+    ]) {
+      expect(packed).toContain(`skills/${skill}/SKILL.md`);
+    }
+    expect(packed).toContain('skills/pick-list/references/metrics.md');
+    expect(packed.filter((p) => p.startsWith('skills-src/'))).toEqual([]);
+  }, 60_000);
 });
