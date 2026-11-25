@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Node 26 no longer bundles corepack, so install the pnpm version pinned in
-# package.json's packageManager field with npm.
+# package.json's packageManager field with npm. hadolint can't see that pin.
+# hadolint ignore=DL3016
 RUN npm install -g "$(node -p "require('./package.json').packageManager.split('+')[0]")"
 
 FROM base AS builder
