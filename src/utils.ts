@@ -42,7 +42,11 @@ export async function makeApiRequest(endpoint: string): Promise<unknown> {
     });
 
     if (!response.ok) {
-      const errorMessage = `TBA API request failed: ${response.status} ${response.statusText} for endpoint ${endpoint}`;
+      // statusText can be empty (it is for TBA responses under Node 26's fetch).
+      const status = [response.status, response.statusText]
+        .filter(Boolean)
+        .join(' ');
+      const errorMessage = `TBA API request failed: ${status} for endpoint ${endpoint}`;
       await log('error', errorMessage);
       throw new Error(errorMessage);
     }

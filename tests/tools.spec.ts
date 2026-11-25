@@ -76,7 +76,7 @@ const EXPECTED_ENDPOINTS: Record<string, string> = {
   get_district_teams: '/district/2024fim/teams',
   get_district_teams_simple: '/district/2024fim/teams/simple',
   get_district_teams_keys: '/district/2024fim/teams/keys',
-  get_match_zebra: '/match/2024hop_qm1/zebra',
+  get_match_zebra: '/match/2024hop_qm1/zebra_motionworks',
   get_event_predictions: '/event/2024hop/predictions',
 };
 

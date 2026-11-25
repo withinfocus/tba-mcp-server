@@ -447,26 +447,24 @@ export const MatchSimpleSchema = z.object({
   actual_time: z.number().nullish(),
 });
 
-export const ZebraSchema = z.object({
-  key: z.string(),
-  times: z.array(z.number()),
-  alliances: z.object({
-    red: z.array(
-      z.object({
-        team_key: z.string(),
-        xs: z.array(z.number()).nullish(),
-        ys: z.array(z.number()).nullish(),
-      }),
-    ),
-    blue: z.array(
-      z.object({
-        team_key: z.string(),
-        xs: z.array(z.number()).nullish(),
-        ys: z.array(z.number()).nullish(),
-      }),
-    ),
-  }),
+const ZebraTeamSchema = z.object({
+  team_key: z.string(),
+  // Positions are null for timesteps where the tracker had no reading.
+  xs: z.array(z.number().nullable()).nullish(),
+  ys: z.array(z.number().nullable()).nullish(),
 });
+
+// TBA returns null for matches without Zebra MotionWorks tracking.
+export const ZebraSchema = z
+  .object({
+    key: z.string(),
+    times: z.array(z.number()),
+    alliances: z.object({
+      red: z.array(ZebraTeamSchema),
+      blue: z.array(ZebraTeamSchema),
+    }),
+  })
+  .nullable();
 
 export const PredictionSchema = z.object({
   match_predictions: z

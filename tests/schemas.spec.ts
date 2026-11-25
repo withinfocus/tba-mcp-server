@@ -346,6 +346,20 @@ describe('Schema validation', () => {
 
       expect(() => ZebraSchema.parse(validZebra)).not.toThrow();
     });
+
+    it('should accept null positions and a null response', () => {
+      const zebraWithGaps = {
+        key: '2022cmptx_f1m1',
+        times: [0.0, 0.1],
+        alliances: {
+          red: [{ team_key: 'frc86', xs: [null, 1.2], ys: [null, 0.5] }],
+          blue: [{ team_key: 'frc254', xs: [4.2, null], ys: [2.5, null] }],
+        },
+      };
+
+      expect(() => ZebraSchema.parse(zebraWithGaps)).not.toThrow();
+      expect(ZebraSchema.parse(null)).toBeNull();
+    });
   });
 
   describe('PredictionSchema', () => {

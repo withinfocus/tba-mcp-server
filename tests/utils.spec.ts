@@ -81,6 +81,20 @@ describe('Utility functions', () => {
       );
     });
 
+    it('should omit an empty status text from API errors', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: '',
+      } as Response);
+
+      const { makeApiRequest } = await import('../src/utils.js');
+
+      await expect(makeApiRequest('/team/invalid')).rejects.toThrow(
+        'TBA API request failed: 404 for endpoint /team/invalid',
+      );
+    });
+
     it('should construct correct URL with base path', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,

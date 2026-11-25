@@ -586,9 +586,9 @@ export const tools: readonly ToolDefinition[] = [
     name: 'get_match_zebra',
     title: 'Get Zebra MotionWorks Match Tracking',
     description:
-      'Retrieve Zebra MotionWorks robot-tracking telemetry for a match: per-timestep XY field positions for every robot on red and blue alliances, plus the timestamp series. Only available for events with Zebra tracking installed (typically FIRST Championship divisions and a subset of regionals/district championships). Useful for advanced scouting, defense analysis, and trajectory visualization.',
+      'Retrieve Zebra MotionWorks robot-tracking telemetry for a match: per-timestep XY field positions for every robot on red and blue alliances, plus the timestamp series. Only available for events with Zebra tracking installed (typically FIRST Championship divisions and a subset of regionals/district championships); returns null when the match has no tracking data. Useful for advanced scouting, defense analysis, and trajectory visualization.',
     inputSchema: GetMatchZebraInputSchema,
-    endpoint: ({ match_key }) => `/match/${match_key}/zebra`,
+    endpoint: ({ match_key }) => `/match/${match_key}/zebra_motionworks`,
     responseSchema: ZebraSchema,
   }),
   defineTool({
