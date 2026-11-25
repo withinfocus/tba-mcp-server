@@ -4,8 +4,8 @@ import type { Client, Tool } from '@modelcontextprotocol/client';
 import { READ_ONLY_API, tools } from '../src/tools.js';
 import { connectInMemoryClient } from './in-memory-client.js';
 
-// The TBA path each tool requested before the move to the tool table, for
-// the sample arguments below. Guards against routing regressions.
+// The TBA path each tool requests for the sample arguments below. Guards
+// against routing regressions.
 const SAMPLE_ARGS = {
   team_key: 'frc86',
   year: 2024,
@@ -14,6 +14,9 @@ const SAMPLE_ARGS = {
   district_key: '2024fim',
   media_tag: 'imagery',
   page_num: 0,
+  district_abbreviation: 'fim',
+  category: 'leaderboard',
+  query: 'cheesy',
 };
 
 const EXPECTED_ENDPOINTS: Record<string, string> = {
@@ -78,11 +81,41 @@ const EXPECTED_ENDPOINTS: Record<string, string> = {
   get_district_teams_keys: '/district/2024fim/teams/keys',
   get_match_zebra: '/match/2024hop_qm1/zebra_motionworks',
   get_event_predictions: '/event/2024hop/predictions',
+  get_district_history: '/district/fim/history',
+  get_district_dcmp_history: '/district/fim/dcmp_history',
+  get_district_insights: '/district/fim/insights',
+  get_district_advancement: '/district/2024fim/advancement',
+  get_district_awards: '/district/2024fim/awards',
+  get_event_advancement_points: '/event/2024hop/advancement_points',
+  get_event_coprs: '/event/2024hop/coprs',
+  get_event_practice_matches: '/event/2024hop/matches/practice',
+  get_event_practice_matches_simple: '/event/2024hop/matches/practice/simple',
+  get_event_practice_matches_keys: '/event/2024hop/matches/practice/keys',
+  get_event_media: '/event/2024hop/media',
+  get_event_nexus_info: '/event/2024hop/nexus_info',
+  get_event_playoff_advancement: '/event/2024hop/playoff_advancement',
+  get_event_regional_champs_pool_points:
+    '/event/2024hop/regional_champs_pool_points',
+  get_event_team_media: '/event/2024hop/team_media',
+  get_event_teams_statuses: '/event/2024hop/teams/statuses',
+  get_insights_leaderboards: '/insights/leaderboards/2024',
+  get_insights_notables: '/insights/notables/2024',
+  get_insights: '/insights/2024',
+  get_insights_by_category: '/insights/2024/leaderboard',
+  get_insights_for_district: '/insights/2024/district/fim',
+  get_insights_for_district_by_category:
+    '/insights/2024/leaderboard/district/fim',
+  get_regional_advancement: '/regional_advancement/2024',
+  get_regional_rankings: '/regional_advancement/2024/rankings',
+  get_search_index: '/search_index',
+  get_sponsors: '/sponsors',
+  get_team_events_all_simple: '/team/frc86/events/simple',
+  get_team_events_all_keys: '/team/frc86/events/keys',
 };
 
 describe('Tool table', () => {
-  it('should define all 61 tools', () => {
-    expect(tools).toHaveLength(61);
+  it('should define all 89 tools', () => {
+    expect(tools).toHaveLength(89);
   });
 
   it('should have unique tool names', () => {
@@ -101,7 +134,7 @@ describe('Tool table', () => {
     });
   });
 
-  it('should build the same TBA endpoint for every tool as before', () => {
+  it('should build the expected TBA endpoint for every tool', () => {
     expect(Object.keys(EXPECTED_ENDPOINTS).sort()).toEqual(
       tools.map((tool) => tool.name).sort(),
     );
@@ -215,6 +248,53 @@ describe('Tool definitions served by tools/list', () => {
       expect(getTool?.inputSchema.properties).toHaveProperty('match_key');
       expect(getTool?.inputSchema.required).toContain('match_key');
     });
+
+    it('should have get_event_coprs tool with OPR caveats', () => {
+      const getTool = find('get_event_coprs');
+      expect(getTool).toBeDefined();
+      expect(getTool?.description).toContain('component');
+      expect(getTool?.description).toContain('get_event_oprs');
+      expect(getTool?.inputSchema.required).toEqual(['event_key']);
+    });
+
+    it('should have get_search_index tool that requires a query', () => {
+      const getTool = find('get_search_index');
+      expect(getTool).toBeDefined();
+      expect(getTool?.inputSchema.required).toEqual(['query']);
+      expect(getTool?.inputSchema.properties?.['query']).toMatchObject({
+        type: 'string',
+        minLength: 2,
+      });
+    });
+
+    it('should have get_insights_by_category tool with a category enum', () => {
+      const getTool = find('get_insights_by_category');
+      expect(getTool).toBeDefined();
+      expect(getTool?.inputSchema.properties?.['category']).toMatchObject({
+        enum: ['leaderboard', 'streak', 'timeseries', 'game_stats', 'clubs'],
+      });
+    });
+
+    it('should validate district_abbreviation as lowercase letters', () => {
+      const withAbbreviation = listed.filter((t) =>
+        Object.keys(t.inputSchema.properties || {}).includes(
+          'district_abbreviation',
+        ),
+      );
+
+      expect(withAbbreviation.map((t) => t.name).sort()).toEqual([
+        'get_district_dcmp_history',
+        'get_district_history',
+        'get_district_insights',
+        'get_insights_for_district',
+        'get_insights_for_district_by_category',
+      ]);
+      withAbbreviation.forEach((tool) => {
+        expect(
+          tool.inputSchema.properties?.['district_abbreviation'],
+        ).toMatchObject({ type: 'string', pattern: '^[a-z]+$' });
+      });
+    });
   });
 
   describe('team_key validation in schemas', () => {
@@ -246,12 +326,18 @@ describe('Tool definitions served by tools/list', () => {
       expect(toolsWithYear.length).toBeGreaterThan(0);
 
       toolsWithYear.forEach((tool) => {
-        const yearProp = tool.inputSchema.properties?.['year'];
-        if (typeof yearProp === 'object' && yearProp !== null) {
-          expect(yearProp).toHaveProperty('minimum');
-          expect((yearProp as { minimum?: number }).minimum).toBe(1992);
-          expect(yearProp).toHaveProperty('maximum');
+        const yearProp = tool.inputSchema.properties?.['year'] as {
+          anyOf?: Array<Record<string, unknown>>;
+        };
+        // Insights tools also accept 0 for all-time insights.
+        const range = tool.name.startsWith('get_insights')
+          ? yearProp.anyOf?.find((branch) => 'minimum' in branch)
+          : yearProp;
+        if (tool.name.startsWith('get_insights')) {
+          expect(yearProp.anyOf).toContainEqual({ type: 'number', const: 0 });
         }
+        expect(range).toHaveProperty('minimum', 1992);
+        expect(range).toHaveProperty('maximum');
       });
     });
   });
@@ -310,7 +396,7 @@ describe('Tool definitions served by tools/list', () => {
       });
     });
 
-    it('should require every parameter except for get_status', () => {
+    it('should require every parameter', () => {
       listed.forEach((tool) => {
         const properties = Object.keys(tool.inputSchema.properties || {});
         expect([...(tool.inputSchema.required ?? [])].sort()).toEqual(
@@ -318,8 +404,12 @@ describe('Tool definitions served by tools/list', () => {
         );
       });
       expect(
-        listed.find((t) => t.name === 'get_status')?.inputSchema.properties,
-      ).toEqual({});
+        listed
+          .filter(
+            (t) => Object.keys(t.inputSchema.properties || {}).length === 0,
+          )
+          .map((t) => t.name),
+      ).toEqual(['get_status', 'get_sponsors']);
     });
   });
 

@@ -23,6 +23,23 @@ import {
   ZebraSchema,
   PredictionSchema,
   TeamHistorySchema,
+  InsightYearSchema,
+  InsightCategorySchema,
+  DistrictAbbreviationSchema,
+  SearchQuerySchema,
+  DistrictDcmpHistorySchema,
+  DistrictInsightSchema,
+  DistrictAdvancementSchema,
+  EventCOPRsSchema,
+  NexusEventInfoSchema,
+  PlayoffAdvancementSchema,
+  LeaderboardInsightSchema,
+  NotablesInsightSchema,
+  InsightV2Schema,
+  RegionalAdvancementSchema,
+  RegionalRankingSchema,
+  SearchIndexSchema,
+  SponsorsSchema,
 } from '../src/schemas.js';
 
 describe('Schema validation', () => {
@@ -517,6 +534,301 @@ describe('Schema validation', () => {
       };
 
       expect(() => DistrictSchema.parse(validDistrict)).not.toThrow();
+    });
+  });
+
+  describe('DistrictPointsSchema', () => {
+    it('should keep highest_match_scores tiebreakers and rookie bonus', () => {
+      const points = {
+        points: {
+          frc254: {
+            alliance_points: 16,
+            award_points: 5,
+            elim_points: 30,
+            qual_points: 22,
+            rookie_bonus: 0,
+            total: 73,
+          },
+        },
+        tiebreakers: {
+          frc254: { highest_match_scores: [250, 240], qual_wins: 11 },
+        },
+      };
+
+      expect(DistrictPointsSchema.parse(points)).toEqual(points);
+    });
+  });
+
+  describe('InsightYearSchema', () => {
+    it('should accept 0 for all-time and any valid season year', () => {
+      expect(InsightYearSchema.parse(0)).toBe(0);
+      expect(InsightYearSchema.parse(2025)).toBe(2025);
+      expect(() => InsightYearSchema.parse(1991)).toThrow();
+      expect(() => InsightYearSchema.parse(1)).toThrow();
+    });
+  });
+
+  describe('InsightCategorySchema', () => {
+    it('should accept only the categories TBA defines', () => {
+      for (const category of [
+        'leaderboard',
+        'streak',
+        'timeseries',
+        'game_stats',
+        'clubs',
+      ]) {
+        expect(InsightCategorySchema.parse(category)).toBe(category);
+      }
+      expect(() => InsightCategorySchema.parse('notables')).toThrow();
+    });
+  });
+
+  describe('DistrictAbbreviationSchema', () => {
+    it('should accept lowercase abbreviations only', () => {
+      expect(DistrictAbbreviationSchema.parse('fim')).toBe('fim');
+      expect(() => DistrictAbbreviationSchema.parse('2025fim')).toThrow();
+      expect(() => DistrictAbbreviationSchema.parse('FIM')).toThrow();
+      expect(() => DistrictAbbreviationSchema.parse('fim/../x')).toThrow();
+    });
+  });
+
+  describe('SearchQuerySchema', () => {
+    it('should trim and require at least 2 characters', () => {
+      expect(SearchQuerySchema.parse('  poofs ')).toBe('poofs');
+      expect(() => SearchQuerySchema.parse(' a ')).toThrow();
+    });
+  });
+
+  describe('EventCOPRsSchema', () => {
+    it('should accept any component name mapping team keys to numbers', () => {
+      const coprs = {
+        'L1 Coral Count': { frc254: 1.2, frc604: -0.3 },
+        autoPoints: { frc254: 18.5 },
+      };
+
+      expect(EventCOPRsSchema.parse(coprs)).toEqual(coprs);
+      expect(() =>
+        EventCOPRsSchema.parse({ autoPoints: { frc254: 'high' } }),
+      ).toThrow();
+    });
+  });
+
+  describe('DistrictSchema', () => {
+    it('should keep official advancement counts', () => {
+      const district = {
+        abbreviation: 'fim',
+        display_name: 'FIRST in Michigan',
+        key: '2025fim',
+        year: 2025,
+        official_advancement_counts: { dcmp: 160, cmp: 80 },
+      };
+
+      expect(DistrictSchema.parse(district)).toEqual(district);
+    });
+  });
+
+  describe('DistrictDcmpHistorySchema', () => {
+    it('should validate a championship event with its awards', () => {
+      expect(() =>
+        DistrictDcmpHistorySchema.parse({
+          event: {
+            key: '2025micmp',
+            name: 'FIM State Championship',
+            event_code: 'micmp',
+            event_type: 2,
+            start_date: '2025-04-03',
+            end_date: '2025-04-05',
+            year: 2025,
+            event_type_string: 'District Championship',
+          },
+          awards: [],
+        }),
+      ).not.toThrow();
+    });
+  });
+
+  describe('DistrictInsightSchema', () => {
+    it('should validate team and district data and drop seasonal_insights', () => {
+      const regionData = {
+        yearly_active_team_count: { '2025': 500 },
+        yearly_event_count: { '2025': 30 },
+        yearly_gained_teams: { '2025': ['frc10000'] },
+        yearly_lost_teams: { '2025': [] },
+      };
+      const record = { wins: 1, losses: 2, ties: 0 };
+      const parsed = DistrictInsightSchema.parse({
+        district_data: {
+          region_data: { Michigan: regionData },
+          district_wide_data: regionData,
+        },
+        team_data: {
+          frc67: {
+            district_seasons: 17,
+            total_district_points: 4161,
+            total_pre_dcmp_district_points: 2118,
+            district_event_wins: 25,
+            dcmp_wins: 5,
+            team_awards: 90,
+            individual_awards: 5,
+            blue_banners: 33,
+            quals_record: record,
+            elims_record: record,
+            in_district_extra_play_count: 5,
+            total_matches_played: 973,
+            dcmp_appearances: 17,
+            cmp_appearances: 16,
+          },
+        },
+        seasonal_insights: { '2025': { score_distribution: {} } },
+      });
+
+      expect(parsed.team_data?.['frc67']?.blue_banners).toBe(33);
+      expect(parsed).not.toHaveProperty('seasonal_insights');
+    });
+  });
+
+  describe('DistrictAdvancementSchema', () => {
+    it('should accept computed and not-yet-computed advancement', () => {
+      expect(() =>
+        DistrictAdvancementSchema.parse({ teams: null, cutoffs: null }),
+      ).not.toThrow();
+      expect(() =>
+        DistrictAdvancementSchema.parse({
+          teams: { frc67: { dcmp: true, cmp: false, cmp_qualification: null } },
+          cutoffs: {
+            dcmp_original: 160,
+            dcmp_effective: 158,
+            dcmp_declines: ['frc1'],
+            cmp_original: 80,
+            cmp_effective: 80,
+            cmp_declines: [],
+            cmp_qualification: { frc67: 'dcmp_winner' },
+          },
+        }),
+      ).not.toThrow();
+    });
+  });
+
+  describe('NexusEventInfoSchema', () => {
+    it('should validate a pit map without queuing data', () => {
+      expect(() =>
+        NexusEventInfoSchema.parse({
+          data_as_of_ms: null,
+          now_queueing: null,
+          matches: {},
+          pit_map: {
+            size: { x: 850, y: 1498 },
+            pits: {
+              A1: {
+                position: { x: 250, y: 241.7 },
+                size: { x: 100, y: 100 },
+                team_key: null,
+              },
+            },
+            areas: {},
+            labels: {},
+            arrows: {
+              r0: {
+                position: { x: 1, y: 2 },
+                size: { x: 3, y: 4 },
+                angle: 90,
+                type: 'single',
+              },
+            },
+            walls: {},
+          },
+        }),
+      ).not.toThrow();
+    });
+  });
+
+  describe('PlayoffAdvancementSchema', () => {
+    it('should reject a level without sort order info', () => {
+      expect(() =>
+        PlayoffAdvancementSchema.parse({
+          level: 'f',
+          level_name: 'Finals',
+          type: 'best_of_3',
+          rankings: null,
+        }),
+      ).toThrow();
+    });
+  });
+
+  describe('Insight schemas', () => {
+    it('should validate leaderboard and notables insights', () => {
+      expect(() =>
+        LeaderboardInsightSchema.parse({
+          name: 'typed_leaderboard_blue_banners',
+          year: 0,
+          data: {
+            key_type: 'team',
+            rankings: [{ value: 90, keys: ['frc254'] }],
+          },
+        }),
+      ).not.toThrow();
+      expect(() =>
+        NotablesInsightSchema.parse({
+          name: 'notables_hall_of_fame',
+          year: 0,
+          data: { entries: [{ team_key: 'frc254', context: ['2004cmp'] }] },
+        }),
+      ).not.toThrow();
+    });
+
+    it('should keep InsightV2 data intact whatever the category', () => {
+      const insight = {
+        name: 'einstein_streak',
+        display_name: 'Longest Einstein Streak',
+        year: 0,
+        category: 'streak',
+        district_abbreviation: null,
+        data: { entries: [{ key: 'frc254', streak_length: 5 }] },
+      };
+
+      expect(InsightV2Schema.parse(insight)).toEqual(insight);
+    });
+  });
+
+  describe('Regional advancement schemas', () => {
+    it('should validate advancement entries and pool rankings', () => {
+      expect(() =>
+        RegionalAdvancementSchema.parse({
+          frc4481: {
+            cmp: true,
+            cmp_status: 'PoolQualified',
+            qualifying_pool_week: 3,
+          },
+        }),
+      ).not.toThrow();
+      expect(RegionalAdvancementSchema.parse(null)).toBeNull();
+      expect(() =>
+        RegionalRankingSchema.parse({ team_key: 'frc4481', rank: 1 }),
+      ).toThrow();
+    });
+  });
+
+  describe('SearchIndexSchema and SponsorsSchema', () => {
+    it('should validate the search index and sponsor list', () => {
+      expect(() =>
+        SearchIndexSchema.parse({
+          teams: [{ key: 'frc254', nickname: 'The Cheesy Poofs' }],
+          events: [{ key: '2025casj', name: 'Silicon Valley Regional' }],
+        }),
+      ).not.toThrow();
+      expect(() =>
+        SponsorsSchema.parse({
+          sponsors: [
+            {
+              name: 'AndyMark',
+              url: 'https://www.andymark.com/',
+              logo_style: 'wordmark',
+              logo_url: null,
+              logo_url_dark: null,
+            },
+          ],
+        }),
+      ).not.toThrow();
     });
   });
 
