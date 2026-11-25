@@ -76,7 +76,7 @@ pnpm run test:integration:debug   # Debug mode
 Integration tests cover:
 
 - **MCP Protocol**: Server initialization, tool listing, request/response handling
-- **API Endpoints**: All 35+ TBA API tools with proper parameter validation
+- **API Endpoints**: All 89 TBA API tools with proper parameter validation
 - **Error Handling**: Invalid inputs, API failures, missing parameters
 - **Performance**: Response times, concurrent requests, memory usage
 - **Data Validation**: Schema compliance, consistency across endpoints

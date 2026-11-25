@@ -114,7 +114,7 @@ The integration tests require:
 ### Key Integration Test Areas
 
 - **MCP Protocol**: Server initialization, tool listing, request/response handling
-- **API Endpoints**: All 35+ TBA API tools with proper parameter validation
+- **API Endpoints**: All 89 TBA API tools with proper parameter validation
 - **Error Handling**: Invalid inputs, API failures, missing parameters
 - **Performance**: Response times, concurrent requests, memory usage
 - **Data Validation**: Schema compliance, consistency across endpoints
@@ -203,6 +203,7 @@ defineTool({
 
 - `endpoint` receives arguments that are already validated and typed from `inputSchema`; it returns the path under `https://www.thebluealliance.com/api/v3`
 - `responseSchema` validates the TBA response before it is returned
+- `select` (optional) post-processes the validated response with access to the arguments; use it only when the raw payload is too large or noisy for a model (see `get_search_index` and `get_event_team_media`)
 - `createServer()` registers the entry with `registerTool()`, adding the shared read-only annotations (`READ_ONLY_API`) and the `title`
 - `executeTool()` in `src/handlers.ts` runs the request and formats the result as `JSON.stringify(data, null, 2)` text content; errors become `isError: true` results
 

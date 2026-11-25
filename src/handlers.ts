@@ -7,10 +7,11 @@ import { log, makeApiRequest } from './utils.js';
  *
  * `args` must already be validated against `tool.inputSchema`; the MCP SDK
  * does that before invoking the registered callback. The TBA response is
- * validated against `tool.responseSchema` and returned as pretty-printed JSON
- * text. Any failure (HTTP error, network error, unexpected response shape) is
- * returned as an `isError` result rather than thrown, so the client receives
- * a tool error it can show to the model.
+ * validated against `tool.responseSchema`, passed through `tool.select` when
+ * the tool defines one, and returned as pretty-printed JSON text. Any failure
+ * (HTTP error, network error, unexpected response shape) is returned as an
+ * `isError` result rather than thrown, so the client receives a tool error it
+ * can show to the model.
  */
 export async function executeTool(
   tool: ToolDefinition,
@@ -18,7 +19,8 @@ export async function executeTool(
 ): Promise<CallToolResult> {
   try {
     const data = await makeApiRequest(tool.endpoint(args));
-    const result = tool.responseSchema.parse(data);
+    const parsed = tool.responseSchema.parse(data);
+    const result = tool.select ? tool.select(parsed, args) : parsed;
     return {
       content: [
         {

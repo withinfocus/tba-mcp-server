@@ -133,17 +133,28 @@ Elimination alliance information:
 
 ## Additional Schemas
 
-- **District Schema**: District information with abbreviation, display name, key, year
+- **District Schema**: District information with abbreviation, display name, key, year, and official DCMP/CMP advancement counts
 - **Robot Schema**: Robot information with year, name, key, team_key
-- **Media Schema**: Media objects with type, foreign_key, details, URLs
-- **DistrictPoints Schema**: District points breakdown by team
+- **Media Schema**: Media objects with type, foreign_key, details, URLs, and team_keys
+- **DistrictPoints Schema**: District, advancement, or regional pool points by team (including rookie bonus), with highest-match-score and qualification-win tiebreakers
 - **DistrictRanking Schema**: District standings with point totals and event breakdown
-- **TeamEventStatus Schema**: Team status at specific events (qualification rank, alliance, playoff status)
+- **TeamEventStatus Schema**: Team status at specific events (qualification rank, alliance, playoff status, pit location)
 - **Insights Schema**: Event-specific statistics and insights
 - **EventOPRs Schema**: OPR, DPR, and CCWM ratings
+- **EventCOPRs Schema**: Component OPRs keyed by component name, then team key
 - **Zebra Schema**: Robot tracking data with position coordinates over time
 - **Prediction Schema**: TBA-generated match and ranking predictions
 - **Status Schema**: API status information
+- **DistrictDcmpHistory Schema**: A district championship event paired with its awards
+- **DistrictInsight Schema**: All-time district growth data and per-team district totals
+- **DistrictAdvancement Schema**: Per-team DCMP/CMP advancement and the advancement cutoffs
+- **NexusEventInfo Schema**: Nexus queuing status, estimated times, and pit map
+- **PlayoffAdvancement Schema**: Playoff levels with ranked alliances and sort order metadata
+- **LeaderboardInsight and NotablesInsight Schemas**: Legacy season leaderboards and notables
+- **InsightV2 Schema**: Typed insight with name, display name, year, category, district, and category-specific data
+- **RegionalAdvancement and RegionalRanking Schemas**: Championship advancement and regional pool standings for regional teams
+- **SearchIndex Schema**: Team keys and nicknames, event keys and names
+- **Sponsors Schema**: TBA platinum sponsors with logo URLs
 
 ## Schema Validation
 

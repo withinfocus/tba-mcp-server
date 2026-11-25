@@ -623,4 +623,394 @@ test.describe('TBA API Integration Tests', () => {
       }
     });
   });
+
+  // Events and seasons below were checked against the live API and have data.
+  test.describe('Remaining TBA Endpoints', () => {
+    const parse = (result: { content: Array<{ text: string }> }) =>
+      JSON.parse(result.content[0]?.text || '');
+
+    test('should get district history across renames', async () => {
+      const districts = parse(
+        await mcpClient.callTool('get_district_history', {
+          district_abbreviation: 'fma',
+        }),
+      );
+
+      expect(districts.length).toBeGreaterThan(5);
+      expect(districts.map((d: { key: string }) => d.key)).toContain('2012mar');
+      expect(districts.at(-1)).toMatchObject({
+        abbreviation: 'fma',
+        official_advancement_counts: {
+          dcmp: expect.any(Number),
+          cmp: expect.any(Number),
+        },
+      });
+    });
+
+    test('should get district championship history', async () => {
+      const history = parse(
+        await mcpClient.callTool('get_district_dcmp_history', {
+          district_abbreviation: 'ne',
+        }),
+      );
+
+      expect(history.length).toBeGreaterThan(5);
+      expect(history[0]).toMatchObject({
+        event: expect.objectContaining({ key: expect.any(String) }),
+        awards: expect.any(Array),
+      });
+    });
+
+    test('should get district insights', async () => {
+      const insights = parse(
+        await mcpClient.callTool('get_district_insights', {
+          district_abbreviation: 'isr',
+        }),
+      );
+
+      expect(insights.district_data.district_wide_data).toHaveProperty(
+        'yearly_active_team_count',
+      );
+      expect(Object.keys(insights.team_data).length).toBeGreaterThan(50);
+      expect(insights).not.toHaveProperty('seasonal_insights');
+    });
+
+    test('should get district advancement', async () => {
+      const advancement = parse(
+        await mcpClient.callTool('get_district_advancement', {
+          district_key: '2025fim',
+        }),
+      );
+
+      expect(advancement.teams['frc67']).toMatchObject({
+        dcmp: true,
+        cmp: expect.any(Boolean),
+      });
+      expect(advancement.cutoffs.dcmp_effective).toEqual(expect.any(Number));
+    });
+
+    test('should get district awards', async () => {
+      const awards = parse(
+        await mcpClient.callTool('get_district_awards', {
+          district_key: '2025fim',
+        }),
+      );
+
+      expect(awards.length).toBeGreaterThan(100);
+      expect(awards[0].event_key).toMatch(/^2025mi/);
+    });
+
+    test('should get event advancement points for district and regional events', async () => {
+      const district = parse(
+        await mcpClient.callTool('get_event_advancement_points', {
+          event_key: '2025micmp',
+        }),
+      );
+      const regional = parse(
+        await mcpClient.callTool('get_event_advancement_points', {
+          event_key: '2025casj',
+        }),
+      );
+      const offseason = parse(
+        await mcpClient.callTool('get_event_advancement_points', {
+          event_key: '2025cc',
+        }),
+      );
+
+      expect(Object.keys(district.points).length).toBeGreaterThan(0);
+      // TBA only includes rookie_bonus for teams that earned one.
+      const teamPoints = Object.values(regional.points) as Array<
+        Record<string, number>
+      >;
+      expect(teamPoints.some((p) => 'rookie_bonus' in p)).toBe(true);
+      const [tiebreaker] = Object.values(regional.tiebreakers) as Array<
+        Record<string, unknown>
+      >;
+      expect(tiebreaker).toHaveProperty('highest_match_scores');
+      expect(offseason).toBeNull();
+    });
+
+    test('should get event component OPRs', async () => {
+      const coprs = parse(
+        await mcpClient.callTool('get_event_coprs', {
+          event_key: '2025casj',
+        }),
+      );
+
+      expect(coprs).toHaveProperty('L1 Coral Count');
+      expect(coprs).toHaveProperty('totalPoints');
+      const l1 = coprs['L1 Coral Count'] as Record<string, number>;
+      expect(Object.keys(l1).length).toBeGreaterThan(30);
+      expect(Object.keys(l1).every((key) => /^frc\d+$/.test(key))).toBe(true);
+      expect(Object.values(l1).every((v) => typeof v === 'number')).toBe(true);
+    });
+
+    test('should get practice matches in all three forms', async () => {
+      const full = parse(
+        await mcpClient.callTool('get_event_practice_matches', {
+          event_key: '2025casj',
+        }),
+      );
+      const simple = parse(
+        await mcpClient.callTool('get_event_practice_matches_simple', {
+          event_key: '2025casj',
+        }),
+      );
+      const keys = parse(
+        await mcpClient.callTool('get_event_practice_matches_keys', {
+          event_key: '2025casj',
+        }),
+      );
+
+      expect(full.length).toBeGreaterThan(0);
+      expect(full[0].comp_level).toBe('pm');
+      expect(simple).toHaveLength(full.length);
+      expect(simple[0]).not.toHaveProperty('score_breakdown');
+      expect(keys).toHaveLength(full.length);
+      expect(keys[0]).toMatch(/^2025casj_pm\d+$/);
+    });
+
+    test('should get event media', async () => {
+      const media = parse(
+        await mcpClient.callTool('get_event_media', { event_key: '2025casj' }),
+      );
+
+      expect(media.length).toBeGreaterThan(0);
+      expect(media[0]).toMatchObject({ type: 'youtube' });
+    });
+
+    test('should get event Nexus info or null', async () => {
+      const withPitMap = parse(
+        await mcpClient.callTool('get_event_nexus_info', {
+          event_key: '2026cmptx',
+        }),
+      );
+      const without = parse(
+        await mcpClient.callTool('get_event_nexus_info', {
+          event_key: '2025casj',
+        }),
+      );
+
+      expect(withPitMap).toHaveProperty('matches');
+      expect(withPitMap.pit_map).toHaveProperty('pits');
+      expect(without).toBeNull();
+    });
+
+    test('should get event playoff advancement', async () => {
+      const levels = parse(
+        await mcpClient.callTool('get_event_playoff_advancement', {
+          event_key: '2025casj',
+        }),
+      );
+
+      expect(levels.length).toBeGreaterThan(0);
+      expect(levels[0]).toMatchObject({
+        level: expect.any(String),
+        level_name: expect.any(String),
+        type: 'double_elim',
+        sort_order_info: expect.any(Array),
+      });
+      expect(levels[0].rankings[0].team_keys.length).toBeGreaterThan(0);
+    });
+
+    test('should get regional pool points, null for district events', async () => {
+      const regional = parse(
+        await mcpClient.callTool('get_event_regional_champs_pool_points', {
+          event_key: '2025casj',
+        }),
+      );
+      const district = parse(
+        await mcpClient.callTool('get_event_regional_champs_pool_points', {
+          event_key: '2025micmp',
+        }),
+      );
+
+      expect(Object.keys(regional.points).length).toBeGreaterThan(30);
+      expect(district).toBeNull();
+    });
+
+    test('should get team media for an event without avatar images', async () => {
+      const media = parse(
+        await mcpClient.callTool('get_event_team_media', {
+          event_key: '2025casj',
+        }),
+      );
+
+      expect(media.length).toBeGreaterThan(10);
+      expect(media[0].team_keys.length).toBeGreaterThan(0);
+      const avatars = media.filter(
+        (m: { type: string }) => m.type === 'avatar',
+      );
+      expect(avatars.length).toBeGreaterThan(0);
+      avatars.forEach((avatar: { details: Record<string, unknown> }) => {
+        expect(avatar.details).not.toHaveProperty('base64Image');
+      });
+    });
+
+    test('should get statuses for every team at an event', async () => {
+      const statuses = parse(
+        await mcpClient.callTool('get_event_teams_statuses', {
+          event_key: '2025casj',
+        }),
+      );
+
+      expect(Object.keys(statuses).length).toBeGreaterThan(30);
+      expect(statuses['frc100']).toMatchObject({
+        overall_status_str: expect.any(String),
+        qual: expect.objectContaining({ num_teams: expect.any(Number) }),
+      });
+    });
+
+    test('should get leaderboards for a season and all-time', async () => {
+      const season = parse(
+        await mcpClient.callTool('get_insights_leaderboards', { year: 2025 }),
+      );
+      const allTime = parse(
+        await mcpClient.callTool('get_insights_leaderboards', { year: 0 }),
+      );
+
+      expect(season[0]).toMatchObject({
+        year: 2025,
+        data: expect.objectContaining({ rankings: expect.any(Array) }),
+      });
+      expect(allTime[0].year).toBe(0);
+    });
+
+    test('should get notables', async () => {
+      const notables = parse(
+        await mcpClient.callTool('get_insights_notables', { year: 2025 }),
+      );
+
+      expect(notables.length).toBeGreaterThan(0);
+      expect(notables[0].data.entries[0]).toMatchObject({
+        team_key: expect.stringMatching(/^frc\d+$/),
+        context: expect.any(Array),
+      });
+    });
+
+    test('should get all insights for a season', async () => {
+      const insights = parse(
+        await mcpClient.callTool('get_insights', { year: 2025 }),
+      );
+      const categories = new Set(
+        insights.map((i: { category: string }) => i.category),
+      );
+
+      expect(categories).toContain('game_stats');
+      expect(categories).toContain('leaderboard');
+    });
+
+    test('should get insights by category', async () => {
+      const clubs = parse(
+        await mcpClient.callTool('get_insights_by_category', {
+          year: 0,
+          category: 'clubs',
+        }),
+      );
+
+      expect(clubs.length).toBeGreaterThan(0);
+      clubs.forEach((insight: { category: string; year: number }) => {
+        expect(insight).toMatchObject({ category: 'clubs', year: 0 });
+      });
+    });
+
+    test('should get insights for a district', async () => {
+      const insights = parse(
+        await mcpClient.callTool('get_insights_for_district', {
+          year: 2025,
+          district_abbreviation: 'fim',
+        }),
+      );
+
+      expect(insights.length).toBeGreaterThan(0);
+      insights.forEach((insight: { district_abbreviation: string }) => {
+        expect(insight.district_abbreviation).toBe('fim');
+      });
+    });
+
+    test('should get insights for a district by category', async () => {
+      const streaks = parse(
+        await mcpClient.callTool('get_insights_for_district_by_category', {
+          year: 0,
+          category: 'streak',
+          district_abbreviation: 'ne',
+        }),
+      );
+
+      expect(streaks.length).toBeGreaterThan(0);
+      expect(streaks[0]).toMatchObject({
+        category: 'streak',
+        district_abbreviation: 'ne',
+      });
+    });
+
+    test('should get regional advancement', async () => {
+      const advancement = parse(
+        await mcpClient.callTool('get_regional_advancement', { year: 2025 }),
+      );
+      const [entry] = Object.values(advancement) as Array<
+        Record<string, unknown>
+      >;
+
+      expect(Object.keys(advancement).length).toBeGreaterThan(100);
+      expect(entry).toMatchObject({
+        cmp: expect.any(Boolean),
+        cmp_status: expect.any(String),
+      });
+    });
+
+    test('should get regional pool rankings', async () => {
+      const rankings = parse(
+        await mcpClient.callTool('get_regional_rankings', { year: 2025 }),
+      );
+
+      expect(rankings.length).toBeGreaterThan(1000);
+      expect(rankings[0]).toMatchObject({
+        team_key: expect.stringMatching(/^frc\d+$/),
+        rank: 1,
+        point_total: expect.any(Number),
+      });
+    });
+
+    test('should search teams and events by name', async () => {
+      const poofs = parse(
+        await mcpClient.callTool('get_search_index', { query: 'Cheesy Poofs' }),
+      );
+      const casj = parse(
+        await mcpClient.callTool('get_search_index', { query: '2025casj' }),
+      );
+
+      expect(poofs.teams[0]).toEqual({
+        key: 'frc254',
+        nickname: 'The Cheesy Poofs',
+      });
+      expect(casj.events[0].key).toBe('2025casj');
+      expect(casj.total_matching_events).toBe(1);
+    });
+
+    test('should get sponsors', async () => {
+      const sponsors = parse(await mcpClient.callTool('get_sponsors', {}));
+
+      expect(sponsors.sponsors).toBeInstanceOf(Array);
+      expect(sponsors.sponsors.length).toBeLessThanOrEqual(3);
+    });
+
+    test('should get all team events in simple and key form', async () => {
+      const simple = parse(
+        await mcpClient.callTool('get_team_events_all_simple', {
+          team_key: 'frc254',
+        }),
+      );
+      const keys = parse(
+        await mcpClient.callTool('get_team_events_all_keys', {
+          team_key: 'frc254',
+        }),
+      );
+
+      expect(simple.length).toBeGreaterThan(50);
+      expect(keys).toHaveLength(simple.length);
+      expect(keys).toContain('2025cc');
+      expect(simple[0]).not.toHaveProperty('webcasts');
+    });
+  });
 });

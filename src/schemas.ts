@@ -49,6 +49,36 @@ export const YearSchema = z
     'FRC competition season year. FRC began in 1992 and runs one game per year (e.g., 2023 = "Charged Up", 2024 = "Crescendo", 2025 = "Reefscape"). Must be between 1992 and next calendar year.',
   );
 
+export const InsightYearSchema = z
+  .union([z.literal(0), YearSchema])
+  .describe(
+    'FRC season year the insights cover (1992 through next calendar year), or 0 for all-time insights across every season.',
+  );
+
+export const InsightCategorySchema = z
+  .enum(['leaderboard', 'streak', 'timeseries', 'game_stats', 'clubs'])
+  .describe(
+    "Insight category: 'leaderboard' (teams, events, or matches ranked by a value), 'streak' (consecutive achievements), 'timeseries' (values over weeks or years), 'game_stats' (per-season, per-week, and per-event game statistics; large), or 'clubs' (all-time milestone memberships).",
+  );
+
+export const DistrictAbbreviationSchema = z
+  .string()
+  .regex(
+    /^[a-z]+$/,
+    'District abbreviation must be lowercase letters (e.g. fim, ne)',
+  )
+  .describe(
+    "FRC district abbreviation without a year (e.g., 'fim' for FIRST in Michigan, 'ne' for New England, 'chs' for Chesapeake, 'pnw' for Pacific Northwest, 'fit' for FIRST In Texas). Covers every season of the district, including renames such as 'mar' to 'fma'. Use get_districts to discover abbreviations.",
+  );
+
+export const SearchQuerySchema = z
+  .string()
+  .trim()
+  .min(2)
+  .describe(
+    "Case-insensitive text to look for in team keys, team numbers, team nicknames, event keys, and event names (e.g., 'Cheesy', '254', 'Silicon Valley', '2025casj'). At least 2 characters.",
+  );
+
 // API response schemas
 export const TeamSchema = z.object({
   key: z.string(),
@@ -248,13 +278,14 @@ export const DistrictPointsSchema = z.object({
       elim_points: z.number(),
       qual_points: z.number(),
       total: z.number(),
+      rookie_bonus: z.number().nullish(),
     }),
   ),
   tiebreakers: z
     .record(
       z.string(),
       z.object({
-        highest_qual_scores: z.array(z.number()).nullish(),
+        highest_match_scores: z.array(z.number()).nullish(),
         qual_wins: z.number().nullish(),
       }),
     )
@@ -273,6 +304,7 @@ export const MediaSchema = z.object({
   preferred: z.boolean().nullish(),
   direct_url: z.string().nullish(),
   view_url: z.string().nullish(),
+  team_keys: z.array(z.string()).nullish(),
 });
 
 export const RobotSchema = z.object({
@@ -287,6 +319,12 @@ export const DistrictSchema = z.object({
   display_name: z.string(),
   key: z.string(),
   year: z.number(),
+  official_advancement_counts: z
+    .object({
+      dcmp: z.number(),
+      cmp: z.number(),
+    })
+    .nullish(),
 });
 
 export const StatusSchema = z.object({
@@ -367,6 +405,8 @@ export const TeamEventStatusSchema = z.object({
         .nullish(),
       level: z.string().nullish(),
       playoff_average: z.number().nullish(),
+      playoff_type: z.number().nullish(),
+      double_elim_round: z.string().nullish(),
       record: z
         .object({
           losses: z.number(),
@@ -377,6 +417,7 @@ export const TeamEventStatusSchema = z.object({
       status: z.string().nullish(),
     })
     .nullish(),
+  pit_location: z.string().nullish(),
   alliance_status_str: z.string(),
   playoff_status_str: z.string(),
   overall_status_str: z.string(),
@@ -502,6 +543,283 @@ export const TeamHistorySchema = z.object({
   events: z.array(EventSchema).nullish(),
   matches: z.array(MatchSchema).nullish(),
   robots: z.array(RobotSchema).nullish(),
+});
+
+const WinLossTieSchema = z.object({
+  wins: z.number(),
+  losses: z.number(),
+  ties: z.number(),
+});
+
+export const DistrictDcmpHistorySchema = z.object({
+  event: EventSchema,
+  awards: z.array(AwardSchema),
+});
+
+const DistrictInsightRegionDataSchema = z.object({
+  yearly_active_team_count: z.record(z.string(), z.number()),
+  yearly_event_count: z.record(z.string(), z.number()),
+  yearly_gained_teams: z.record(z.string(), z.array(z.string())),
+  yearly_lost_teams: z.record(z.string(), z.array(z.string())),
+});
+
+// The live API also returns `seasonal_insights` (per-season score
+// distributions, roughly 700 KB for FIM). It is not in the OpenAPI spec and
+// is deliberately left out here, so the parse drops it.
+export const DistrictInsightSchema = z.object({
+  district_data: z.object({
+    region_data: z
+      .record(z.string(), DistrictInsightRegionDataSchema)
+      .nullish(),
+    district_wide_data: DistrictInsightRegionDataSchema.nullish(),
+  }),
+  team_data: z
+    .record(
+      z.string(),
+      z.object({
+        district_seasons: z.number(),
+        total_district_points: z.number(),
+        total_pre_dcmp_district_points: z.number(),
+        district_event_wins: z.number(),
+        dcmp_wins: z.number(),
+        team_awards: z.number(),
+        individual_awards: z.number(),
+        blue_banners: z.number().nullish(),
+        quals_record: WinLossTieSchema,
+        elims_record: WinLossTieSchema,
+        in_district_extra_play_count: z.number(),
+        total_matches_played: z.number(),
+        dcmp_appearances: z.number(),
+        cmp_appearances: z.number(),
+      }),
+    )
+    .nullish(),
+});
+
+export const DistrictAdvancementSchema = z.object({
+  teams: z
+    .record(
+      z.string(),
+      z.object({
+        dcmp: z.boolean(),
+        cmp: z.boolean(),
+        cmp_qualification: z.string().nullish(),
+      }),
+    )
+    .nullish(),
+  cutoffs: z
+    .object({
+      dcmp_original: z.number(),
+      dcmp_effective: z.number(),
+      dcmp_declines: z.array(z.string()),
+      cmp_original: z.number(),
+      cmp_effective: z.number(),
+      cmp_declines: z.array(z.string()),
+      cmp_qualification: z.record(z.string(), z.string()).nullish(),
+    })
+    .nullish(),
+});
+
+// Keyed by component name, then by team key. Component names come from the
+// season's score breakdown and change every year.
+export const EventCOPRsSchema = z.record(
+  z.string(),
+  z.record(z.string(), z.number()),
+);
+
+const NexusMapVectorSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+});
+
+const NexusMapElementSchema = z.object({
+  position: NexusMapVectorSchema.nullish(),
+  size: NexusMapVectorSchema.nullish(),
+  angle: z.number().nullish(),
+});
+
+export const NexusEventInfoSchema = z.object({
+  data_as_of_ms: z.number().nullish(),
+  now_queueing: z
+    .object({
+      match_key: z.string(),
+      match_name: z.string(),
+    })
+    .nullish(),
+  matches: z
+    .record(
+      z.string(),
+      z.object({
+        label: z.string(),
+        status: z.string(),
+        played: z.boolean(),
+        times: z
+          .object({
+            estimated_queue_time_ms: z.number().nullish(),
+            estimated_start_time_ms: z.number().nullish(),
+          })
+          .nullish(),
+      }),
+    )
+    .nullish(),
+  pit_map: z
+    .object({
+      size: NexusMapVectorSchema.nullish(),
+      pits: z
+        .record(
+          z.string(),
+          NexusMapElementSchema.extend({ team_key: z.string().nullish() }),
+        )
+        .nullish(),
+      areas: z
+        .record(
+          z.string(),
+          NexusMapElementSchema.extend({ label: z.string().nullish() }),
+        )
+        .nullish(),
+      labels: z
+        .record(
+          z.string(),
+          NexusMapElementSchema.extend({ label: z.string().nullish() }),
+        )
+        .nullish(),
+      arrows: z
+        .record(
+          z.string(),
+          NexusMapElementSchema.extend({ type: z.string().nullish() }),
+        )
+        .nullish(),
+      walls: z.record(z.string(), NexusMapElementSchema).nullish(),
+    })
+    .nullish(),
+});
+
+const PlayoffAdvancementSortOrderInfoSchema = z.object({
+  name: z.string(),
+  type: z.string().nullish(),
+  precision: z.number(),
+});
+
+export const PlayoffAdvancementSchema = z.object({
+  level: z.string(),
+  level_name: z.string(),
+  type: z.string(),
+  rankings: z
+    .array(
+      z.object({
+        team_keys: z.array(z.string()),
+        alliance_name: z.string(),
+        alliance_color: z.string().nullish(),
+        rank: z.number().nullish(),
+        record: WinLossTieSchema.nullish(),
+        matches_played: z.number(),
+        sort_orders: z.array(z.number()),
+        extra_stats: z.array(z.number()),
+      }),
+    )
+    .nullish(),
+  sort_order_info: z.array(PlayoffAdvancementSortOrderInfoSchema),
+  extra_stats_info: z.array(PlayoffAdvancementSortOrderInfoSchema),
+});
+
+export const LeaderboardInsightSchema = z.object({
+  name: z.string(),
+  year: z.number(),
+  data: z.object({
+    key_type: z.string(),
+    rankings: z.array(
+      z.object({
+        value: z.number(),
+        keys: z.array(z.string()),
+      }),
+    ),
+  }),
+});
+
+export const NotablesInsightSchema = z.object({
+  name: z.string(),
+  year: z.number(),
+  data: z.object({
+    entries: z.array(
+      z.object({
+        team_key: z.string(),
+        context: z.array(z.string()),
+      }),
+    ),
+  }),
+});
+
+// `data` differs by category and TBA marks these models as under active
+// development, so it is passed through without a fixed shape.
+export const InsightV2Schema = z.object({
+  name: z.string(),
+  display_name: z.string(),
+  year: z.number(),
+  category: z.string(),
+  district_abbreviation: z.string().nullish(),
+  data: z.record(z.string(), z.unknown()),
+});
+
+export const RegionalAdvancementSchema = z
+  .record(
+    z.string(),
+    z.object({
+      cmp: z.boolean(),
+      cmp_status: z.string(),
+      qualifying_event: z.string().nullish(),
+      qualifying_award_name: z.string().nullish(),
+      qualifying_pool_week: z.number().nullish(),
+    }),
+  )
+  .nullable();
+
+export const RegionalRankingSchema = z.object({
+  team_key: z.string(),
+  rank: z.number(),
+  point_total: z.number(),
+  rookie_bonus: z.number().nullish(),
+  single_event_bonus: z.number().nullish(),
+  adjustments: z.number().nullish(),
+  event_points: z
+    .array(
+      z.object({
+        event_key: z.string(),
+        total: z.number(),
+        alliance_points: z.number(),
+        elim_points: z.number(),
+        award_points: z.number(),
+        qual_points: z.number(),
+        rookie_bonus: z.number().nullish(),
+      }),
+    )
+    .nullish(),
+});
+
+export const SearchIndexSchema = z.object({
+  teams: z.array(
+    z.object({
+      key: z.string(),
+      nickname: z.string().nullish(),
+    }),
+  ),
+  events: z.array(
+    z.object({
+      key: z.string(),
+      name: z.string(),
+    }),
+  ),
+});
+
+export const SponsorsSchema = z.object({
+  sponsors: z.array(
+    z.object({
+      name: z.string(),
+      url: z.string(),
+      logo_style: z.string(),
+      logo_url: z.string().nullish(),
+      logo_url_dark: z.string().nullish(),
+    }),
+  ),
 });
 
 // Tool input schemas. Registered with the MCP SDK, which converts them to
@@ -766,4 +1084,118 @@ export const GetDistrictTeamsSimpleInputSchema = z.object({
 
 export const GetDistrictTeamsKeysInputSchema = z.object({
   district_key: DistrictKeySchema,
+});
+
+export const GetDistrictHistoryInputSchema = z.object({
+  district_abbreviation: DistrictAbbreviationSchema,
+});
+
+export const GetDistrictDcmpHistoryInputSchema = z.object({
+  district_abbreviation: DistrictAbbreviationSchema,
+});
+
+export const GetDistrictInsightsInputSchema = z.object({
+  district_abbreviation: DistrictAbbreviationSchema,
+});
+
+export const GetDistrictAdvancementInputSchema = z.object({
+  district_key: DistrictKeySchema,
+});
+
+export const GetDistrictAwardsInputSchema = z.object({
+  district_key: DistrictKeySchema,
+});
+
+export const GetEventAdvancementPointsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventCoprsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventPracticeMatchesInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventPracticeMatchesSimpleInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventPracticeMatchesKeysInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventMediaInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventNexusInfoInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventPlayoffAdvancementInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventRegionalChampsPoolPointsInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventTeamMediaInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetEventTeamsStatusesInputSchema = z.object({
+  event_key: EventKeySchema,
+});
+
+export const GetInsightsLeaderboardsInputSchema = z.object({
+  year: InsightYearSchema,
+});
+
+export const GetInsightsNotablesInputSchema = z.object({
+  year: InsightYearSchema,
+});
+
+export const GetInsightsInputSchema = z.object({
+  year: InsightYearSchema,
+});
+
+export const GetInsightsByCategoryInputSchema = z.object({
+  year: InsightYearSchema,
+  category: InsightCategorySchema,
+});
+
+export const GetInsightsForDistrictInputSchema = z.object({
+  year: InsightYearSchema,
+  district_abbreviation: DistrictAbbreviationSchema,
+});
+
+export const GetInsightsForDistrictByCategoryInputSchema = z.object({
+  year: InsightYearSchema,
+  category: InsightCategorySchema,
+  district_abbreviation: DistrictAbbreviationSchema,
+});
+
+export const GetRegionalAdvancementInputSchema = z.object({
+  year: YearSchema,
+});
+
+export const GetRegionalRankingsInputSchema = z.object({
+  year: YearSchema,
+});
+
+export const GetSearchIndexInputSchema = z.object({
+  query: SearchQuerySchema,
+});
+
+export const GetSponsorsInputSchema = z.object({});
+
+export const GetTeamEventsAllSimpleInputSchema = z.object({
+  team_key: TeamKeySchema,
+});
+
+export const GetTeamEventsAllKeysInputSchema = z.object({
+  team_key: TeamKeySchema,
 });
