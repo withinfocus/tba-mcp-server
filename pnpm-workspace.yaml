@@ -15,48 +15,15 @@ allowBuilds:
   # Selects the prebuilt native binding for the current platform.
   unrs-resolver: true
 
-# ajv pulls in fast-uri, and 3.1.5 carries four high-severity advisories:
-# host confusion via percent-encoded scheme normalization and skipped IDN
-# canonicalization, plus SSRF via malformed IPv6 normalization and repeated
-# hostname percent-decoding. All four are fixed in 3.1.6. Four more, from
-# low to medium, are fixed in 3.1.9. Held to the 3.x line because ajv asks
-# for ^3.0.1; an unbounded floor resolves 4.x and takes a transitive major
-# that ajv has not declared support for. Drop this once ajv requires a
-# patched version on its own.
-#
-# postcss pulls in nanoid, and 3.3.17 carries a high-severity advisory: the
-# custom generators spin forever when handed a size of zero, hanging the
-# calling thread. Fixed in 3.3.18. Only the inspector's dev tree reaches it,
-# by way of `vite`. Held to the 3.x line because postcss asks for ^3.3.17.
-#
-# jest's coverage loader (@istanbuljs/load-nyc-config) pulls in js-yaml, and
-# 3.15.1 carries a high-severity CPU denial of service through empty merge
-# sources (GHSA-2883-xcg3-v3hh). Fixed in 3.15.2. Dev only. Held to the 3.x
-# line because load-nyc-config asks for ^3.13.1.
-#
-# eslint, typescript-eslint, and jest's coverage tooling pull in minimatch 9
-# and 10 and glob 10 and 13. Both carry a medium-severity advisory
-# (GHSA-g3hv-75wg-m249 for minimatch, GHSA-3g3m-2fjr-6pw4 for glob) that is
-# only fixed in a new major: minimatch 11.0.1 and glob 14.0.2. No fix was
-# backported. The majors drop APIs these consumers do not call (makeRe, the
-# AST class, the debug option) and keep the CommonJS builds jest requires, so
-# the override is a transitive major on purpose. Moving minimatch 9 off the
-# tree also retires brace-expansion 2.1.4 and its three advisories
-# (GHSA-6j4f-fj2g-mc7p, GHSA-qhr7-859c-m2p7, GHSA-q2hr-2g5m-vwhr). Dev only.
-# Drop these once eslint, typescript-eslint, and test-exclude move to the
-# patched majors.
+# jest's coverage tooling (babel-plugin-istanbul > test-exclude), eslint, and
+# typescript-eslint pull in minimatch 9 and 10 and glob 10 and 13. Both carry
+# a medium-severity advisory (GHSA-g3hv-75wg-m249 for minimatch,
+# GHSA-3g3m-2fjr-6pw4 for glob) that is only fixed in a new major: minimatch
+# 11.0.1 and glob 14.0.2. No fix was backported. The majors drop APIs these
+# consumers do not call (makeRe, the AST class, the debug option) and keep the
+# CommonJS builds jest requires, so the override is a transitive major on
+# purpose. Dev only. Drop these once test-exclude, eslint, and
+# typescript-eslint move to the patched majors.
 overrides:
-  fast-uri: "^3.1.9"
-  nanoid: "^3.3.18"
-  js-yaml@3: "^3.15.2"
   minimatch: "^11.0.1"
   glob: "^14.0.2"
-
-# jest-config pulls in deepmerge, and every release through 4.3.1, the
-# latest, carries a low-severity prototype poisoning advisory with no fixed
-# release. jest only merges its own config objects with it, so untrusted
-# input never reaches it. Mirrored in osv-scanner.toml. Remove once a fixed
-# deepmerge ships.
-auditConfig:
-  ignoreGhsas:
-    - GHSA-gcqx-w48m-w2h4
