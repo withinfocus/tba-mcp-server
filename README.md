@@ -10,6 +10,37 @@ A Model Context Protocol (MCP) server that provides access to The Blue Alliance 
 - **Historical Data**: Query data from 1992 to the current year
 - **Type Safety**: All responses validated with Zod schemas
 - **Comprehensive Coverage**: 89 tools covering the TBA API v3 read endpoints
+- **Scouting Skills**: Four skills for pre-scouting, match briefs, pick lists and checking scouting data
+
+## For scouting teams
+
+The server ships four scouting skills that tell Claude how to turn TBA data into the work a scouting subteam does at an event. You don't need to know any tool names. Ask in your own words and the client loads the matching skill.
+
+| Skill                 | Use it                          | What you get                                                                                                                          |
+| --------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `pre-scout-event`     | Before an event                 | A roster of every attending team's season so far (rank, record, alliance role, OPR, awards) and a short list of match videos to watch |
+| `match-preview`       | During quals or playoffs        | A one-screen brief on the six teams in a match: what each robot reliably does, the opponents' likely plan, and what to watch for      |
+| `pick-list`           | Before alliance selection       | Tiered first-pick and second-pick lists, an empty do-not-pick column for you to fill, and the backup-robot pool after selection       |
+| `check-scouting-data` | Any time you have your own data | A list of suspect matches to re-watch, with video links, where your scouting data disagrees with TBA's schedule or score breakdowns   |
+
+Every skill works with TBA data alone and gets better when you paste in your own scouting data (a CSV, a table, or a Google Sheet export). Your data stays in the conversation; the server never stores it.
+
+Each skill has two modes. Coach mode gives a concrete answer, such as a ranked list or a match plan, states the weights it used, and says where strong teams would disagree. Analyst mode gives you the data, the tradeoffs and the caveats, and leaves the decision to you. The skill picks the mode from how you ask ("who should we pick?" versus "show me the numbers"), asks once if it can't tell, and switches whenever you say so.
+
+Example prompts:
+
+- "We're going to 2025casj. Pre-scout it for us."
+- "Which teams at our next regional should we watch videos of? We're team 649."
+- "Brief us on 2025casj_qm10. What should we do?"
+- "Our next match at 2025casj, side-by-side numbers only. We're 1700."
+- "Help us build our pick list for 2025casj. Here's our scouting CSV."
+- "Who's left for our second pick?"
+- "Check this scouting data against TBA and tell us which matches to re-watch."
+- "Which of our scouts are getting the team numbers wrong?"
+
+The skills are careful about what TBA can and can't tell you. OPR needs about 5–6 matches per team and has an error of roughly ±15 points, so they group teams into tiers instead of ranking on small gaps. TBA can't attribute game pieces to individual robots, and the skills say so instead of guessing.
+
+Skills are served through the [MCP Skills extension](https://modelcontextprotocol.io/extensions/skills/overview). Clients that support it include Claude, Claude Code 2.1.331 and later, and VS Code Copilot. Other MCP clients still get every tool, plus short guidance in the server's instructions.
 
 ## Installation
 
