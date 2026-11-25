@@ -77,3 +77,16 @@ describe('skills over MCP', () => {
     }
   });
 });
+
+describe('scouting skills catalog', () => {
+  const realRoot = path.resolve('skills');
+
+  async function servedUris(): Promise<string[]> {
+    const catalog = await loadScoutingSkills(realRoot, { strict: true });
+    return catalog?.entries.map((e) => e.uri) ?? [];
+  }
+
+  it('pre-scout-event is served', async () => {
+    expect(await servedUris()).toContain('skill://pre-scout-event/SKILL.md');
+  });
+});
