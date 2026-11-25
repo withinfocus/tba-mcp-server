@@ -295,20 +295,23 @@ test.describe('TBA API Integration Tests', () => {
     });
 
     test('should get zebra motion data for a match', async () => {
-      try {
-        const result = await mcpClient.callTool('get_match_zebra', {
-          match_key: '2023casj_qm1',
-        });
-        expect(result.content).toBeInstanceOf(Array);
+      const result = await mcpClient.callTool('get_match_zebra', {
+        match_key: '2022cmptx_f1m1',
+      });
 
-        const zebraData = JSON.parse(result.content[0]?.text || '');
-        expect(zebraData).toHaveProperty('key');
-        expect(zebraData).toHaveProperty('times');
-        expect(zebraData).toHaveProperty('alliances');
-      } catch (error) {
-        expect(String(error)).toMatch(/404 Not Found/);
-        console.log('Zebra data not available for this match');
-      }
+      const zebraData = JSON.parse(result.content[0]?.text || '');
+      expect(zebraData.key).toBe('2022cmptx_f1m1');
+      expect(zebraData.times.length).toBeGreaterThan(0);
+      expect(zebraData.alliances.red.length).toBeGreaterThan(0);
+      expect(zebraData.alliances.blue.length).toBeGreaterThan(0);
+    });
+
+    test('should return null for a match without zebra data', async () => {
+      const result = await mcpClient.callTool('get_match_zebra', {
+        match_key: '2023casj_qm1',
+      });
+
+      expect(JSON.parse(result.content[0]?.text || '')).toBeNull();
     });
   });
 

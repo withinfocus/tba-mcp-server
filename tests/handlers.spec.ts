@@ -2,16 +2,46 @@ import {
   describe,
   it,
   expect,
+  beforeAll,
+  afterAll,
   beforeEach,
   afterEach,
   jest,
 } from '@jest/globals';
+import type { Client } from '@modelcontextprotocol/client';
+import { executeTool } from '../src/handlers.js';
+import { tools } from '../src/tools.js';
+import { connectInMemoryClient } from './in-memory-client.js';
 
 global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
 
 const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
 
+type TextResult = {
+  content: Array<{ type: string; text: string }>;
+  isError?: boolean;
+};
+
 describe('Handler functions', () => {
+  let client: Client;
+
+  // Calls a tool through the MCP SDK, so input validation and error mapping
+  // run exactly as they do for a real client.
+  async function handleToolCall(
+    name: string,
+    args: Record<string, unknown>,
+  ): Promise<TextResult> {
+    return (await client.callTool({ name, arguments: args })) as TextResult;
+  }
+
+  beforeAll(async () => {
+    client = await connectInMemoryClient();
+  });
+
+  afterAll(async () => {
+    await client.close();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     process.env['TBA_API_KEY'] = 'test-api-key';
@@ -21,7 +51,7 @@ describe('Handler functions', () => {
     delete process.env['TBA_API_KEY'];
   });
 
-  describe('handleToolCall', () => {
+  describe('tools/call', () => {
     it('should handle get_team tool', async () => {
       const mockTeamData = {
         key: 'frc86',
@@ -36,8 +66,6 @@ describe('Handler functions', () => {
         ok: true,
         json: async () => mockTeamData,
       } as Response);
-
-      const { handleToolCall } = await import('../src/handlers.js');
 
       const result = await handleToolCall('get_team', {
         team_key: 'frc86',
@@ -68,8 +96,6 @@ describe('Handler functions', () => {
         ok: true,
         json: async () => mockEvents,
       } as Response);
-
-      const { handleToolCall } = await import('../src/handlers.js');
 
       const result = await handleToolCall('get_team_events', {
         team_key: 'frc86',
@@ -105,8 +131,6 @@ describe('Handler functions', () => {
         json: async () => mockStatus,
       } as Response);
 
-      const { handleToolCall } = await import('../src/handlers.js');
-
       const result = await handleToolCall('get_status', {});
 
       expect(result.content).toBeDefined();
@@ -115,43 +139,43 @@ describe('Handler functions', () => {
       expect(parsedContent.current_season).toBe(2025);
     });
 
-    it('should throw error for invalid team key format', async () => {
-      const { handleToolCall } = await import('../src/handlers.js');
+    it('should return an error result for invalid team key format', async () => {
+      const result = await handleToolCall('get_team', {
+        team_key: 'invalid',
+      });
 
-      await expect(
-        handleToolCall('get_team', {
-          team_key: 'invalid',
-        }),
-      ).rejects.toThrow();
+      expect(result.isError).toBe(true);
+      expect(result.content[0]!.text).toContain(
+        'Team key must be in format frcXXXX',
+      );
+      expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    it('should throw error for invalid year', async () => {
-      const { handleToolCall } = await import('../src/handlers.js');
+    it('should return an error result for invalid year', async () => {
+      const result = await handleToolCall('get_team_events', {
+        team_key: 'frc86',
+        year: 1990, // Before 1992
+      });
 
-      await expect(
-        handleToolCall('get_team_events', {
-          team_key: 'frc86',
-          year: 1990, // Before 1992
-        }),
-      ).rejects.toThrow();
+      expect(result.isError).toBe(true);
+      expect(result.content[0]!.text).toContain('year');
+      expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    it('should throw error for missing required parameters', async () => {
-      const { handleToolCall } = await import('../src/handlers.js');
+    it('should return an error result for missing required parameters', async () => {
+      const result = await handleToolCall('get_team_events', {
+        team_key: 'frc86',
+        // missing year parameter
+      });
 
-      await expect(
-        handleToolCall('get_team_events', {
-          team_key: 'frc86',
-          // missing year parameter
-        }),
-      ).rejects.toThrow();
+      expect(result.isError).toBe(true);
+      expect(result.content[0]!.text).toMatch(/year.*received undefined/);
+      expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    it('should throw error for unknown tool name', async () => {
-      const { handleToolCall } = await import('../src/handlers.js');
-
+    it('should reject an unknown tool name with a protocol error', async () => {
       await expect(handleToolCall('unknown_tool', {})).rejects.toThrow(
-        'Unknown tool: unknown_tool',
+        'Tool unknown_tool not found',
       );
     });
 
@@ -173,8 +197,6 @@ describe('Handler functions', () => {
         ok: true,
         json: async () => mockTeams,
       } as Response);
-
-      const { handleToolCall } = await import('../src/handlers.js');
 
       const result = await handleToolCall('get_teams', {
         page_num: 0,
@@ -202,8 +224,6 @@ describe('Handler functions', () => {
         json: async () => mockEvent,
       } as Response);
 
-      const { handleToolCall } = await import('../src/handlers.js');
-
       const result = await handleToolCall('get_event', {
         event_key: '2024hop',
       });
@@ -220,13 +240,14 @@ describe('Handler functions', () => {
         statusText: 'Not Found',
       } as Response);
 
-      const { handleToolCall } = await import('../src/handlers.js');
+      const result = await handleToolCall('get_team', {
+        team_key: 'frc999999',
+      });
 
-      await expect(
-        handleToolCall('get_team', {
-          team_key: 'frc999999',
-        }),
-      ).rejects.toThrow('TBA API request failed: 404 Not Found');
+      expect(result.isError).toBe(true);
+      expect(result.content[0]!.text).toBe(
+        'Error: TBA API request failed: 404 Not Found for endpoint /team/frc999999',
+      );
     });
 
     it('should handle get_match tool', async () => {
@@ -253,8 +274,6 @@ describe('Handler functions', () => {
         json: async () => mockMatch,
       } as Response);
 
-      const { handleToolCall } = await import('../src/handlers.js');
-
       const result = await handleToolCall('get_match', {
         match_key: '2024hop_qm112',
       });
@@ -276,13 +295,45 @@ describe('Handler functions', () => {
         json: async () => invalidTeamData,
       } as Response);
 
-      const { handleToolCall } = await import('../src/handlers.js');
+      const result = await handleToolCall('get_team', {
+        team_key: 'frc86',
+      });
 
-      await expect(
-        handleToolCall('get_team', {
-          team_key: 'frc86',
-        }),
-      ).rejects.toThrow();
+      expect(result.isError).toBe(true);
+      expect(result.content[0]!.text).toMatch(/^Error: /);
+    });
+  });
+
+  describe('executeTool', () => {
+    const getTeam = tools.find((tool) => tool.name === 'get_team')!;
+
+    it('should request the tool endpoint and return pretty-printed JSON', async () => {
+      const mockTeam = { key: 'frc86', team_number: 86, name: 'Resistance' };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockTeam,
+      } as Response);
+
+      const result = await executeTool(getTeam, { team_key: 'frc86' });
+
+      expect(mockFetch.mock.calls[0]?.[0]).toBe(
+        'https://www.thebluealliance.com/api/v3/team/frc86',
+      );
+      expect(result.isError).toBeUndefined();
+      expect(result.content).toEqual([
+        { type: 'text', text: JSON.stringify(mockTeam, null, 2) },
+      ]);
+    });
+
+    it('should return network failures as error results', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('socket hang up'));
+
+      const result = await executeTool(getTeam, { team_key: 'frc86' });
+
+      expect(result).toEqual({
+        content: [{ type: 'text', text: 'Error: socket hang up' }],
+        isError: true,
+      });
     });
   });
 });

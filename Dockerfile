@@ -1,12 +1,16 @@
-FROM node:24-alpine AS base
+FROM node:26-alpine AS base
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Node 26 no longer bundles corepack, so install the pnpm version pinned in
+# package.json's packageManager field with npm. hadolint can't see that pin.
+# hadolint ignore=DL3016
+RUN npm install -g "$(node -p "require('./package.json').packageManager.split('+')[0]")"
 
 FROM base AS builder
 
@@ -25,17 +29,19 @@ FROM base AS dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile --prod --ignore-scripts --config.node-linker=hoisted
 
-FROM gcr.io/distroless/nodejs24-debian12:nonroot AS release
+FROM gcr.io/distroless/nodejs26-debian13:nonroot AS release
 
 WORKDIR /app
-USER nonroot
+# The distroless nonroot user, by numeric ID so hosts can resolve it.
+USER 65532:65532
 
 COPY --from=builder /app/dist ./dist
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY package.json ./
 
+COPY docker/healthcheck.mjs ./docker/healthcheck.mjs
+
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD export TBA_API_KEY="dummy" && echo '{ "jsonrpc": "2.0", "id": "123", "method": "ping" }' | \
-    ./dist/index.js | grep -q '"result": {}' || exit 1
+    CMD ["/nodejs/bin/node", "docker/healthcheck.mjs"]
 
 CMD ["dist/index.js"]

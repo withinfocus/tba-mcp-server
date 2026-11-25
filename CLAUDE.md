@@ -18,28 +18,33 @@ Model Context Protocol (MCP) server that provides access to The Blue Alliance AP
 The codebase is organized into separate modules for maintainability:
 
 - `src/index.ts` - Main server entry point
-  - Initializes the MCP server
-  - Sets up request handlers for ListTools and CallTool
-  - Connects to stdio transport
+  - Validates `TBA_API_KEY` at startup
+  - Serves the MCP server over stdio with `serveStdio(() => createServer(version))`
   - Handles error logging and process lifecycle
 
-- `src/tools.ts` - Tool definitions
-  - Exports the `tools` array containing all MCP tool definitions
-  - Each tool has: name, description, and inputSchema (JSON Schema format)
-  - Tool definitions describe what parameters each tool accepts
+- `src/server.ts` - Server factory
+  - Exports `createServer(version)`, which builds an `McpServer` (from `@modelcontextprotocol/server`) and calls `registerTool()` once per entry in the `tools` table
+  - Returns the server unconnected, so extensions can be attached before `serveStdio` connects it
 
-- `src/handlers.ts` - Tool execution handlers
-  - Exports `handleToolCall(name, args)` function
-  - Contains a switch statement that routes tool calls to their implementations
-  - Each case: validates input, calls TBA API, validates response, returns formatted result
+- `src/tools.ts` - Tool table
+  - Exports the `tools` array of `ToolDefinition` entries, one per MCP tool, built with `defineTool()`
+  - Each entry has: `name`, `title`, `description`, `inputSchema` (a Zod object schema), `endpoint(args)` (builds the TBA API path), and `responseSchema` (Zod)
+  - Exports `READ_ONLY_API`, the tool annotations every tool shares
+  - Both server registration and the unit tests read from this table
+
+- `src/handlers.ts` - Tool execution
+  - Exports `executeTool(tool, args)`: calls `makeApiRequest(tool.endpoint(args))`, validates the response with `tool.responseSchema`, and returns the JSON as text content
+  - Failures (HTTP, network, unexpected response shape) come back as `isError: true` results with an `Error: ...` message
+  - Input validation is not done here: the SDK validates arguments against `inputSchema` before calling the handler
 
 - `src/schemas.ts` - Zod validation schemas
-  - Input validation schemas: TeamKeySchema, YearSchema, EventKeySchema
+  - Parameter schemas: TeamKeySchema, YearSchema, EventKeySchema, etc.
+  - Tool input schemas: `Get*InputSchema` (one `z.object` per tool)
   - API response schemas: TeamSchema, EventSchema, MatchSchema, etc.
   - All schemas use Zod for runtime type validation
 
 - `src/utils.ts` - Utility functions
-  - `log()` - MCP-aware logging function
+  - `log()` - Writes server logs to stderr (stdout carries the stdio JSON-RPC stream)
   - `getApiKey()` - Retrieves and validates TBA_API_KEY environment variable
   - `makeApiRequest()` - Makes HTTP requests to TBA API with proper headers
 
@@ -47,9 +52,13 @@ The codebase is organized into separate modules for maintainability:
 
 Tests are organized to mirror the source structure:
 
+- `tests/tools.spec.ts` - Unit tests for the tool table and the `tools/list` output (schemas, annotations, endpoints)
+- `tests/handlers.spec.ts` - Unit tests for `tools/call` (input validation, error results) and `executeTool`
+- `tests/server.spec.ts` - Unit tests for `createServer`
 - `tests/schemas.spec.ts` - Unit tests for all Zod schemas
 - `tests/utils.spec.ts` - Unit tests for utility functions
-- `tests/integration/*.spec.ts` - Playwright integration tests for MCP protocol compliance
+- `tests/in-memory-client.ts` - Test helper that connects an SDK `Client` to `createServer()` over `InMemoryTransport`
+- `tests/integration/*.spec.ts` - Playwright integration tests for MCP protocol compliance, using a raw JSON-RPC stdio client (`tests/integration/mcp-client.ts`)
 
 ### Configuration Files
 
@@ -136,42 +145,29 @@ pnpm run inspect                  # Launch MCP inspector for debugging
 ## MCP Server Details
 
 - **Name**: The Blue Alliance MCP Server
-- **Transport**: StdioServerTransport
+- **SDK**: MCP TypeScript SDK v2 (`@modelcontextprotocol/server`; `@modelcontextprotocol/client` is a dev dependency for unit tests)
+- **Server class**: `McpServer`, tools registered with `registerTool()`
+- **Transport**: stdio via `serveStdio()`, which answers both the 2025-era `initialize` handshake and the 2026-07-28 `server/discover` opening
 - **Current Capabilities**: Access to The Blue Alliance API for FRC data
 
 ## How to Add a New Tool
 
-Follow these steps when adding a new MCP tool to the server:
+Most tools are one entry in the `tools` table. Follow these steps when adding a new MCP tool to the server:
 
-### 1. Define the Tool (`src/tools.ts`)
+### 1. Create the Input Schema (`src/schemas.ts`)
 
-Add a new tool definition to the `tools` array:
+Add a `z.object` describing the tool arguments. Reuse the parameter schemas (`TeamKeySchema`, `YearSchema`, ...) so patterns, ranges, and descriptions stay consistent:
 
 ```typescript
-{
-  name: 'get_team_media',
-  description: 'Get media (photos, videos) for a team in a specific year',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      team_key: {
-        type: 'string',
-        description: 'Team key in format frcXXXX (e.g., frc86)',
-        pattern: '^frc\\d+$',
-      },
-      year: {
-        type: 'number',
-        description: 'Competition year',
-        minimum: 1992,
-        maximum: new Date().getFullYear() + 1,
-      },
-    },
-    required: ['team_key', 'year'],
-  },
-}
+export const GetTeamMediaInputSchema = z.object({
+  team_key: TeamKeySchema,
+  year: YearSchema,
+});
 ```
 
-### 2. Create Response Schema (`src/schemas.ts`)
+The SDK converts this schema to JSON Schema for `tools/list` and validates `tools/call` arguments against it, so constraints such as `.regex()`, `.min()`, `.max()`, and `.describe()` are what clients see and what the server enforces.
+
+### 2. Create a Response Schema (`src/schemas.ts`)
 
 If the API response needs a new schema, add it:
 
@@ -186,39 +182,31 @@ export const MediaSchema = z.object({
 });
 ```
 
-Don't forget to export it and import it in `handlers.ts`.
+Export both schemas and import them in `src/tools.ts`.
 
-### 3. Implement the Handler (`src/handlers.ts`)
+### 3. Add the Tool to the Table (`src/tools.ts`)
 
-Add a new case to the switch statement in `handleToolCall()`:
+Add a `defineTool()` entry to the `tools` array:
 
 ```typescript
-case 'get_team_media': {
-  const { team_key, year } = z
-    .object({
-      team_key: TeamKeySchema,
-      year: YearSchema,
-    })
-    .parse(args);
-  const data = await makeApiRequest(`/team/${team_key}/media/${year}`);
-  const media = z.array(MediaSchema).parse(data);
-  return {
-    content: [
-      {
-        type: 'text',
-        text: JSON.stringify(media, null, 2),
-      },
-    ],
-  };
-}
+defineTool({
+  name: 'get_team_media',
+  title: 'Get Team Media for a Year',
+  description: 'Get media (photos, videos) for a team in a specific year',
+  inputSchema: GetTeamMediaInputSchema,
+  endpoint: ({ team_key, year }) => `/team/${team_key}/media/${year}`,
+  responseSchema: z.array(MediaSchema),
+}),
 ```
 
-**Handler Pattern:**
+**Entry pattern:**
 
-- Parse and validate input arguments using Zod schemas
-- Call `makeApiRequest()` with the TBA API endpoint
-- Parse and validate the response using Zod schemas
-- Return formatted result with `content` array
+- `endpoint` receives arguments that are already validated and typed from `inputSchema`; it returns the path under `https://www.thebluealliance.com/api/v3`
+- `responseSchema` validates the TBA response before it is returned
+- `createServer()` registers the entry with `registerTool()`, adding the shared read-only annotations (`READ_ONLY_API`) and the `title`
+- `executeTool()` in `src/handlers.ts` runs the request and formats the result as `JSON.stringify(data, null, 2)` text content; errors become `isError: true` results
+
+There is no handler or `switch` case to write. Only change `src/handlers.ts` or `src/server.ts` if a tool needs behavior the table cannot express.
 
 ### 4. Add Unit Tests
 
@@ -253,9 +241,12 @@ describe('MediaSchema', () => {
 
 **If you added a new tool** (`tests/tools.spec.ts`):
 
+- Add the expected path to `EXPECTED_ENDPOINTS` (the endpoint test fails until you do) and bump the tool count
+- Add a check against the listed definition if the tool has notable parameters:
+
 ```typescript
-it('should include get_team_media tool', () => {
-  const tool = tools.find((t) => t.name === 'get_team_media');
+it('should have get_team_media tool', () => {
+  const tool = find('get_team_media');
   expect(tool).toBeDefined();
   expect(tool?.description).toContain('media');
   expect(tool?.inputSchema.required).toContain('team_key');
@@ -263,18 +254,22 @@ it('should include get_team_media tool', () => {
 });
 ```
 
-**If you added a new handler** (`tests/handlers.spec.ts`):
+**To test a tool call** (`tests/handlers.spec.ts`), call it through the in-memory SDK client (the `handleToolCall` helper in that spec) with a mocked `fetch`:
 
 ```typescript
 it('should handle get_team_media', async () => {
+  mockFetch.mockResolvedValueOnce({
+    ok: true,
+    json: async () => [],
+  } as Response);
+
   const result = await handleToolCall('get_team_media', {
     team_key: 'frc86',
     year: 2024,
   });
 
-  expect(result.content).toBeDefined();
-  expect(result.content[0].type).toBe('text');
-  const data = JSON.parse(result.content[0].text);
+  expect(result.content[0]!.type).toBe('text');
+  const data = JSON.parse(result.content[0]!.text);
   expect(Array.isArray(data)).toBe(true);
 });
 ```
@@ -288,26 +283,16 @@ Add tests to validate the utility function behavior.
 Add an integration test that calls your new tool via the MCP protocol:
 
 ```typescript
-test('should get team media for a year', async ({ page }) => {
-  const result = await page.evaluate(async () => {
-    return window.testClient.request(
-      {
-        method: 'tools/call',
-        params: {
-          name: 'get_team_media',
-          arguments: {
-            team_key: 'frc86',
-            year: 2024,
-          },
-        },
-      },
-      CallToolResultSchema,
-    );
+// Inside the existing describe block, which creates `mcpClient` in beforeEach
+test('should get team media for a year', async () => {
+  const result = await mcpClient.callTool('get_team_media', {
+    team_key: 'frc86',
+    year: 2024,
   });
 
-  expect(result.content).toBeDefined();
-  expect(result.content.length).toBeGreaterThan(0);
-  const content = JSON.parse(result.content[0].text);
+  expect(result.content).toBeInstanceOf(Array);
+  expect(result.content[0]?.type).toBe('text');
+  const content = JSON.parse(result.content[0]?.text || '');
   expect(Array.isArray(content)).toBe(true);
 });
 ```
@@ -329,6 +314,6 @@ pnpm run test:integration     # Run integration tests
 4. Use `pnpm run inspect` to debug MCP functionality
 5. Follow existing TypeScript patterns and MCP SDK conventions
 6. When adding new tools, follow the 6-step process outlined above
-7. Keep the separation of concerns: tools → schemas → handlers → tests
+7. Keep the separation of concerns: schemas → tool table (`tools.ts`) → execution (`handlers.ts`) → registration (`server.ts`) → tests
 
 Always verify that both unit tests and integration tests pass before considering any changes complete.

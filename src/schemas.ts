@@ -447,26 +447,24 @@ export const MatchSimpleSchema = z.object({
   actual_time: z.number().nullish(),
 });
 
-export const ZebraSchema = z.object({
-  key: z.string(),
-  times: z.array(z.number()),
-  alliances: z.object({
-    red: z.array(
-      z.object({
-        team_key: z.string(),
-        xs: z.array(z.number()).nullish(),
-        ys: z.array(z.number()).nullish(),
-      }),
-    ),
-    blue: z.array(
-      z.object({
-        team_key: z.string(),
-        xs: z.array(z.number()).nullish(),
-        ys: z.array(z.number()).nullish(),
-      }),
-    ),
-  }),
+const ZebraTeamSchema = z.object({
+  team_key: z.string(),
+  // Positions are null for timesteps where the tracker had no reading.
+  xs: z.array(z.number().nullable()).nullish(),
+  ys: z.array(z.number().nullable()).nullish(),
 });
+
+// TBA returns null for matches without Zebra MotionWorks tracking.
+export const ZebraSchema = z
+  .object({
+    key: z.string(),
+    times: z.array(z.number()),
+    alliances: z.object({
+      red: z.array(ZebraTeamSchema),
+      blue: z.array(ZebraTeamSchema),
+    }),
+  })
+  .nullable();
 
 export const PredictionSchema = z.object({
   match_predictions: z
@@ -506,7 +504,8 @@ export const TeamHistorySchema = z.object({
   robots: z.array(RobotSchema).nullish(),
 });
 
-// Input schemas for tools - these will be converted to JSON Schema
+// Tool input schemas. Registered with the MCP SDK, which converts them to
+// JSON Schema for tools/list and validates tools/call arguments against them.
 export const GetTeamInputSchema = z.object({
   team_key: TeamKeySchema,
 });
@@ -768,23 +767,3 @@ export const GetDistrictTeamsSimpleInputSchema = z.object({
 export const GetDistrictTeamsKeysInputSchema = z.object({
   district_key: DistrictKeySchema,
 });
-
-// Helper function to convert Zod schema to MCP-compatible JSON Schema
-export function toMCPSchema(zodSchema: z.ZodType): {
-  type: 'object';
-  properties?: { [key: string]: object };
-  required?: string[];
-  [key: string]: unknown;
-} {
-  const jsonSchema = z.toJSONSchema(zodSchema) as {
-    type: 'object';
-    properties?: { [key: string]: object };
-    required?: string[];
-    [key: string]: unknown;
-  };
-
-  // Remove $schema field for MCP compatibility
-  delete jsonSchema['$schema'];
-
-  return jsonSchema;
-}
