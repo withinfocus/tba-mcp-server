@@ -97,4 +97,20 @@ describe('scouting skills catalog', () => {
   it('pick-list is served', async () => {
     expect(await servedUris()).toContain('skill://pick-list/SKILL.md');
   });
+
+  it('check-scouting-data is served', async () => {
+    expect(await servedUris()).toContain(
+      'skill://check-scouting-data/SKILL.md',
+    );
+  });
+
+  it('serves exactly the four scouting skills', async () => {
+    const catalog = await loadScoutingSkills(realRoot, { strict: true });
+    expect(catalog?.entries.map((e) => e.frontmatter.name).sort()).toEqual([
+      'check-scouting-data',
+      'match-preview',
+      'pick-list',
+      'pre-scout-event',
+    ]);
+  });
 });
