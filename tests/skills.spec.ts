@@ -89,4 +89,8 @@ describe('scouting skills catalog', () => {
   it('pre-scout-event is served', async () => {
     expect(await servedUris()).toContain('skill://pre-scout-event/SKILL.md');
   });
+
+  it('match-preview is served', async () => {
+    expect(await servedUris()).toContain('skill://match-preview/SKILL.md');
+  });
 });
