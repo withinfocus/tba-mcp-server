@@ -93,4 +93,8 @@ describe('scouting skills catalog', () => {
   it('match-preview is served', async () => {
     expect(await servedUris()).toContain('skill://match-preview/SKILL.md');
   });
+
+  it('pick-list is served', async () => {
+    expect(await servedUris()).toContain('skill://pick-list/SKILL.md');
+  });
 });
