@@ -9,7 +9,7 @@ A Model Context Protocol (MCP) server that provides access to The Blue Alliance 
 - **Match Results**: Retrieve match data with scores, alliances, and breakdowns
 - **Historical Data**: Query data from 1992 to the current year
 - **Type Safety**: All responses validated with Zod schemas
-- **Comprehensive Coverage**: 35+ tools covering all major TBA API endpoints
+- **Comprehensive Coverage**: 89 tools covering the TBA API v3 read endpoints
 
 ## Installation
 
@@ -104,17 +104,17 @@ docker run --rm -i --init \
 
 ## Available Tools
 
-### Team Information (24 tools)
+### Team Information (27 tools)
 
 Access comprehensive team data including profiles, participation history, events, matches, awards, and media.
 
 **Key tools**: `get_team`, `get_team_events`, `get_team_matches`, `get_team_awards`, `get_team_media`
 
-### Event Information (19 tools)
+### Event Information (29 tools)
 
-Query event details, participants, rankings, matches, and analytics.
+Query event details, participants, rankings, matches, playoff advancement, media, live queuing, and analytics.
 
-**Key tools**: `get_event`, `get_events`, `get_event_teams`, `get_event_rankings`, `get_event_matches`, `get_event_oprs`
+**Key tools**: `get_event`, `get_events`, `get_event_teams`, `get_event_rankings`, `get_event_matches`, `get_event_oprs`, `get_event_coprs`, `get_event_teams_statuses`
 
 ### Match Information (3 tools)
 
@@ -122,21 +122,33 @@ Retrieve detailed match data including scores, alliances, and robot tracking.
 
 **Key tools**: `get_match`, `get_match_simple`, `get_match_zebra`
 
-### District Tools (8 tools)
+### District Tools (13 tools)
 
-Access district rankings, events, and team information.
+Access district rankings, events, teams, awards, advancement, and history.
 
-**Key tools**: `get_districts`, `get_district_rankings`, `get_district_events`, `get_district_teams`
+**Key tools**: `get_districts`, `get_district_rankings`, `get_district_events`, `get_district_teams`, `get_district_advancement`
 
-### General/Utility Tools (6 tools)
+### Regional Advancement (2 tools)
 
-Paginated team listings and API status information.
+FIRST Championship advancement and regional pool rankings for 2025 and later.
 
-**Key tools**: `get_teams`, `get_teams_by_year`, `get_status`
+**Key tools**: `get_regional_advancement`, `get_regional_rankings`
+
+### Insights (6 tools)
+
+TBA season and all-time insights: leaderboards, notables, streaks, timeseries, game stats, and clubs, globally or per district.
+
+**Key tools**: `get_insights_by_category`, `get_insights_leaderboards`, `get_insights_notables`
+
+### General/Utility Tools (9 tools)
+
+Paginated team listings, team and event search, API status, and sponsors.
+
+**Key tools**: `get_teams`, `get_teams_by_year`, `get_search_index`, `get_status`
 
 ### Complete Documentation
 
-- **[All Tools](docs/TOOLS.md)** - Complete reference for all 35+ tools with parameters and examples
+- **[All Tools](docs/TOOLS.md)** - Complete reference for all 89 tools with parameters and examples
 - **[Data Schemas](docs/SCHEMAS.md)** - Detailed schema documentation for all response types
 
 ## Quick Examples

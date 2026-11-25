@@ -17,8 +17,11 @@ Tools for accessing The Blue Alliance API. All tools validate input parameters a
   - [Event Results & Rankings](#event-results--rankings)
   - [Event Matches](#event-matches)
   - [Event Analytics](#event-analytics)
+  - [Event Media & Live Info](#event-media--live-info)
 - [Match Information Tools](#match-information-tools)
 - [District Tools](#district-tools)
+- [Regional Advancement Tools](#regional-advancement-tools)
+- [Insights Tools](#insights-tools)
 - [General/Utility Tools](#generalutility-tools)
 - [Parameter Validation](#parameter-validation)
 - [Data Response Formats](#data-response-formats)
@@ -102,6 +105,20 @@ Get all events a team has participated in across all years
 
 - **Parameters**: `team_key` (string)
 - **Returns**: Array of detailed event objects
+
+#### `get_team_events_all_simple`
+
+Get simplified events a team has competed at across all years
+
+- **Parameters**: `team_key` (string)
+- **Returns**: Array of basic event data
+
+#### `get_team_events_all_keys`
+
+Get event keys a team has competed at across all years
+
+- **Parameters**: `team_key` (string)
+- **Returns**: Array of event key strings
 
 #### `get_team_event_status`
 
@@ -277,6 +294,13 @@ Get team keys in an event
 - **Parameters**: `event_key` (string)
 - **Returns**: Array of team key strings
 
+#### `get_event_teams_statuses`
+
+Get the status of every team at an event in one call
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Object keyed by team key; each value matches `get_team_event_status` (with pit location) or is null
+
 ### Event Results & Rankings
 
 #### `get_event_rankings`
@@ -299,6 +323,27 @@ Get awards from a specific event
 
 - **Parameters**: `event_key` (string)
 - **Returns**: Array of award objects
+
+#### `get_event_playoff_advancement`
+
+Get how alliances advanced through each playoff level
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Array of levels (round, type, ranked alliances with records, sort order and extra stat metadata); empty when not computed
+
+#### `get_event_advancement_points`
+
+Get advancement points earned at an event: district points for district events, Championship regional pool points for 2025+ regionals
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Per-team point breakdown and tiebreakers, or null for events that award neither
+
+#### `get_event_regional_champs_pool_points`
+
+Get Championship regional pool points earned at a 2025+ regional
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Per-team point breakdown (including rookie bonus) and tiebreakers, or null for district and pre-2025 events
 
 ### Event Matches
 
@@ -323,6 +368,27 @@ Get match keys for an event
 - **Parameters**: `event_key` (string)
 - **Returns**: Array of match key strings
 
+#### `get_event_practice_matches`
+
+Get practice matches at an event (not included in `get_event_matches`)
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Array of complete match objects with `comp_level` `pm`
+
+#### `get_event_practice_matches_simple`
+
+Get simplified practice matches at an event
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Array of basic match data
+
+#### `get_event_practice_matches_keys`
+
+Get practice match keys at an event
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Array of match key strings
+
 ### Event Analytics
 
 #### `get_event_insights`
@@ -339,6 +405,15 @@ Get OPR, DPR, and CCWM ratings for teams at an event
 - **Parameters**: `event_key` (string)
 - **Returns**: Object with OPR (Offensive Power Rating), DPR (Defensive Power Rating), CCWM (Calculated Contribution to Winning Margin)
 
+#### `get_event_coprs`
+
+Get component OPRs: per-team OPR estimates for each scoring component in the season's score breakdown
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Object keyed by component name (names change each season, e.g. `L1 Coral Count` in 2025), each a team key to number map; null before matches are played
+- **Note**: Same least-squares method as OPR, so the same small-sample caveats apply; values can be negative
+- **Example**: `get_event_coprs(event_key="2025casj")`
+
 #### `get_event_predictions`
 
 Get TBA-generated predictions for an event
@@ -352,6 +427,29 @@ Get district points for teams at an event
 
 - **Parameters**: `event_key` (string)
 - **Returns**: District points breakdown by team
+
+### Event Media & Live Info
+
+#### `get_event_media`
+
+Get media for the event itself (event videos, photo galleries)
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Array of media objects
+
+#### `get_event_team_media`
+
+Get that season's media for every team at an event
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Array of media objects with `team_keys`; base64 avatar images are removed
+
+#### `get_event_nexus_info`
+
+Get live queuing info and the pit map from Nexus
+
+- **Parameters**: `event_key` (string)
+- **Returns**: Now-queuing match, per-match queue status and estimated times, pit map; null when unavailable
 
 ## Match Information Tools
 
@@ -436,6 +534,103 @@ Get team keys in a district
 - **Parameters**: `district_key` (string)
 - **Returns**: Array of team key strings
 
+#### `get_district_awards`
+
+Get every award given in a district season
+
+- **Parameters**: `district_key` (string)
+- **Returns**: Array of award objects
+
+#### `get_district_advancement`
+
+Get which teams advanced to the district championship and FIRST Championship
+
+- **Parameters**: `district_key` (string)
+- **Returns**: Per-team advancement (with Championship qualification method) and cutoffs
+
+#### `get_district_history`
+
+Get every season of a district, following renames
+
+- **Parameters**: `district_abbreviation` (string, e.g. `fim`)
+- **Returns**: Array of district objects with official advancement counts
+
+#### `get_district_dcmp_history`
+
+Get every district championship event with its awards
+
+- **Parameters**: `district_abbreviation` (string)
+- **Returns**: Array of `{ event, awards }`
+
+#### `get_district_insights`
+
+Get all-time district statistics
+
+- **Parameters**: `district_abbreviation` (string)
+- **Returns**: Yearly team and event counts (district-wide and per region) and per-team totals; very large for big districts
+
+## Regional Advancement Tools
+
+### `get_regional_advancement`
+
+Get Championship advancement for regional teams (2025+)
+
+- **Parameters**: `year` (number)
+- **Returns**: Object keyed by team key with qualification status and how the team qualified
+
+### `get_regional_rankings`
+
+Get the season-long regional pool rankings (2025+)
+
+- **Parameters**: `year` (number)
+- **Returns**: Array of rankings with point totals and per-event breakdown; very large
+
+## Insights Tools
+
+All insights tools accept `year` 0 for all-time insights.
+
+### `get_insights_leaderboards`
+
+Get leaderboard insights for a season
+
+- **Parameters**: `year` (number or 0)
+- **Returns**: Array of leaderboards ranking team, event, or match keys by value
+
+### `get_insights_notables`
+
+Get notables insights (Hall of Fame, Championship winners, etc.)
+
+- **Parameters**: `year` (number or 0)
+- **Returns**: Array of notables with team keys and the events where each was earned
+
+### `get_insights`
+
+Get all global insights for a season across categories
+
+- **Parameters**: `year` (number or 0)
+- **Returns**: Array of typed insights; about 1 MB for a recent season, so prefer `get_insights_by_category`
+
+### `get_insights_by_category`
+
+Get global insights for a season in one category
+
+- **Parameters**: `year` (number or 0), `category` (`leaderboard`, `streak`, `timeseries`, `game_stats`, `clubs`)
+- **Returns**: Array of typed insights
+
+### `get_insights_for_district`
+
+Get district-scoped insights for a season across categories
+
+- **Parameters**: `year` (number or 0), `district_abbreviation` (string)
+- **Returns**: Array of typed insights
+
+### `get_insights_for_district_by_category`
+
+Get district-scoped insights for a season in one category
+
+- **Parameters**: `year` (number or 0), `category` (string), `district_abbreviation` (string)
+- **Returns**: Array of typed insights
+
 ## General/Utility Tools
 
 ### `get_teams`
@@ -487,6 +682,21 @@ Get TBA API status information
 - **No parameters required**
 - **Returns**: API status including current season, downtime info, app versions
 
+### `get_search_index`
+
+Find teams and events by name
+
+- **Parameters**: `query` (string, at least 2 characters)
+- **Returns**: Up to 25 matching teams (key, nickname) and 25 events (key, name), exact matches first, with total match counts. The server filters TBA's ~700 KB search index rather than returning it.
+- **Example**: `get_search_index(query="Cheesy Poofs")`
+
+### `get_sponsors`
+
+Get The Blue Alliance's platinum sponsors
+
+- **No parameters required**
+- **Returns**: Up to 3 sponsors with name, URL, and logo URLs
+
 ## Parameter Validation
 
 All tools implement strict parameter validation:
@@ -496,6 +706,10 @@ All tools implement strict parameter validation:
 - **Event Keys**: String format like `2023casj`, `2024week1`
 - **Match Keys**: String format like `2023casj_qm1`, `2024week1_sf1m1`
 - **District Keys**: String format like `2023fim`, `2024pnw`
+- **District Abbreviations**: Lowercase letters with no year, like `fim`, `ne`
+- **Insights Years**: 0 (all-time) or a valid season year
+- **Insights Categories**: `leaderboard`, `streak`, `timeseries`, `game_stats`, `clubs`
+- **Search Queries**: At least 2 characters after trimming
 - **Page Numbers**: 0-indexed integers (≥ 0)
 
 ## Data Response Formats
