@@ -32,7 +32,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 FROM gcr.io/distroless/nodejs26-debian13:nonroot AS release
 
 WORKDIR /app
-USER nonroot
+# The distroless nonroot user, by numeric ID so hosts can resolve it.
+USER 65532:65532
 
 COPY --from=builder /app/dist ./dist
 COPY --from=dependencies /app/node_modules ./node_modules
