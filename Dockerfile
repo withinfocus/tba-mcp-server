@@ -1,12 +1,15 @@
-FROM node:24-alpine AS base
+FROM node:26-alpine AS base
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Node 26 no longer bundles corepack, so install the pnpm version pinned in
+# package.json's packageManager field with npm.
+RUN npm install -g "$(node -p "require('./package.json').packageManager.split('+')[0]")"
 
 FROM base AS builder
 
@@ -25,7 +28,7 @@ FROM base AS dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile --prod --ignore-scripts --config.node-linker=hoisted
 
-FROM gcr.io/distroless/nodejs24-debian12:nonroot AS release
+FROM gcr.io/distroless/nodejs26-debian13:nonroot AS release
 
 WORKDIR /app
 USER nonroot

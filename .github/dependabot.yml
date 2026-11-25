@@ -12,9 +12,9 @@ updates:
       default-days: 1
     open-pull-requests-limit: 5
     ignore:
-      # Only allow Node 24.x (LTS), block all other versions
+      # Only allow Node 26.x (LTS), block all other versions
       - dependency-name: "node"
-        versions: ["<24", ">=25"]
+        versions: ["<26", ">=27"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -47,9 +47,9 @@ updates:
       default-days: 1
     open-pull-requests-limit: 10
     ignore:
-      # Ignore all @types/node versions except 24.x
+      # Ignore all @types/node versions except 26.x
       - dependency-name: "@types/node"
-        versions: ["<24", ">=25"]
+        versions: ["<26", ">=27"]
     # A dependency joins the first group it matches, so the toolchain groups
     # have to stay above the two catch-all groups at the bottom. Toolchain
     # groups take majors as well: packages in one of these families have to
