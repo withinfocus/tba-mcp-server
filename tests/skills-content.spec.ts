@@ -74,6 +74,11 @@ describe('skill content', () => {
       ).not.toBe('');
       expect(text).toContain('## Coach mode');
       expect(text).toContain('## Analyst mode');
+
+      // Coach mode must name where strong teams would disagree (spec: Modes).
+      const coach =
+        /#{2,3} Coach mode\n([\s\S]*?)(?=\n#{1,3} |$)/.exec(text)?.[1] ?? '';
+      expect(coach).toMatch(/disagree/i);
     },
   );
 

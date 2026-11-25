@@ -32,7 +32,11 @@ Say early, once, that a pick list from TBA alone is weak: TBA can't see per-robo
 2. Rankings: `get_event_rankings`. Use `sort_order_info` to name the `sort_orders` columns.
 3. Every team's status in one call: `get_event_teams_statuses` (rank, record, matches played, and alliance once selection has happened).
 4. Ratings: `get_event_oprs` and `get_event_coprs`. Choose the components that match the roles a partner can fill this season (main scoring pieces, auto, endgame). If `get_event_coprs` is empty, say so and use total OPR and per-robot rates.
-5. Reliability: for the candidate teams (usually the top 20–24 by your criteria, not the whole event), `get_team_event_matches` at this event, counting `...RobotN` outcomes per team (see `references/score-breakdown.md`). Count DQs separately. Summarize each team as you go; don't keep raw matches in context.
+5. Reliability. Full match data is large (one team's matches at an event is over 100 KB of tool output; the whole event is about 700 KB), so don't pull it per team for the whole candidate list.
+   - Screen every candidate with the component OPRs of per-robot point fields (for 2025, `autoMobilityPoints` and `endGameBargePoints`). They estimate auto and endgame contribution but aren't exact counts; say so.
+   - DQs: `get_event_rankings` has a `dq` count per team.
+   - Exact per-robot counts ("deep climb in 9 of 12"): only for the few teams where they decide a pick, usually five to eight second-pick candidates. Use `get_team_event_matches_keys` and `get_match` on recent played matches, counting `...RobotN` outcomes (see `references/score-breakdown.md`).
+   - If the host can save a large tool result to a file and process it with code, one `get_event_matches` call covers every team instead.
 6. Scouting data: if provided, normalize team numbers to `frcNNNN`, average each metric per team, and join it to the TBA data. Prefer scouting data for anything TBA can't attribute to one robot.
 7. Build the lists:
    - First-pick list: teams that add the most scoring or fill the role the user's alliance most needs.

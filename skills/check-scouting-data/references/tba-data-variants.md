@@ -15,16 +15,29 @@ What only the full version has, checked against live 2025 data:
 
 ## Keeping big results out of context
 
-A full match list for one event (`get_event_matches`) is around 380 KB for a 74-match regional, because each match carries its whole `score_breakdown`. Avoid it unless you need breakdowns for every match.
+Tool results come back as pretty-printed JSON. Measured sizes at 2025casj (37 teams, 89 matches):
 
-- For one team's matches with breakdowns, use `get_team_event_matches` (about a dozen matches) instead of the whole event.
-- For one match, use `get_match`.
+| Call                                            | Size         |
+| ----------------------------------------------- | ------------ |
+| `get_match` (one match, full)                   | about 7 KB   |
+| `get_team_event_matches` (one team, 15 matches) | about 115 KB |
+| `get_event_matches` (whole event)               | about 700 KB |
+| `get_event_predictions`                         | about 165 KB |
+| `get_event_teams_statuses`                      | about 60 KB  |
+| `get_event_coprs`                               | about 40 KB  |
+
+Full matches are big because each carries its whole `score_breakdown` (in 2025, a node-by-node map of the reef). Per-robot rates are the most expensive thing to compute, so:
+
+- For per-robot counts on a few teams, list their matches with `get_team_event_matches_keys` and call `get_match` on the recent played ones.
+- `get_team_event_matches` is fine for one or two teams, not for a whole list.
+- For a cheap estimate across many teams, use the component OPRs of per-robot point fields (see `metrics.md`).
+- Avoid `get_event_matches` unless the host can save a large result to a file and process it with code, or the event is small.
 - For the schedule, use `get_event_matches_simple` or `get_team_event_matches_simple`.
 - For video links for a handful of matches, call `get_match` on just those match keys.
 - `get_event_teams_statuses` gives every team's rank, record, alliance and playoff result in one call. Prefer it to calling `get_team_event_status` once per team.
 - `get_team_event_statuses` gives one team's status at every event it attended in a year, which is the fastest way to summarize a season.
 
-If you must pull the full event match list, extract what you need (for example, per-robot fields) and work from that summary rather than quoting raw JSON back to the user.
+Whatever you fetch, extract what you need (for example, per-robot fields) and work from that summary rather than quoting raw JSON back to the user.
 
 ## Data that may be missing
 

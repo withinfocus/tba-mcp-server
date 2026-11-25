@@ -30,7 +30,10 @@ Decide from the request, then keep the mode for the rest of the conversation unl
 2. Get the six teams and their stations from `get_match_simple`. Our alliance is the one with the user's team, if they have one in the match.
 3. Context for all six teams in one call: `get_event_teams_statuses` (rank, record, matches played). If it's not available for the event, use `get_event_rankings`.
 4. Ratings: `get_event_oprs` for total OPR, and `get_event_coprs` for component OPR. List the component names first and pick the few that matter for this game (scoring pieces by type, auto, endgame). If `get_event_coprs` is empty, say so and use total OPR and per-robot rates.
-5. Per-robot rates: for each of the six teams, `get_team_event_matches` at this event, then count the `...RobotN` outcomes for that team's station in each played match (see `references/score-breakdown.md`). Summarize each team as soon as you've read its matches; don't keep the raw matches around.
+5. Per-robot rates. Full match data is large (one team's matches at an event is over 100 KB of tool output), so spend it where it matters:
+   - For all six teams, use the component OPRs of per-robot point fields (for 2025, `autoMobilityPoints` and `endGameBargePoints`) as a cheap estimate of auto and endgame contribution. Say they're estimates.
+   - For exact counts, pick up to three teams where reliability decides the plan (usually our partners). Get their match keys with `get_team_event_matches_keys`, call `get_match` on their most recent four to six played matches (about 7 KB each), and count the `...RobotN` outcomes for their station (see `references/score-breakdown.md`).
+   - If the host can save a large tool result to a file and process it with code, one `get_event_matches` call covers every team instead.
 6. Prediction (optional): `get_event_predictions` has a win probability and predicted score per match in `match_predictions.qual` or `.playoff`, keyed by match key. The result covers the whole event and is large, so fetch it only when the user wants a prediction, and quote only this match.
 
 ## Output
@@ -45,6 +48,8 @@ One screen. Lead with the most useful line, not with method.
 ### Coach mode
 
 Add a suggested plan for our alliance: who should do what in auto, teleop and endgame, and what to deny the opponents. State the facts each suggestion rests on (for example "reached the deep cage in 11 of 12 matches"), and say that the drive team knows things TBA doesn't (robot changes, repairs, a partner's own plan), so they should confirm it with partners in the queue.
+
+Name the call where strong teams would disagree, if the plan makes one: for example a safe park versus a riskier high-value endgame, or sending a weak scorer to play defense versus keeping it on a simple scoring task.
 
 ### Analyst mode
 

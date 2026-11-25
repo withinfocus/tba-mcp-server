@@ -31,7 +31,7 @@ Decide from the request, then keep the mode for the rest of the conversation unl
 5. Awards: `get_team_awards` for the year, per team. Keep only notable ones (event winner, finalist, technical awards, Impact, Engineering Inspiration). For a large roster, do this only for the teams you shortlist in step 6.
 6. Shortlist the teams that matter most: the strongest by results and OPR, likely alliance partners or opponents the user named, and any team the user asks about. Usually 6–10 teams.
 7. Videos: for each shortlisted team, pick two or three recent matches (a playoff match, its best qualification match, and one where it struggled are good choices). Get the links with `get_match` per match key, or `get_team_event_matches` for one team at one event. The `_simple` variants don't include `videos`. YouTube entries have `type: "youtube"` and `key`; the link is `https://www.youtube.com/watch?v=<key>`.
-8. Optional, for shortlisted teams only: per-robot auto and endgame rates from `score_breakdown` in `get_team_event_matches` at their most recent event (see `references/score-breakdown.md`).
+8. Optional, for two or three teams the user cares most about: per-robot auto and endgame rates from `score_breakdown` in `get_team_event_matches` at their most recent event (see `references/score-breakdown.md`). Each call returns over 100 KB, so don't do this for the whole shortlist.
 
 Tell the user roughly how many calls a big roster needs before starting a long run, and keep raw JSON out of the reply.
 
@@ -49,6 +49,7 @@ Add:
 
 - A short "watch closely" list (three to six teams) with one line each on why.
 - A draft tiering (for example "likely captains", "strong picks", "solid", "unknown") with the rules you used to sort teams, such as "captain or first pick at an earlier event" or "OPR in the top quarter there". Say that a scouting lead should adjust it after watching videos and seeing robots in the pits.
+- Where strong teams would disagree with the tiering: how much earlier events should count (some teams trust a strong history, others only trust what they see at this event, because robots change), and whether to sort by results (rank, alliance role) or by OPR. Say which you leaned on.
 
 ### Analyst mode
 

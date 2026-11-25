@@ -43,7 +43,7 @@ Decide from the request, then keep the mode for the rest of the conversation unl
 
 ### Coach mode
 
-Add a prioritized re-watch list (the few matches that would fix the most data) and, if the data has a scout column, per-scout patterns: how many of each scout's rows had schedule errors or per-robot mismatches, and how often their alliances failed the totals check. Say clearly that one scout's mistake shows up in the whole alliance's total, so per-scout totals error is rough and shouldn't be used to single anyone out. Suggest process fixes (station assignment, team number confirmation) rather than blame.
+Add a prioritized re-watch list (the few matches that would fix the most data) and, if the data has a scout column, per-scout patterns: how many of each scout's rows had schedule errors or per-robot mismatches, and how often their alliances failed the totals check. Say clearly that one scout's mistake shows up in the whole alliance's total, so per-scout totals error is rough and shouldn't be used to single anyone out. Suggest process fixes (station assignment, team number confirmation) rather than blame. Teams disagree about tracking per-scout accuracy at all: some use it to coach scouts, others avoid it because it can make scouting feel like a test. Mention that and let the user decide.
 
 ### Analyst mode
 

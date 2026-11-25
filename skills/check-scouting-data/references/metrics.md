@@ -21,6 +21,7 @@ Caveats to state whenever you use them:
 The same calculation, done separately for individual `score_breakdown` fields. The result is an object keyed by component name, each a map of team to value. Component names change every season. 2025casj had, among others, `L1 Coral Count` through `L4 Coral Count`, `Total Coral Count`, `Total Algae Count`, `autoPoints`, `teleopPoints`, `endGameBargePoints` and `foulPoints`. 2026 events have names such as `Hub Total Fuel Count` and `totalTowerPoints`. List the keys before using them.
 
 - Component OPR is the closest TBA gets to per-robot game-piece numbers, but it's an estimate with the same caveats as OPR, and noisier for rare actions.
+- For fields that are really per robot (2025 `autoMobilityPoints` from the auto line, `endGameBargePoints` from the endgame), component OPR is a cheap estimate of each team's average across every team at once. It's still a regression estimate, not a count; use `score_breakdown` for exact counts on a few teams.
 - `foulPoints` and foul-count components are mostly noise; don't use them to call a team clean or dirty.
 - If the result is empty for the event, fall back to total OPR and per-robot `score_breakdown` rates, and tell the user.
 

@@ -32,7 +32,7 @@ Example prompts:
 - "We're going to 2025casj. Pre-scout it for us."
 - "Which teams at our next regional should we watch videos of? We're team 649."
 - "Brief us on 2025casj_qm10. What should we do?"
-- "Our next match at 2025casj, side-by-side numbers only. We're 1700."
+- "Our next match, side-by-side numbers only. We're team 1700."
 - "Help us build our pick list for 2025casj. Here's our scouting CSV."
 - "Who's left for our second pick?"
 - "Check this scouting data against TBA and tell us which matches to re-watch."
