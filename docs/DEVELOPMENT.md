@@ -140,6 +140,13 @@ pnpm run inspect
 ```
 
 Launches the MCP inspector tool for debugging MCP functionality in a browser.
+Set `TBA_API_KEY` in the inspector's environment variables for the server.
+
+For a quick check without the browser UI, use the inspector's CLI mode:
+
+```bash
+pnpm exec mcp-inspector --cli -e TBA_API_KEY=your_api_key_here node dist/index.js --method tools/list
+```
 
 ### Manual Testing
 
@@ -158,6 +165,12 @@ The server provides detailed error messages for:
 - **Invalid years** (must be 1992 to current year + 1)
 - **TBA API errors** (rate limits, not found, etc.)
 - **Schema validation failures**
+
+Invalid arguments are rejected by the MCP SDK before the TBA API is called and
+come back as an `isError: true` tool result starting with `Input validation
+error:`. TBA API and response validation failures come back as `isError: true`
+results starting with `Error:`. Calling a tool name that does not exist is a
+JSON-RPC error (`-32602`, `Tool <name> not found`) rather than a tool result.
 
 ## API Rate Limits
 
@@ -214,12 +227,19 @@ git push origin feature/your-feature-name
 
 ### Adding a New Tool
 
-1. Define the tool in `src/tools.ts`
-2. Create response schema in `src/schemas.ts`
-3. Implement the handler in `src/handlers.ts`
-4. Add unit tests
-5. Add integration tests
-6. Build and test
+Tools are registered on an `McpServer` from the MCP TypeScript SDK v2
+(`@modelcontextprotocol/server`). Each tool is one `defineTool()` entry in the
+`tools` table in `src/tools.ts`; `createServer()` in `src/server.ts` registers
+every entry with `registerTool()`, and `executeTool()` in `src/handlers.ts`
+runs it.
+
+1. Create the input schema (a `z.object`) in `src/schemas.ts`, plus a response schema if the API response needs a new one
+2. Add a `defineTool()` entry to the `tools` table in `src/tools.ts` with `name`, `title`, `description`, `inputSchema`, `endpoint`, and `responseSchema`
+3. Add unit tests, including the tool's path in `EXPECTED_ENDPOINTS` in `tests/tools.spec.ts`
+4. Add integration tests
+5. Build and test
+
+See the "Adding a New Tool" section of [CONTRIBUTING.md](../CONTRIBUTING.md) for a worked example.
 
 ## Related Links
 
