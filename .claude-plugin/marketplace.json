@@ -1,0 +1,19 @@
+{
+  "name": "tba",
+  "description": "The Blue Alliance plugin for FRC scouting",
+  "owner": {
+    "name": "Matt Bishop",
+    "url": "https://github.com/withinfocus"
+  },
+  "plugins": [
+    {
+      "name": "tba",
+      "source": {
+        "source": "git-subdir",
+        "url": "withinfocus/tba-mcp-server",
+        "path": "plugin",
+        "ref": "latest"
+      }
+    }
+  ]
+}

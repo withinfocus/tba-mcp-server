@@ -12,7 +12,10 @@ const SCOUTING_SKILLS = [
   'pre-scout-event',
 ];
 
-async function connect(modern: boolean): Promise<Client> {
+async function connect(
+  modern: boolean,
+  extraEnv: Record<string, string> = {},
+): Promise<Client> {
   const client = new Client(
     { name: 'skills-integration-test', version: '1.0.0' },
     modern ? { versionNegotiation: { mode: { pin: '2026-07-28' } } } : {},
@@ -21,7 +24,7 @@ async function connect(modern: boolean): Promise<Client> {
     new StdioClientTransport({
       command: 'node',
       args: [getServerPath()],
-      env: { ...process.env, TBA_API_KEY: getApiKey() } as Record<
+      env: { ...process.env, TBA_API_KEY: getApiKey(), ...extraEnv } as Record<
         string,
         string
       >,
@@ -67,6 +70,18 @@ test.describe('Scouting skills over stdio', () => {
       expect(tools.map((t) => t.name).sort()).toEqual(
         toolTable.map((t) => t.name).sort(),
       );
+    } finally {
+      await client.close();
+    }
+  });
+
+  test('TBA_MCP_SKILLS=off serves tools without skills', async () => {
+    const client = await connect(true, { TBA_MCP_SKILLS: 'off' });
+    try {
+      expect(new SkillsClient(client).supported).toBe(false);
+
+      const { tools } = await client.listTools();
+      expect(tools).toHaveLength(toolTable.length);
     } finally {
       await client.close();
     }

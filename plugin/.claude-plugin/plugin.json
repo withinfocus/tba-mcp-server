@@ -1,0 +1,27 @@
+{
+  "name": "tba",
+  "displayName": "The Blue Alliance",
+  "version": "2.0.0",
+  "description": "FIRST Robotics Competition data from The Blue Alliance, with scouting skills for pre-scouting an event, briefing a match, building a pick list, and checking your scouting data.",
+  "author": {
+    "name": "Matt Bishop",
+    "url": "https://github.com/withinfocus"
+  },
+  "homepage": "https://github.com/withinfocus/tba-mcp-server",
+  "repository": "https://github.com/withinfocus/tba-mcp-server",
+  "license": "MIT",
+  "icon": "./.claude-plugin/icon.png",
+  "keywords": ["frc", "first-robotics", "scouting", "the-blue-alliance"],
+  "network": {
+    "hosts": ["www.thebluealliance.com", "registry.npmjs.org"]
+  },
+  "userConfig": {
+    "tba_api_key": {
+      "type": "string",
+      "title": "The Blue Alliance API key",
+      "description": "Read API key from your account page at thebluealliance.com/account",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}

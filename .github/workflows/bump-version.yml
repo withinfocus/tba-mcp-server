@@ -82,13 +82,23 @@ jobs:
           mv server.json.tmp server.json
           echo "✓ Updated server.json"
 
+      # The plugin pins the npm release it runs, so both move with the version.
+      - name: Update Claude plugin
+        run: |
+          VERSION="${{ steps.new-version.outputs.version }}"
+          jq --arg v "$VERSION" '.version = $v' plugin/.claude-plugin/plugin.json > plugin.json.tmp
+          mv plugin.json.tmp plugin/.claude-plugin/plugin.json
+          jq --arg v "$VERSION" '.mcpServers.tba.args |= map(if startswith("@withinfocus/tba-mcp-server@") then "@withinfocus/tba-mcp-server@" + $v else . end)' plugin/.mcp.json > mcp.json.tmp
+          mv mcp.json.tmp plugin/.mcp.json
+          echo "✓ Updated Claude plugin"
+
       # jq reformats the JSON it rewrites, which does not always match Prettier
       # (it expands short arrays in glama.json). Normalize before committing so
       # the bump does not leave main failing the lint job.
       - name: Format updated files
         run: |
           PRETTIER_VERSION=$(jq -r '.devDependencies.prettier' package.json)
-          npx --yes "prettier@${PRETTIER_VERSION}" --write package.json glama.json server.json
+          npx --yes "prettier@${PRETTIER_VERSION}" --write package.json glama.json server.json plugin/.claude-plugin/plugin.json plugin/.mcp.json
           echo "✓ Formatted updated files"
 
       - name: Configure Git
@@ -100,7 +110,7 @@ jobs:
         run: |
           BRANCH_NAME="version-bump-${{ steps.new-version.outputs.version }}"
           git checkout -b "$BRANCH_NAME"
-          git add package.json glama.json server.json
+          git add package.json glama.json server.json plugin/.claude-plugin/plugin.json plugin/.mcp.json
           git commit -m "Bump version to ${{ steps.new-version.outputs.version }}"
           git push -u origin "$BRANCH_NAME"
           echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
