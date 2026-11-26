@@ -1,7 +1,7 @@
 {
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "name": "@withinfocus/tba-mcp-server",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "FIRST Robotics Competition data from The Blue Alliance API: teams, events, matches, rankings, OPRs, awards, districts and media, with 89 read-only tools. Also serves four scouting skills over MCP for pre-scouting an event, briefing a match, building a pick list and checking your own scouting data.",
   "maintainers": ["withinfocus"],
   "homepage": "https://github.com/withinfocus/tba-mcp-server",
