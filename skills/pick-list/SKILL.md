@@ -28,7 +28,7 @@ Say early, once, that a pick list from TBA alone is weak: TBA can't see per-robo
 
 ## Steps
 
-1. Get the event key and the user's team. Find the user's current rank, because it decides which picks they're likely to get.
+1. Get the event key and the user's team. Find the user's current rank, because it decides which picks they're likely to get. If the event is over or alliance selection has already happened (`get_event_alliances` isn't empty), say so first: the real alliances and playoff results are hindsight, so build the list from qualification data and show what actually happened separately (see "Past matches and finished events" in `references/tba-data-variants.md`).
 2. Rankings: `get_event_rankings`. Use `sort_order_info` to name the `sort_orders` columns.
 3. Every team's status in one call: `get_event_teams_statuses` (rank, record, matches played, and alliance once selection has happened).
 4. Ratings: `get_event_oprs` and `get_event_coprs`. Choose the components that match the roles a partner can fill this season (main scoring pieces, auto, endgame). If `get_event_coprs` is empty, say so and use total OPR and per-robot rates.

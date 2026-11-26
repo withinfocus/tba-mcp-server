@@ -27,6 +27,7 @@ Decide from the request, then keep the mode for the rest of the conversation unl
 1. Find the match.
    - A match key or label ("qm34", "Q34", "playoff 7"): build the key with `references/tba-keys.md`. Ask for the event if you don't know it.
    - "Our next match": ask for the team number if you don't know it, then call `get_team_event_status` and use `next_match_key`. If it's empty, look at `get_team_event_matches_simple` for the first match without a result.
+   - If the match has already been played (it has a `score_breakdown` or `actual_time`), follow "Past matches and finished events" in `references/tba-data-variants.md`: brief from earlier matches only, and keep the real result for the end.
 2. Get the six teams and their stations from `get_match_simple`. Our alliance is the one with the user's team, if they have one in the match.
 3. Context for all six teams in one call: `get_event_teams_statuses` (rank, record, matches played). If it's not available for the event, use `get_event_rankings`.
 4. Ratings: `get_event_oprs` for total OPR, and `get_event_coprs` for component OPR. List the component names first and pick the few that matter for this game (scoring pieces by type, auto, endgame). If `get_event_coprs` is empty, say so and use total OPR and per-robot rates.
@@ -65,6 +66,7 @@ Follow it with the prediction if fetched, and the caveats. No strategy.
 - OPR has an error of roughly ±15 points; treat small gaps as ties.
 - TBA can't tell which robot scored which game piece, or how well a robot defends. Component OPR is an estimate of that, not a measurement.
 - TBA predictions are statistical and weak early in an event.
+- For a match that's already been played, event-wide OPR, component OPR and rankings include later matches. Use only earlier matches, or label those numbers as hindsight.
 
 ## With the user's scouting data
 

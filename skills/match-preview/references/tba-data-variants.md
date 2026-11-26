@@ -39,6 +39,15 @@ Full matches are big because each carries its whole `score_breakdown` (in 2025, 
 
 Whatever you fetch, extract what you need (for example, per-robot fields) and work from that summary rather than quoting raw JSON back to the user.
 
+## Past matches and finished events
+
+TBA answers with everything played so far, which leaks hindsight when the user asks about a match or event that's already over (a review, a practice run on an old event, or the wrong year).
+
+- Check first. A match with a `score_breakdown` or `actual_time` has been played; an event whose `end_date` has passed is over. Say so in the first line of the reply and ask whether they meant another event or year.
+- Build the analysis only from matches played before the one being asked about: compare `comp_level` and match number, or `actual_time`. Per-robot counts, records and averages can be rebuilt from those earlier matches.
+- `get_event_oprs`, `get_event_coprs`, `get_event_rankings`, `get_event_teams_statuses` and `get_event_alliances` describe the event as it stands now, not as it stood before the match. Leave them out of a preview of a past match, or label them as hindsight. Early in an event few matches exist, so say how many each team had played.
+- If the real result is useful, give it in a separate section at the end, clearly marked as what actually happened.
+
 ## Data that may be missing
 
 - Events that haven't started have no matches, rankings, OPRs or predictions. Tools return empty lists or `null`.

@@ -24,9 +24,10 @@ Decide from the request, then keep the mode for the rest of the conversation unl
 
 ## Steps
 
-1. Get the event key. If the user gave a name or "our next event", find it with `get_team_events_simple` for their team, or `get_events_simple` for the year. Confirm the event and year if there's any doubt.
+1. Get the event key. If the user gave a name or "our next event", find it with `get_team_events_simple` for their team, or `get_events_simple` for the year. Confirm the event and year if there's any doubt. Note its `start_date`. If the event is already over, say so first and follow "Past matches and finished events" in `references/tba-data-variants.md`: scout from what was known before it started.
 2. Get the roster with `get_event_teams_simple` (or `get_event_teams_keys` if you only need keys).
-3. For each team, get its season so far with `get_team_event_statuses` for the event's year. Each entry has rank, record, alliance (with `pick`: 0 is captain, 1 is first pick, and so on) and playoff result. Ignore the upcoming event itself and any event with no matches played.
+3. For each team, get its season so far with `get_team_event_statuses` for the event's year. Each entry has rank, record, alliance (with `pick`: 0 is captain, 1 is first pick, and so on) and playoff result. Count only events that started before this event's `start_date` (dates come from `get_team_events_simple` for the team and year). Ignore this event, anything after it, and any event with no matches played.
+   - If most teams have no earlier event this season (common in weeks 1–3), fall back to last season: `get_team_event_statuses` for the previous year gives each team's rank, alliance role and playoff result. Show it in its own column marked as last season, and use it only to break ties, because robots are rebuilt every year. It costs one call per team, so say so before a big roster. For teams with no match film this season, `get_team_media` for the current year often has robot photos or reveal videos.
 4. For each earlier event that any roster team attended, call `get_event_oprs` once and pull out the roster teams. One call per event covers every team that was there, so don't call it per team.
 5. Awards: `get_team_awards` for the year, per team. Keep only notable ones (event winner, finalist, technical awards, Impact, Engineering Inspiration). For a large roster, do this only for the teams you shortlist in step 6.
 6. Shortlist the teams that matter most: the strongest by results and OPR, likely alliance partners or opponents the user named, and any team the user asks about. Usually 6–10 teams.
@@ -58,7 +59,7 @@ Give the roster table sorted by the column the user chose (ask if they care; def
 ## Caveats to always include
 
 - Robots change between events. Results from weeks ago may not reflect the robot that shows up.
-- Early-season and rookie teams may have no history this year. Say "no data yet" for them rather than ranking them low.
+- Early-season and rookie teams may have no history this year. Say "no data yet" for them rather than ranking them low. Last season's results describe a different robot.
 - OPR from an earlier event is only comparable within that event; strength of field differs. Don't rank across events on OPR differences of a few points. See `references/metrics.md`.
 - This server has no Statbotics EPA. For cross-event strength ratings, suggest statbotics.io.
 - TBA can't attribute game pieces to individual robots. What a robot actually scores needs video or scouts.
