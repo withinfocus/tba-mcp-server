@@ -65,6 +65,7 @@ Tests are organized to mirror the source structure:
 - `tests/schemas.spec.ts` - Unit tests for all Zod schemas
 - `tests/utils.spec.ts` - Unit tests for utility functions
 - `tests/skills.spec.ts` - Unit tests for loading and serving skills (fixture in `tests/fixtures/skills/`)
+- `tests/glama.spec.ts` - Guard tests for `glama.json`: tool and skill lists match the tool table and `skills/`, version and Node/pnpm majors match `package.json`
 - `tests/plugin.spec.ts` - Guard tests for the Claude plugin: skills copy in sync, version and `npx` pin match `package.json`, API key and skills flag wired up
 - `tests/skills-content.spec.ts` - Guard tests for skill content: shared references in sync, only real tool names, `SKILL.md` structure, strict catalog load, and npm packaging
 - `tests/in-memory-client.ts` - Test helper that connects an SDK `Client` to `createServer()` over `InMemoryTransport`
@@ -269,6 +270,7 @@ describe('MediaSchema', () => {
 **If you added a new tool** (`tests/tools.spec.ts`):
 
 - Add the expected path to `EXPECTED_ENDPOINTS` (the endpoint test fails until you do) and bump the tool count
+- Add the tool to `glama.json`'s `tools` list at the same position as in the table, with a one-sentence description (`tests/glama.spec.ts` fails until you do)
 - Add a check against the listed definition if the tool has notable parameters:
 
 ```typescript
@@ -366,7 +368,7 @@ This copies every shared file into each skill's `references/` folder, then mirro
 
 ### Guard tests
 
-`tests/skills-content.spec.ts` fails if a shared copy differs from its source, if a skill names a tool that doesn't exist, if a `SKILL.md` breaks the rules above, if the catalog doesn't load under `strict: true`, or if the npm package would leave out `skills/`. `tests/skills.spec.ts` checks that each skill is served. Add a skill's name to the expected list there when you add a skill. `tests/integration/skills.spec.ts` lists and reads the skills over stdio. `tests/plugin.spec.ts` fails if `plugin/skills/` differs from `skills/` or if the plugin's version or `npx` pin drifts from `package.json`.
+`tests/skills-content.spec.ts` fails if a shared copy differs from its source, if a skill names a tool that doesn't exist, if a `SKILL.md` breaks the rules above, if the catalog doesn't load under `strict: true`, or if the npm package would leave out `skills/`. `tests/skills.spec.ts` checks that each skill is served. Add a skill's name to the expected list there when you add a skill, and add it to `glama.json`'s `skills` list (`tests/glama.spec.ts` checks it). `tests/integration/skills.spec.ts` lists and reads the skills over stdio. `tests/plugin.spec.ts` fails if `plugin/skills/` differs from `skills/` or if the plugin's version or `npx` pin drifts from `package.json`.
 
 ## When Working on The Project
 

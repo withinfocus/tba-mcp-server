@@ -2,7 +2,7 @@
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "name": "@withinfocus/tba-mcp-server",
   "version": "2.1.0",
-  "description": "Provides access to The Blue Alliance API for FIRST Robotics Competition data. Enables AI assistants and other MCP clients to retrieve comprehensive FRC team, event, and match information.",
+  "description": "FIRST Robotics Competition data from The Blue Alliance API: teams, events, matches, rankings, OPRs, awards, districts and media, with 89 read-only tools. Also serves four scouting skills over MCP for pre-scouting an event, briefing a match, building a pick list and checking your own scouting data.",
   "maintainers": ["withinfocus"],
   "homepage": "https://github.com/withinfocus/tba-mcp-server",
   "repository": "https://github.com/withinfocus/tba-mcp-server.git",
@@ -15,6 +15,9 @@
     "tba",
     "robotics",
     "competition-data",
+    "scouting",
+    "mcp",
+    "skills",
     "api",
     "typescript"
   ],
@@ -22,6 +25,9 @@
   "installation": {
     "npm": {
       "package": "@withinfocus/tba-mcp-server"
+    },
+    "docker": {
+      "image": "ghcr.io/withinfocus/tba-mcp-server"
     }
   },
   "configuration": {
@@ -29,261 +35,397 @@
     "args": ["-y", "@withinfocus/tba-mcp-server"],
     "env": {
       "TBA_API_KEY": {
-        "description": "The Blue Alliance API key (register at https://www.thebluealliance.com/account)",
+        "description": "The Blue Alliance Read API key (create one at https://www.thebluealliance.com/account)",
         "required": true,
+        "type": "string"
+      },
+      "TBA_MCP_SKILLS": {
+        "description": "Set to off, false or 0 to stop serving the scouting skills",
+        "required": false,
         "type": "string"
       }
     }
   },
   "capabilities": {
     "tools": true,
-    "resources": false,
-    "prompts": false
+    "resources": true,
+    "prompts": false,
+    "extensions": ["io.modelcontextprotocol/skills"]
   },
   "tools": [
     {
       "name": "get_team",
-      "description": "Get detailed information about a specific FRC team including location, website, rookie year, and motto"
-    },
-    {
-      "name": "get_team_simple",
-      "description": "Get simplified information about a specific team"
+      "description": "Retrieve the full profile of a single FIRST Robotics Competition (FRC) team identified by team key (e.g., 'frc86')."
     },
     {
       "name": "get_team_events",
-      "description": "Get events that a team has participated in for a given year"
-    },
-    {
-      "name": "get_team_events_simple",
-      "description": "Get simplified events for a team in a specific year"
-    },
-    {
-      "name": "get_team_events_keys",
-      "description": "Get event keys for a team in a specific year"
-    },
-    {
-      "name": "get_team_events_all",
-      "description": "Get all events a team has participated in across all years"
+      "description": "List every FRC event a team registered for in a given season year."
     },
     {
       "name": "get_team_awards",
-      "description": "Get awards won by a team in a specific year"
-    },
-    {
-      "name": "get_team_awards_all",
-      "description": "Get all awards won by a team across all years"
-    },
-    {
-      "name": "get_team_event_awards",
-      "description": "Get awards won by a team at a specific event"
+      "description": "Retrieve every award won by a team during a single FRC season year."
     },
     {
       "name": "get_team_matches",
-      "description": "Get matches played by a team in a specific year"
-    },
-    {
-      "name": "get_team_matches_simple",
-      "description": "Get simplified matches for a team in a specific year"
-    },
-    {
-      "name": "get_team_matches_keys",
-      "description": "Get match keys for a team in a specific year"
-    },
-    {
-      "name": "get_team_event_matches",
-      "description": "Get matches for a team at a specific event"
-    },
-    {
-      "name": "get_team_event_matches_simple",
-      "description": "Get simplified matches for a team at a specific event"
-    },
-    {
-      "name": "get_team_event_matches_keys",
-      "description": "Get match keys for a team at a specific event"
-    },
-    {
-      "name": "get_team_years_participated",
-      "description": "Get years that a team has participated in competition"
-    },
-    {
-      "name": "get_team_districts",
-      "description": "Get district history for a team"
-    },
-    {
-      "name": "get_team_robots",
-      "description": "Get robot names for a team by year"
-    },
-    {
-      "name": "get_team_media",
-      "description": "Get media for a team in a specific year"
-    },
-    {
-      "name": "get_team_media_by_tag",
-      "description": "Get media for a team filtered by tag"
-    },
-    {
-      "name": "get_team_media_by_tag_year",
-      "description": "Get media for a team filtered by tag and year"
-    },
-    {
-      "name": "get_team_social_media",
-      "description": "Get social media information for a team"
-    },
-    {
-      "name": "get_team_event_status",
-      "description": "Get team competition rank and status at a specific event"
-    },
-    {
-      "name": "get_team_event_statuses",
-      "description": "Get team event statuses for all events in a year"
-    },
-    {
-      "name": "get_team_history",
-      "description": "Get historical data for a team across all years"
+      "description": "List every qualification, playoff, and finals match a team played during a given FRC season year, across all events."
     },
     {
       "name": "get_events",
-      "description": "Get all FRC events for a specific year"
-    },
-    {
-      "name": "get_events_simple",
-      "description": "Get simplified list of events for a year"
-    },
-    {
-      "name": "get_events_keys",
-      "description": "Get list of event keys for a year"
+      "description": "List every FRC event scheduled or completed for a given season year, worldwide."
     },
     {
       "name": "get_event",
-      "description": "Get detailed information about a specific event"
-    },
-    {
-      "name": "get_event_simple",
-      "description": "Get simplified information about a specific event"
+      "description": "Retrieve the full record for a single FRC event by event key (e.g., '2023casj' for the 2023 Silicon Valley Regional)."
     },
     {
       "name": "get_event_teams",
-      "description": "Get teams participating in a specific event"
-    },
-    {
-      "name": "get_event_teams_simple",
-      "description": "Get simplified teams participating in an event"
-    },
-    {
-      "name": "get_event_teams_keys",
-      "description": "Get team keys participating in an event"
+      "description": "List every FRC team registered to compete at a specific event, with full team profiles (number, nickname, name, location, website, motto, rookie year)."
     },
     {
       "name": "get_event_rankings",
-      "description": "Get team rankings for a specific event"
-    },
-    {
-      "name": "get_event_alliances",
-      "description": "Get elimination alliances for a specific event"
+      "description": "Retrieve the live or final qualification rankings for an FRC event."
     },
     {
       "name": "get_event_matches",
-      "description": "Get matches for a specific event"
+      "description": "Fetch every match played at a specific FRC event, including qualification, playoff, and finals."
     },
     {
-      "name": "get_event_matches_simple",
-      "description": "Get simplified matches for an event"
-    },
-    {
-      "name": "get_event_matches_keys",
-      "description": "Get match keys for an event"
-    },
-    {
-      "name": "get_event_awards",
-      "description": "Get awards from a specific event"
+      "name": "get_event_alliances",
+      "description": "Retrieve playoff alliance selections for an FRC event."
     },
     {
       "name": "get_event_insights",
-      "description": "Get event-specific insights and statistics"
-    },
-    {
-      "name": "get_event_oprs",
-      "description": "Get OPR, DPR, and CCWM ratings for teams at an event"
-    },
-    {
-      "name": "get_event_predictions",
-      "description": "Get TBA-generated predictions for an event"
+      "description": "Retrieve aggregated game-specific statistics computed by The Blue Alliance for an event, separated into qualification and playoff phases."
     },
     {
       "name": "get_event_district_points",
-      "description": "Get district points for teams at an event"
+      "description": "Retrieve district championship qualifying points awarded at an event for each participating team."
     },
     {
-      "name": "get_match",
-      "description": "Get detailed information about a specific match"
+      "name": "get_team_years_participated",
+      "description": "Retrieve every season year in which a team has competed in FRC, sorted ascending."
     },
     {
-      "name": "get_match_simple",
-      "description": "Get simplified information about a specific match"
+      "name": "get_team_districts",
+      "description": "List the FRC district affiliations a team has held across its history."
     },
     {
-      "name": "get_match_zebra",
-      "description": "Get Zebra MotionWorks data for a match (robot tracking)"
+      "name": "get_team_robots",
+      "description": "List the named robots a team has built and registered each year (e.g., 'Stronghold' for 2016, 'Citrus Circuits Quokka' patterns)."
     },
     {
-      "name": "get_districts",
-      "description": "Get all districts for a specific year"
+      "name": "get_team_media",
+      "description": "Retrieve media (photos, videos, presentations, essays) submitted for a team in a given FRC season year."
     },
     {
-      "name": "get_district_rankings",
-      "description": "Get team rankings within a district"
-    },
-    {
-      "name": "get_district_events",
-      "description": "Get events in a specific district"
-    },
-    {
-      "name": "get_district_events_simple",
-      "description": "Get simplified events in a specific district"
-    },
-    {
-      "name": "get_district_events_keys",
-      "description": "Get event keys in a specific district"
-    },
-    {
-      "name": "get_district_teams",
-      "description": "Get teams in a specific district"
-    },
-    {
-      "name": "get_district_teams_simple",
-      "description": "Get simplified teams in a specific district"
-    },
-    {
-      "name": "get_district_teams_keys",
-      "description": "Get team keys in a specific district"
+      "name": "get_team_event_matches",
+      "description": "Fetch every match a team played at a single specific event in one call."
     },
     {
       "name": "get_teams",
-      "description": "Get paginated list of all teams (detailed)"
-    },
-    {
-      "name": "get_teams_simple",
-      "description": "Get paginated list of teams (simplified)"
-    },
-    {
-      "name": "get_teams_keys",
-      "description": "Get paginated list of team keys"
-    },
-    {
-      "name": "get_teams_by_year",
-      "description": "Get teams that competed in a specific year (detailed)"
-    },
-    {
-      "name": "get_teams_by_year_simple",
-      "description": "Get teams from a year (simplified)"
-    },
-    {
-      "name": "get_teams_by_year_keys",
-      "description": "Get team keys from a specific year"
+      "description": "List all FRC teams ever registered, paginated in groups of 500."
     },
     {
       "name": "get_status",
-      "description": "Get TBA API status information"
+      "description": "Retrieve TBA API status: current FRC season, max season available, datafeed health flag, list of currently down event keys, max team page index, and minimum/latest mobile app versions for iOS and Android."
+    },
+    {
+      "name": "get_match",
+      "description": "Retrieve the full record for a single match by match key (e.g., '2023casj_qm1')."
+    },
+    {
+      "name": "get_event_oprs",
+      "description": "Retrieve OPR (Offensive Power Rating), DPR (Defensive Power Rating), and CCWM (Calculated Contribution to Winning Margin) for every team at an event, returned as three team_key→number maps."
+    },
+    {
+      "name": "get_event_awards",
+      "description": "List every award given out at a specific FRC event."
+    },
+    {
+      "name": "get_team_awards_all",
+      "description": "Retrieve every award won by a team across its entire FRC competition history."
+    },
+    {
+      "name": "get_team_events_all",
+      "description": "List every FRC event a team has competed at across all years it has participated."
+    },
+    {
+      "name": "get_team_event_status",
+      "description": "Retrieve a team's competitive status and standings at a specific event."
+    },
+    {
+      "name": "get_districts",
+      "description": "List every active FRC district for a given season year (FIRST in Michigan 'fim', New England 'ne', Chesapeake 'chs', Pacific Northwest 'pnw', FIRST In Texas 'fit', Indiana 'in', Ontario 'ont', Israel 'isr', etc.)."
+    },
+    {
+      "name": "get_district_rankings",
+      "description": "Retrieve season-end district rankings for all teams in an FRC district."
+    },
+    {
+      "name": "get_teams_simple",
+      "description": "Paginated listing of every registered FRC team with reduced fields (key, team_number, nickname, name, city, state_prov, country)."
+    },
+    {
+      "name": "get_teams_keys",
+      "description": "Paginated listing of every registered FRC team key only (strings like 'frc86')."
+    },
+    {
+      "name": "get_teams_by_year",
+      "description": "List every FRC team that competed in a given season year, paginated in groups of 500."
+    },
+    {
+      "name": "get_teams_by_year_simple",
+      "description": "Paginated list of FRC teams that competed in a given year with reduced team fields (key, team_number, nickname, name, location)."
+    },
+    {
+      "name": "get_teams_by_year_keys",
+      "description": "Paginated list of team keys that competed in a given FRC season year."
+    },
+    {
+      "name": "get_team_simple",
+      "description": "Retrieve a reduced FRC team profile (key, team_number, nickname, name, city, state_prov, country)."
+    },
+    {
+      "name": "get_event_simple",
+      "description": "Retrieve a reduced FRC event profile (key, name, event_code, type, location, dates, year)."
+    },
+    {
+      "name": "get_events_simple",
+      "description": "List every FRC event for a season year with reduced event fields."
+    },
+    {
+      "name": "get_events_keys",
+      "description": "List every FRC event key for a season year (strings like '2024casj', '2024nyro', '2024micmp4')."
+    },
+    {
+      "name": "get_match_simple",
+      "description": "Retrieve a single match with reduced fields (alliances, scores, winning alliance, timing)."
+    },
+    {
+      "name": "get_team_events_simple",
+      "description": "List a team's FRC events in a season year with reduced event fields."
+    },
+    {
+      "name": "get_team_events_keys",
+      "description": "List the event keys a team registered for in a given FRC season year."
+    },
+    {
+      "name": "get_team_event_awards",
+      "description": "Retrieve every award won by a specific team at a specific event."
+    },
+    {
+      "name": "get_team_matches_simple",
+      "description": "List every match a team played in a season year with reduced match fields (no game-specific score breakdown or videos)."
+    },
+    {
+      "name": "get_team_matches_keys",
+      "description": "List every match key a team played in a given FRC season year."
+    },
+    {
+      "name": "get_team_social_media",
+      "description": "Retrieve a team's official social media handles registered with The Blue Alliance (Twitter/X, Instagram, Facebook, YouTube channel, GitHub, team website link, etc.)."
+    },
+    {
+      "name": "get_team_media_by_tag",
+      "description": "Retrieve a team's media filtered by a specific TBA tag (e.g., 'chairmans_video', 'chairmans_essay', 'chairmans_presentation', 'imagery') across all years."
+    },
+    {
+      "name": "get_team_media_by_tag_year",
+      "description": "Retrieve a team's media filtered by both tag and season year."
+    },
+    {
+      "name": "get_event_teams_simple",
+      "description": "List teams competing at an event with reduced team fields (key, team_number, nickname, name, location)."
+    },
+    {
+      "name": "get_event_teams_keys",
+      "description": "List team keys competing at an event (strings like 'frc86')."
+    },
+    {
+      "name": "get_event_matches_simple",
+      "description": "List matches at an event with reduced match fields (no game-specific score breakdown or videos)."
+    },
+    {
+      "name": "get_event_matches_keys",
+      "description": "List match keys at an event (strings like '2023casj_qm1', '2023casj_sf1m1')."
+    },
+    {
+      "name": "get_event_predictions",
+      "description": "Retrieve TBA-generated match score predictions and end-of-event ranking predictions for an event when computed."
+    },
+    {
+      "name": "get_match_zebra",
+      "description": "Retrieve Zebra MotionWorks robot-tracking telemetry for a match: per-timestep XY field positions for every robot on red and blue alliances, plus the timestamp series."
+    },
+    {
+      "name": "get_team_history",
+      "description": "Retrieve a team's full FRC competition history aggregated into a single response: every event, every match, every award, and every robot."
+    },
+    {
+      "name": "get_team_event_statuses",
+      "description": "Retrieve a team's per-event status for every event the team attended in a given year, returned as an object keyed by event_key."
+    },
+    {
+      "name": "get_team_event_matches_simple",
+      "description": "Lighter variant of get_team_event_matches: every match a team played at a single event with reduced match fields (no game-specific score breakdown or videos)."
+    },
+    {
+      "name": "get_team_event_matches_keys",
+      "description": "Lightest variant returning only match keys for a team at a specific event."
+    },
+    {
+      "name": "get_district_events",
+      "description": "List every FRC event in a district (e.g., all 2024 FIRST in Michigan district qualifying events plus the district championship)."
+    },
+    {
+      "name": "get_district_events_simple",
+      "description": "List events in an FRC district with reduced event fields."
+    },
+    {
+      "name": "get_district_events_keys",
+      "description": "List event keys in an FRC district."
+    },
+    {
+      "name": "get_district_teams",
+      "description": "List every team affiliated with an FRC district in a given year."
+    },
+    {
+      "name": "get_district_teams_simple",
+      "description": "List teams in an FRC district with reduced team fields."
+    },
+    {
+      "name": "get_district_teams_keys",
+      "description": "List team keys in an FRC district."
+    },
+    {
+      "name": "get_district_history",
+      "description": "List every season of an FRC district by abbreviation, following renames (e.g., 'mar' to 'fma')."
+    },
+    {
+      "name": "get_district_dcmp_history",
+      "description": "List every district championship event a district has held, across all seasons, each paired with the awards given there."
+    },
+    {
+      "name": "get_district_insights",
+      "description": "Retrieve all-time statistics for a district by abbreviation."
+    },
+    {
+      "name": "get_district_advancement",
+      "description": "Retrieve which teams in a district season advanced to the district championship and to the FIRST Championship."
+    },
+    {
+      "name": "get_district_awards",
+      "description": "List every award given at every event in a district season, including the district championship."
+    },
+    {
+      "name": "get_event_advancement_points",
+      "description": "Retrieve the advancement points each team earned at an event, using whichever system the event belongs to: district points for district events, or FIRST Championship regional pool points for 2025+ regionals."
+    },
+    {
+      "name": "get_event_coprs",
+      "description": "Retrieve component OPRs (COPRs) for every team at an event: per-team estimates of how much a team adds to each individual scoring component, not just total score."
+    },
+    {
+      "name": "get_event_practice_matches",
+      "description": "Fetch the practice matches played at an FRC event, which get_event_matches does not include."
+    },
+    {
+      "name": "get_event_practice_matches_simple",
+      "description": "List practice matches at an event with reduced match fields (no game-specific score breakdown or videos)."
+    },
+    {
+      "name": "get_event_practice_matches_keys",
+      "description": "List practice match keys at an event (strings like '2025casj_pm1')."
+    },
+    {
+      "name": "get_event_media",
+      "description": "Retrieve media attached to the event itself rather than to its teams, such as event YouTube videos and photo galleries."
+    },
+    {
+      "name": "get_event_nexus_info",
+      "description": "Retrieve live match-queuing info and the pit map for an event from Nexus (frc.nexus), as cached by TBA."
+    },
+    {
+      "name": "get_event_playoff_advancement",
+      "description": "Retrieve how alliances advanced through each playoff level at an event."
+    },
+    {
+      "name": "get_event_regional_champs_pool_points",
+      "description": "Retrieve FIRST Championship regional pool points earned at a 2025+ regional event."
+    },
+    {
+      "name": "get_event_team_media",
+      "description": "Retrieve that season's media for every team at an event in one call: robot photos (imgur), reveal videos (YouTube), CAD (Onshape, GrabCAD), Chief Delphi threads, and avatars."
+    },
+    {
+      "name": "get_event_teams_statuses",
+      "description": "Retrieve every team's status at an event in one call, returned as an object keyed by team key."
+    },
+    {
+      "name": "get_insights_leaderboards",
+      "description": "Retrieve TBA leaderboard insights for a season, or all-time with year 0."
+    },
+    {
+      "name": "get_insights_notables",
+      "description": "Retrieve TBA notables insights for a season, or all-time with year 0: lists of teams with notable achievements such as Hall of Fame membership, Championship wins, division wins, and Impact Award finals."
+    },
+    {
+      "name": "get_insights",
+      "description": "Retrieve every global (non-district) TBA insight for a season, or all-time with year 0, across all categories: leaderboard, streak, timeseries, game_stats, and clubs."
+    },
+    {
+      "name": "get_insights_by_category",
+      "description": "Retrieve global TBA insights for a season (or all-time with year 0) in one category."
+    },
+    {
+      "name": "get_insights_for_district",
+      "description": "Retrieve TBA insights scoped to one district for a season, or all-time with year 0, across all categories (leaderboard, streak, timeseries, game_stats, clubs)."
+    },
+    {
+      "name": "get_insights_for_district_by_category",
+      "description": "Retrieve TBA insights scoped to one district for a season (or all-time with year 0) in a single category: leaderboard, streak, timeseries, game_stats, or clubs."
+    },
+    {
+      "name": "get_regional_advancement",
+      "description": "Retrieve FIRST Championship advancement for regional (non-district) teams in a season, keyed by team key."
+    },
+    {
+      "name": "get_regional_rankings",
+      "description": "Retrieve the season-long FIRST Championship regional pool rankings (2025 and later)."
+    },
+    {
+      "name": "get_search_index",
+      "description": "Find FRC teams and events by name when you do not know their keys (e.g., 'Cheesy Poofs' for frc254, 'Silicon Valley' for 2025casj)."
+    },
+    {
+      "name": "get_sponsors",
+      "description": "Retrieve The Blue Alliance's current platinum sponsors in display order (0 to 3 entries), with name, link URL, logo style, and light and dark logo URLs."
+    },
+    {
+      "name": "get_team_events_all_simple",
+      "description": "List every FRC event a team has competed at across all years with reduced event fields (key, name, event code, type, location, dates, year)."
+    },
+    {
+      "name": "get_team_events_all_keys",
+      "description": "List the key of every FRC event a team has competed at across all years."
+    }
+  ],
+  "skills": [
+    {
+      "name": "check-scouting-data",
+      "description": "Compares your own scouting data with TBA schedules and score breakdowns and lists suspect matches to re-watch."
+    },
+    {
+      "name": "match-preview",
+      "description": "A one-screen brief on the six teams in an upcoming qualification or playoff match."
+    },
+    {
+      "name": "pick-list",
+      "description": "Tiered first-pick and second-pick lists for alliance selection, from TBA rankings, OPRs and your scouting data."
+    },
+    {
+      "name": "pre-scout-event",
+      "description": "A roster of every attending team's season so far, plus a short list of match videos to watch."
     }
   ],
   "author": {
@@ -291,7 +433,7 @@
     "email": "matt@withinfocus.com"
   },
   "requirements": {
-    "node": "~24",
-    "npm": "~11"
+    "node": "~26",
+    "pnpm": "~12"
   }
 }
