@@ -12,9 +12,6 @@
   "license": "MIT",
   "icon": "./.claude-plugin/icon.png",
   "keywords": ["frc", "first-robotics", "scouting", "the-blue-alliance"],
-  "network": {
-    "hosts": ["www.thebluealliance.com", "registry.npmjs.org"]
-  },
   "userConfig": {
     "tba_api_key": {
       "type": "string",
