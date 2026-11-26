@@ -58,6 +58,7 @@ pnpm run test:integration:ui      # Run with Playwright UI
 pnpm run test:integration:debug   # Debug mode
 pnpm run test:all                 # Run all tests (unit + integration)
 pnpm run inspect                  # Launch MCP inspector for debugging
+pnpm run skills:sync              # Copy shared skill references into every skill
 ```
 
 ## Testing
@@ -111,11 +112,13 @@ Always run both test suites when making changes.
 
 - `src/index.ts` - Main server entry point
   - Validates `TBA_API_KEY` at startup
-  - Serves the MCP server over stdio with `serveStdio(() => createServer(version))`
+  - Loads the scouting skills catalog once at startup (`loadScoutingSkills`)
+  - Serves the MCP server over stdio with `serveStdio(() => createServer(version, { skills }))`
   - Handles error logging and process lifecycle
 
 - `src/server.ts` - Server factory
-  - Exports `createServer(version)`, which builds an `McpServer` (from `@modelcontextprotocol/server`) and calls `registerTool()` once per entry in the `tools` table
+  - Exports `createServer(version, { skills })`, which builds an `McpServer` (from `@modelcontextprotocol/server`), calls `registerTool()` once per entry in the `tools` table, and attaches the skills catalog when one is given
+  - Exports `SERVER_INSTRUCTIONS`, the short scouting guidance sent to every client
   - Returns the server unconnected, so extensions can be attached before `serveStdio` connects it
 
 - `src/tools.ts` - Tool table
@@ -135,6 +138,10 @@ Always run both test suites when making changes.
   - API response schemas: TeamSchema, EventSchema, MatchSchema, etc.
   - All schemas use Zod for runtime type validation
 
+- `src/skills.ts` - Scouting skills loader
+  - Exports `skillsRootFor(moduleUrl)`, which resolves the package's `skills/` folder from a module URL (`dist/index.js` at runtime)
+  - Exports `loadScoutingSkills(root, { strict })`, which loads `skills/` into a `SkillCatalog` with `loadSkills` from `@modelcontextprotocol/server/ext/skills/node`. Failures are logged and return `undefined`, so the server starts without skills instead of crashing
+
 - `src/utils.ts` - Utility functions
   - `log()` - Writes server logs to stderr (stdout carries the stdio JSON-RPC stream)
   - `getApiKey()` - Retrieves and validates TBA_API_KEY environment variable
@@ -147,8 +154,15 @@ Always run both test suites when making changes.
 - `tests/server.spec.ts` - Unit tests for `createServer`
 - `tests/schemas.spec.ts` - Unit tests for all Zod schemas
 - `tests/utils.spec.ts` - Unit tests for utility functions
+- `tests/skills.spec.ts` - Unit tests for loading and serving skills (fixture in `tests/fixtures/skills/`)
+- `tests/skills-content.spec.ts` - Guard tests for skill content: shared references in sync, only real tool names, `SKILL.md` structure, strict catalog load, and npm packaging
 - `tests/in-memory-client.ts` - Test helper that connects an SDK `Client` to `createServer()` over `InMemoryTransport`
-- `tests/integration/*.spec.ts` - Playwright integration tests for MCP protocol compliance, using a raw JSON-RPC stdio client (`tests/integration/mcp-client.ts`)
+- `tests/integration/*.spec.ts` - Playwright integration tests for MCP protocol compliance, using a raw JSON-RPC stdio client (`tests/integration/mcp-client.ts`); `tests/integration/skills.spec.ts` uses the SDK `Client` and `SkillsClient` over stdio
+
+### Skills
+
+- `skills/<name>/` - Scouting skills served over MCP (`SKILL.md` plus `references/`), shipped in the npm package and Docker image
+- `skills-src/shared/` - Shared reference files, copied into each skill by `scripts/sync-skills.mjs` (`pnpm run skills:sync`)
 
 ### Configuration
 
@@ -323,6 +337,41 @@ pnpm run lint                 # Check code quality
 pnpm test                     # Run unit tests
 pnpm run test:integration     # Run integration tests
 ```
+
+## How to Add or Edit a Skill
+
+The server serves FRC scouting skills through the MCP Skills extension (`io.modelcontextprotocol/skills`). Skills are plain files; no TypeScript changes are needed to add one.
+
+### Layout
+
+```text
+skills-src/shared/                 # shared references, edited here only
+skills/<skill-name>/SKILL.md       # the skill itself
+skills/<skill-name>/references/    # shared copies plus skill-specific files
+```
+
+### Rules
+
+- The folder name and the frontmatter `name` must match. `SKILL.md` starts with YAML frontmatter containing `name` and `description`. The description says when to use the skill, in the words a scouting student would use.
+- Keep `SKILL.md` under 200 lines. Put detail in `references/` and point to it from the skill.
+- Every skill has a `## Coach mode` and an `## Analyst mode` section.
+- Name only real tools (`get_...` names from `src/tools.ts`).
+- Don't let a skill invent data TBA doesn't have (per-robot game-piece counts, defense, driver skill), and keep the OPR caveats.
+- Season-specific `score_breakdown` field names go in `skills-src/shared/score-breakdown.md` only after they're checked against live API data.
+
+### Shared references
+
+Skills can only read files in their own folder, so shared references are copied into each skill. Edit them only in `skills-src/shared/`, then run:
+
+```bash
+pnpm run skills:sync
+```
+
+This copies every shared file into each skill's `references/` folder. Commit the copies.
+
+### Guard tests
+
+`tests/skills-content.spec.ts` fails if a shared copy differs from its source, if a skill names a tool that doesn't exist, if a `SKILL.md` breaks the rules above, if the catalog doesn't load under `strict: true`, or if the npm package would leave out `skills/`. `tests/skills.spec.ts` checks that each skill is served. Add a skill's name to the expected list there when you add a skill. `tests/integration/skills.spec.ts` lists and reads the skills over stdio.
 
 ## Best Practices
 

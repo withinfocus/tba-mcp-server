@@ -241,6 +241,10 @@ runs it.
 
 See the "Adding a New Tool" section of [CONTRIBUTING.md](../CONTRIBUTING.md) for a worked example.
 
+### Adding or Editing a Skill
+
+Scouting skills live in `skills/<name>/SKILL.md`, with shared reference files kept once in `skills-src/shared/`. After editing a shared reference, run `pnpm run skills:sync` to copy it into every skill, and commit the copies. Guard tests in `tests/skills-content.spec.ts` fail if a copy drifts, if a skill names a tool that doesn't exist, or if a `SKILL.md` is missing its frontmatter or mode sections. See "How to Add or Edit a Skill" in [CONTRIBUTING.md](../CONTRIBUTING.md) for the full rules.
+
 ## Related Links
 
 - [The Blue Alliance](https://www.thebluealliance.com/) - Official FRC data source

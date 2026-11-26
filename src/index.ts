@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { getApiKey, log } from './utils.js';
 import { createServer, SERVER_NAME } from './server.js';
+import { loadScoutingSkills, skillsRootFor } from './skills.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../package.json') as { version: string };
@@ -22,13 +23,17 @@ async function runServer(): Promise<void> {
       throw new Error(errorMessage, { cause: error });
     }
 
+    // Loaded once and shared by every server the factory builds. A missing or
+    // broken skills folder is logged and the server starts without skills.
+    const skills = await loadScoutingSkills(skillsRootFor(import.meta.url));
+
     await log('info', 'Setting up transport connection ...');
     try {
       // serveStdio answers both the 2025-era `initialize` handshake and the
       // 2026-07-28 `server/discover` opening, calling the factory once the
       // first message picks the era. Anything that extends the server (such
       // as attaching an extension) belongs in the factory, before it returns.
-      serveStdio(() => createServer(version), {
+      serveStdio(() => createServer(version, skills ? { skills } : {}), {
         onerror: (error) => {
           void log('error', `Transport error: ${error.message}`);
         },
