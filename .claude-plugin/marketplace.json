@@ -1,6 +1,6 @@
 {
-  "name": "withinfocus",
-  "description": "Plugins from withinfocus, including The Blue Alliance plugin for FRC scouting",
+  "name": "tba",
+  "description": "The Blue Alliance plugin for FRC scouting",
   "owner": {
     "name": "Matt Bishop",
     "url": "https://github.com/withinfocus"

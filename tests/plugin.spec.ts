@@ -30,6 +30,7 @@ const mcpConfig = readJson<{
   >;
 }>(path.join(PLUGIN_ROOT, '.mcp.json'));
 const marketplace = readJson<{
+  name: string;
   plugins: { name: string; source: unknown }[];
 }>(path.resolve('.claude-plugin', 'marketplace.json'));
 
@@ -89,6 +90,12 @@ describe('Claude plugin', () => {
         ref: 'latest',
       },
     });
+  });
+
+  it('names the marketplace after this server', () => {
+    // Users can register only one marketplace per name, so each server repo
+    // (this one, statbotics-mcp-server, ...) needs its own.
+    expect(marketplace.name).toBe('tba');
   });
 
   it('has a listing icon', () => {
