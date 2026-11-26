@@ -44,7 +44,17 @@ Skills are served through the [MCP Skills extension](https://modelcontextprotoco
 
 ## Installation
 
-### npm (Recommended)
+### Claude plugin
+
+In Claude Code, install the plugin from this repository. It adds the server and the four skills, and asks for your API key:
+
+```text
+/plugin install tba --marketplace withinfocus/tba-mcp-server
+```
+
+The plugin runs the server on your computer, so it works in Claude Code and in Cowork sessions on your computer. It needs Node.js 26 or later. See [plugin/README.md](plugin/README.md).
+
+### npm
 
 ```bash
 npm install -g @withinfocus/tba-mcp-server
@@ -81,6 +91,8 @@ Or create a `.env` file:
 ```bash
 TBA_API_KEY=your_api_key_here
 ```
+
+3. Optional: set `TBA_MCP_SKILLS=off` to stop the server from serving its skills. The Claude plugin does this because it ships the skills itself.
 
 ## Usage
 

@@ -13,3 +13,5 @@ tests
 junit.xml
 *.md
 !skills/**
+plugin
+.claude-plugin

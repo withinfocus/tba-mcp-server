@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import { getApiKey, log } from './utils.js';
 import { createServer, SERVER_NAME } from './server.js';
-import { loadScoutingSkills, skillsRootFor } from './skills.js';
+import { loadScoutingSkills, skillsEnabled, skillsRootFor } from './skills.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../package.json') as { version: string };
@@ -25,7 +25,14 @@ async function runServer(): Promise<void> {
 
     // Loaded once and shared by every server the factory builds. A missing or
     // broken skills folder is logged and the server starts without skills.
-    const skills = await loadScoutingSkills(skillsRootFor(import.meta.url));
+    // TBA_MCP_SKILLS=off skips them (the Claude plugin ships its own copy).
+    const serveSkills = skillsEnabled();
+    if (!serveSkills) {
+      await log('info', 'Skills turned off by TBA_MCP_SKILLS');
+    }
+    const skills = serveSkills
+      ? await loadScoutingSkills(skillsRootFor(import.meta.url))
+      : undefined;
 
     await log('info', 'Setting up transport connection ...');
     try {

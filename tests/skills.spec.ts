@@ -2,7 +2,11 @@ import { describe, it, expect } from '@jest/globals';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SkillsClient } from '@modelcontextprotocol/client/ext/skills';
-import { loadScoutingSkills, skillsRootFor } from '../src/skills.js';
+import {
+  loadScoutingSkills,
+  skillsEnabled,
+  skillsRootFor,
+} from '../src/skills.js';
 import { tools } from '../src/tools.js';
 import { connectInMemoryClient } from './in-memory-client.js';
 
@@ -16,6 +20,26 @@ describe('skillsRootFor', () => {
 
     expect(skillsRootFor(moduleUrl)).toBe(path.resolve('/pkg/skills'));
   });
+});
+
+describe('skillsEnabled', () => {
+  it('serves skills when TBA_MCP_SKILLS is unset', () => {
+    expect(skillsEnabled({})).toBe(true);
+  });
+
+  it.each(['off', 'OFF', ' off ', 'false', '0'])(
+    'turns skills off for TBA_MCP_SKILLS=%j',
+    (value) => {
+      expect(skillsEnabled({ TBA_MCP_SKILLS: value })).toBe(false);
+    },
+  );
+
+  it.each(['on', 'true', '1', ''])(
+    'keeps skills on for TBA_MCP_SKILLS=%j',
+    (value) => {
+      expect(skillsEnabled({ TBA_MCP_SKILLS: value })).toBe(true);
+    },
+  );
 });
 
 describe('loadScoutingSkills', () => {

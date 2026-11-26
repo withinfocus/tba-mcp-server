@@ -14,6 +14,18 @@ export function skillsRootFor(moduleUrl: string): string {
 }
 
 /**
+ * Whether the server should serve its skills. `TBA_MCP_SKILLS=off` (or
+ * `false`, `0`) turns them off. The Claude plugin sets it because the plugin
+ * ships the same skills itself, and serving both would list each one twice.
+ */
+export function skillsEnabled(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  const value = env['TBA_MCP_SKILLS']?.trim().toLowerCase();
+  return !(value === 'off' || value === 'false' || value === '0');
+}
+
+/**
  * Loads the scouting skills under `root` into a catalog for the MCP Skills
  * extension. Skill problems are logged as warnings (or thrown under
  * `strict`). Any failure is logged and returns `undefined`, so the server
