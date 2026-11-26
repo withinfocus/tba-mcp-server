@@ -92,6 +92,12 @@ describe('Claude plugin', () => {
     });
   });
 
+  it('leaves out fields the directory refuses from unverified publishers', () => {
+    // The developer portal blocks `network` (and other fields outside its
+    // allowed list) unless the organization is Verified.
+    expect(Object.keys(manifest)).not.toContain('network');
+  });
+
   it('names the marketplace after this server', () => {
     // Users can register only one marketplace per name, so each server repo
     // (this one, statbotics-mcp-server, ...) needs its own.
