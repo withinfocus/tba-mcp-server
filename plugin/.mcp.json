@@ -2,7 +2,7 @@
   "mcpServers": {
     "tba": {
       "command": "npx",
-      "args": ["-y", "@withinfocus/tba-mcp-server@2.0.0"],
+      "args": ["-y", "@withinfocus/tba-mcp-server@2.1.0"],
       "env": {
         "TBA_API_KEY": "${user_config.tba_api_key}",
         "TBA_MCP_SKILLS": "off"

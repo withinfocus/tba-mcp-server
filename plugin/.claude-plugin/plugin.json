@@ -1,7 +1,7 @@
 {
   "name": "tba",
   "displayName": "The Blue Alliance",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "FIRST Robotics Competition data from The Blue Alliance, with scouting skills for pre-scouting an event, briefing a match, building a pick list, and checking your scouting data.",
   "author": {
     "name": "Matt Bishop",
